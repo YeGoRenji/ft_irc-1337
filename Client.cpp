@@ -24,3 +24,8 @@ int Client::getFd() {
 FD &Client::getFdObject() {
 	return fdObject;
 }
+
+void Client::disconnect() {
+	close(fdObject.getValue());
+	fdObject.setValue(-1);
+}

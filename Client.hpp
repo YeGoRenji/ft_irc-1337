@@ -10,6 +10,7 @@ public:
 	~Client();
 	int getFd();
 	FD &getFdObject();
+	void disconnect();
 	
 private:
 	Client();

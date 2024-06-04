@@ -1,6 +1,6 @@
 CXX = c++
 
-NAME = TypeIdentifier
+NAME = ircserv
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
@@ -8,7 +8,7 @@ SRCS = Client.cpp \
 	   FD.cpp \
        Server.cpp \
        Channel.cpp \
-       main.cpp \
+       main.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
@@ -25,4 +25,4 @@ fclean: clean
 
 re: clean all
 
-.PHONY: clean fclean re bonus all
+.PHONY: clean fclean re all

@@ -20,7 +20,7 @@ public:
 	
 private:
 	Server();
-	vector<Client*> clients;
+	vector<Client> clients;
 	map<string, Channel> channels;
 
 	FD serverSocket;

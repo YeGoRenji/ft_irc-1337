@@ -2,17 +2,17 @@
 
 FD::FD(): fd(-1)
 {
-	std::cout << "FdezNuts: Default constructor called" << std::endl;
+	std::cout << "FD: Default constructor called" << std::endl;
 }
 
 FD::FD(int _fd): fd(_fd)
 {
-	std::cout << "FdezNuts: Parameter constructor called" << std::endl;
+	std::cout << "FD: Parameter constructor called" << std::endl;
 }
 
 FD &FD::operator=(const FD &obj)
 {
-	std::cout << "FdezNuts: Copy assignment operator called" << std::endl;
+	std::cout << "FD: Copy assignment operator called" << std::endl;
 	if (this != &obj)
 	{
 		this->fd = obj.fd;
@@ -22,15 +22,14 @@ FD &FD::operator=(const FD &obj)
 
 FD::FD(FD const &obj)
 {
-	std::cout << "FdezNuts: Copy constructor called" << std::endl;
+	std::cout << "FD: Copy constructor called" << std::endl;
 	if (this != &obj)
 		*this = obj;
 }
 
 FD::~FD()
 {
-	close(fd);
-	std::cout << "FdezNuts: Destructor called" << std::endl;
+	std::cout << "FD: Destructor called" << std::endl;
 }
 
 void FD::operator<<(std::string str) {
@@ -46,10 +45,10 @@ void FD::operator>>(std::string& str) {
 		str += buffer;
 	}
 	cout << "Got result: " << result << endl;
-	if (result == EOF) {
-		cout << "Disconnected lol" << endl;
-		close(fd);
-	}
+	// if (result == EOF) {
+	// 	cout << "Disconnected lol" << endl;
+	// 	close(fd);
+	// }
 }
 
 int FD::getValue() {

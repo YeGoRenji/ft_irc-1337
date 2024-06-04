@@ -49,43 +49,33 @@ void Server::start() {
 
 		fds[0] = (pollfd){ serverSocket.getValue(), POLLIN, 0 };
 		for (size_t i = 0; i < clients.size(); ++i) {
-			fds[i + 1] = (pollfd){ clients[i]->getFd(), POLLIN, 0 };
+			fds[i + 1] = (pollfd){ clients[i].getFd(), POLLIN, 0 };
 		}
 
-
-		// char buffer[256] = { 0 };
-
-		poll(fds, 1 + clients.size(), -1);
+		chk(poll(fds, 1 + clients.size(), WAIT_ANY), "poll failed");
 
 		if (fds[0].revents & POLLIN) {
 			int newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
 
-			clients.push_back(new Client(newClient));
-
-			cout << "New client connected " << newClient << ", Size = " << 1 + clients.size() << endl;
+			clients.push_back(newClient);
+			cout << "New client connected " << newClient << ", size = " << clients.size() << endl;
 			fds[0].revents = 0;
 		}
 
 		for (size_t i = 1; i < 1 + clients.size(); ++i) {
+			if (fds[i].revents & POLLHUP) {
+				cout << "Client " << fds[i].fd << " disconnected" << endl;
+				clients[i - 1].disconnect();
+				clients.erase(clients.begin() + i - 1);
+				fds[i].revents = 0;
+			}
 			if (fds[i].revents & POLLIN) {
 				string data;
-				clients[i - 1]->getFdObject() >> data;
+				clients[i - 1].getFdObject() >> data;
 				cout << "Got <" << data << ">" << endl;
 				fds[i].revents = 0;
 			}
 		}
-
-		// if (fds[1].revents & POLLIN) {
-		// 	recv(clientFd, buffer, 255, 0);
-		// 	std::cout << "Client1 : " << buffer;
-		// }
-		// if (fds[2].revents & POLLIN) {
-		// 	recv(client2Fd, buffer, 255, 0);
-		// 	std::cout << "Client2 : " << buffer;
-		// }
-		// if (fds[3].revents & POLLIN) {
-		// 	puts("Noice !");
-		// }
 	}
 
 
