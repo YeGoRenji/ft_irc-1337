@@ -13,6 +13,7 @@ public:
 	Client(int fd);
 	~Client();
 	int getFd();
+	string getNick();
 	FD &getFdObject();
 	void disconnect();
 	bool login(Server &server);
@@ -25,11 +26,11 @@ private:
 	string realname;
 	string username;
 
-	void setNick();
+	void setNick(Server &server);
 	void authenticate(Server &server);
 	void setUsernameAndRealName();
 	void getLineStream(stringstream &ss);
-
+	bool nickNameAlreadyExists(Server &server, string nickname);
 };
 
 #endif

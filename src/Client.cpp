@@ -29,6 +29,8 @@ void Client::getLineStream(stringstream &ss) {
 	string passLine;
 	fdObject >> passLine;
 
+	cout << "Got : " << passLine << endl;
+
 	ss.str(passLine);
 }
 
@@ -52,7 +54,7 @@ void Client::authenticate(Server &server) {
 bool Client::login(Server &server) {
 	try {
 		this->authenticate(server);
-		this->setNick();
+		this->setNick(server);
 		this->setUsernameAndRealName();
 		cout << "nickname: " << this->nickname << endl;
 		cout << "username: " << this->username << endl;
@@ -66,7 +68,17 @@ bool Client::login(Server &server) {
 	return true;
 }
 
-void Client::setNick() {
+string Client::getNick()
+{
+	return (this -> nickname);
+}
+
+bool Client::nickNameAlreadyExists(Server &server, string nickname)
+{
+	return server.checkUserExistence(nickname);
+}
+
+void Client::setNick(Server &server) {
 	stringstream ss;
 	getLineStream(ss);
 	string token;
@@ -91,6 +103,12 @@ void Client::setNick() {
 	{
 		throw runtime_error("nickname starts with nigger listed characters");
 		// TODO : send an error // dissalowed characters
+	}
+
+	if (nickNameAlreadyExists(server, token))
+	{
+		throw runtime_error("nickname already exists!");
+		// TODO : send an error // nickname already exists
 	}
 
 	this->nickname = token;

@@ -21,6 +21,7 @@ public:
 	~Server();
 	void start();
 	bool checkPassword(string passLine);
+	bool checkUserExistence(string NickName);
 	
 private:
 	Server();

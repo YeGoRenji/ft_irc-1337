@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
+/*   Updated: 2024/06/05 21:39:30 by afatimi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
 #include "Client.hpp"
 #include <cstdio>
@@ -84,4 +96,21 @@ void Server::start() {
 bool Server::checkPassword(string passLine) {
 	string serverPassLine = "PASS " + this -> password;
 	return serverPassLine == passLine;
+}
+
+bool Server::checkUserExistence(string NickName)
+{
+	vector<Client>::iterator it;
+	cout << "Nicknames list : " << endl;
+	for(it = clients.begin(); it != clients.end(); it++)
+	{
+		cout << it -> getNick() << endl;
+		if (it -> getNick() == NickName)
+		{
+			cout << "NickName found!!" << endl;
+			return true;
+		}
+	}
+	cout << "NickName wasn't found --" << endl;
+	return (false);
 }
