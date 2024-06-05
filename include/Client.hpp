@@ -15,7 +15,7 @@ public:
 	int getFd();
 	FD &getFdObject();
 	void disconnect();
-	void login(Server &server);
+	bool login(Server &server);
 	
 private:
 	Client();

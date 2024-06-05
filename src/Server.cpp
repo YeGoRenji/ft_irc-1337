@@ -56,10 +56,12 @@ void Server::start() {
 
 		if (fds[0].revents & POLLIN) {
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
-			newClient.login(*this);
-			clients.push_back(newClient);
-			cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
-			fds[0].revents = 0;
+			if (newClient.login(*this))
+			{
+				clients.push_back(newClient);
+				cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
+				fds[0].revents = 0;
+			}
 		}
 
 		for (size_t i = 1; i < 1 + clients.size(); ++i) {
