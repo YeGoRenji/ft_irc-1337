@@ -42,6 +42,7 @@ clean:
 
 fclean: clean
 	rm -rf $(NAME)
+	find . -name "*~" -delete
 
 re: clean all
 

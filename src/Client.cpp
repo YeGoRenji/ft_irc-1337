@@ -28,6 +28,7 @@ FD &Client::getFdObject() {
 void Client::getLineStream(stringstream &ss) {
 	string passLine;
 	fdObject >> passLine;
+	cout << "Got " << passLine;
 
 	ss.str(passLine);
 }
@@ -67,6 +68,7 @@ void Client::setNick() {
 	// Skip NICK keyword
 	ss >> token;
 	if (token != "NICK") {
+		// TODO : send back an error response
 		cerr << "UNEXPECTED LINE !" << endl;
 	}
 
@@ -101,13 +103,11 @@ void Client::setUsernameAndRealName() {
 	}
 
 	getline(ss, realNameToken);
-	if (realNameToken[0] != ':')
-	{
-		// TODO : send an error
-		;
-	}
+	cout << "realNameToken <" << realNameToken << ">" << endl;
+	realNameToken.erase(0, 1);
+	if (realNameToken[0] == ':')
+		realNameToken.erase(0, 1);
 
-	realNameToken.erase(1, 1);
 
 	// TODO : realname minlen must be 1
 	if (realNameToken.empty()) {
