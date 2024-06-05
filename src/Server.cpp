@@ -1,19 +1,19 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include <cstdio>
+#include <cstring>
 #include <sys/socket.h>
 
 int chk(int status, const std::string msg) {
 	// TODO: use throw ?
 	if (status < 0) {
-		std::cerr << "Error[" << status << "]\t" << msg << std::endl;
-		perror("Hh: ");
+		std::cerr << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno) << std::endl; 
 		exit(status);
 	}
 	return status;
 }
 
-Server::Server(int port)
+Server::Server(int port, string pass): password(pass)
 {
 	std::cout << "Server: Parameter constructor called" << std::endl;
 
@@ -55,10 +55,10 @@ void Server::start() {
 		chk(poll(fds, 1 + clients.size(), WAIT_ANY), "poll failed");
 
 		if (fds[0].revents & POLLIN) {
-			int newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
-
+			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
+			newClient.login(*this);
 			clients.push_back(newClient);
-			cout << "New client connected " << newClient << ", size = " << clients.size() << endl;
+			cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
 			fds[0].revents = 0;
 		}
 
@@ -77,7 +77,9 @@ void Server::start() {
 			}
 		}
 	}
-
-
 }
 
+bool Server::checkPassword(string passLine) {
+	string serverPassLine = "PASS " + this -> password;
+	return serverPassLine == passLine;
+}

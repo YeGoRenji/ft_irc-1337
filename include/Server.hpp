@@ -12,19 +12,22 @@
 # include <sys/poll.h>
 # include <netinet/in.h>
 
+class Client;
+class Channel;
+
 class Server {
 public:
-	Server(int port);
+	Server(int port, string pass);
 	~Server();
 	void start();
+	bool checkPassword(string passLine);
 	
 private:
 	Server();
 	vector<Client> clients;
 	map<string, Channel> channels;
-
 	FD serverSocket;
-
+	string password;
 
 };
 

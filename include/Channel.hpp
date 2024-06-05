@@ -1,8 +1,10 @@
 #ifndef Channel_HPP
 # define Channel_HPP
 
-#include "Client.hpp"
+# include "Client.hpp"
 # include "Hacks.hpp"
+
+class Client;
 
 struct Message {
 	Client *sender;

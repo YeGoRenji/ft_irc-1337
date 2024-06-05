@@ -1,0 +1,8 @@
+------
+the case when client sends 
+PASS pass
+PASS anotherpass
+
+pass is correct
+and anotherpass is anything
+------

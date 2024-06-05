@@ -20,6 +20,7 @@ public:
 	
 private:
 	int fd;
+	string remainder;
 	
 };
 

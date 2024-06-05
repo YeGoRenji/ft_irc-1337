@@ -1,8 +1,14 @@
 #include "Server.hpp"
 
-int main (void) {
+int main (int argc, char **argv) {
 
-	Server srv(6969);
+	if (argc != 3) {
+		cerr << "Usage: ./ircserv <port> <password>" << endl;
+	}
+
+	// TODO check for argv validation
+
+	Server srv(6969, argv[2]);
 
 	srv.start();
 	
