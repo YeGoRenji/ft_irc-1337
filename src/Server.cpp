@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/05 21:39:30 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/06 11:51:55 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 int chk(int status, const std::string msg) {
 	// TODO: use throw ?
 	if (status < 0) {
-		std::cerr << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno) << std::endl; 
+		std::cerr << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno) << endl;
 		exit(status);
 	}
 	return status;
@@ -27,7 +27,7 @@ int chk(int status, const std::string msg) {
 
 Server::Server(int port, string pass): password(pass)
 {
-	std::cout << "Server: Parameter constructor called" << std::endl;
+	std::cout << "Server: Parameter constructor called" << endl;
 
 	serverSocket.setValue(chk(socket(AF_INET, SOCK_STREAM, 0), "Couldn't open socket"));
 
@@ -51,7 +51,7 @@ Server::Server(int port, string pass): password(pass)
 
 Server::~Server()
 {
-	std::cout << "Server: Destructor called" << std::endl;
+	std::cout << "Server: Destructor called" << endl;
 }
 
 void Server::start() {
@@ -93,24 +93,23 @@ void Server::start() {
 	}
 }
 
-bool Server::checkPassword(string passLine) {
-	string serverPassLine = "PASS " + this -> password;
-	return serverPassLine == passLine;
+bool Server::checkPassword(string input) {
+	return this -> password == input;
 }
 
 bool Server::checkUserExistence(string NickName)
 {
 	vector<Client>::iterator it;
-	cout << "Nicknames list : " << endl;
+	cout << "conncted Nicknames list : " << endl;
 	for(it = clients.begin(); it != clients.end(); it++)
 	{
-		cout << it -> getNick() << endl;
+		cout << "<" << it -> getNick() << ">" << endl;
 		if (it -> getNick() == NickName)
 		{
 			cout << "NickName found!!" << endl;
 			return true;
 		}
 	}
-	cout << "NickName wasn't found --" << endl;
+	cout << "NickName wasn't found --, carry on connecting mate" << endl;
 	return (false);
 }

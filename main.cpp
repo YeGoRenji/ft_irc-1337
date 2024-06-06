@@ -11,6 +11,6 @@ int main (int argc, char **argv) {
 	Server srv(6969, argv[2]);
 
 	srv.start();
-	
+
 	return 0;
 }

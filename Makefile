@@ -43,6 +43,7 @@ clean:
 fclean: clean
 	rm -rf $(NAME)
 	find . -name "*~" -delete
+	find . -name "*.swp" -delete
 
 re: clean all
 

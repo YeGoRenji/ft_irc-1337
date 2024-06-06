@@ -34,15 +34,24 @@ void Client::getLineStream(stringstream &ss) {
 	ss.str(passLine);
 }
 
+// format : PASS pass
 void Client::authenticate(Server &server) {
-	string passLine;
-	fdObject >> passLine;
+	string input;
 
-	// TODO : send errors in case the pass is wrong
+	stringstream ss;
+	getLineStream(ss);
 
-	cout << "passLine <" << passLine << ">" << endl;
+	if (!Utility::match(ss, "PASS"))
+	{
+		// TODO : return some message to the client idk
+		throw runtime_error("PASS command wasn't found!");
+		return;
+	}
 
-	if (server.checkPassword(passLine)) {
+	ss >> input;
+	cout << "password given <" << input << ">" << endl;
+
+	if (server.checkPassword(input)) {
 		cout << "Connected" << endl;
 		this->isAuthed = true;
 	} else {
@@ -78,14 +87,14 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 	return server.checkUserExistence(nickname);
 }
 
+// format : NICKNAME nick
 void Client::setNick(Server &server) {
 	stringstream ss;
 	getLineStream(ss);
 	string token;
 
 	// Skip NICK keyword
-	ss >> token;
-	if (token != "NICK") {
+	if (!Utility::match(ss, "NICK")){
 		// TODO : send back an error response
 		throw runtime_error("no NICK command");
 	}
@@ -112,9 +121,9 @@ void Client::setNick(Server &server) {
 	}
 
 	this->nickname = token;
-	cout << "nickname : " << token << endl;
 }
 
+// format : <username> 0 * [:]<realname>
 void Client::setUsernameAndRealName() {
 	stringstream ss;
 	getLineStream(ss);
@@ -126,12 +135,14 @@ void Client::setUsernameAndRealName() {
 		// TODO : send an error
 		throw runtime_error("USER command not found");
 	}
+
 	ss >> usernameToken;
 	if (usernameToken.empty())
 	{
 		throw runtime_error("empty username given");
 		// TODO : send an error
 	}
+
 	if (!Utility::match(ss, "0") || !Utility::match(ss, "*"))
 	{
 		// TODO : send an error
@@ -139,11 +150,9 @@ void Client::setUsernameAndRealName() {
 	}
 
 	getline(ss, realNameToken);
-	cout << "realNameToken <" << realNameToken << ">" << endl;
 	realNameToken.erase(0, 1);
 	if (realNameToken[0] == ':')
 		realNameToken.erase(0, 1);
-
 
 	// TODO : realname minlen must be 1
 	if (realNameToken.empty()) {
@@ -153,8 +162,6 @@ void Client::setUsernameAndRealName() {
 
 	this->realname = realNameToken;
 	this->username = usernameToken;
-	cout << "realname : " << realname << endl;
-	cout << "username : " << username << endl;
 }
 
 void Client::disconnect() {
