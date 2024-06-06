@@ -13,7 +13,7 @@ public:
 	FD(const FD &);
 	FD &operator=(const FD &);
 	~FD();
-	void operator<<(std::string);
+	FD &operator<<(std::string);
 	void operator>>(std::string&);
 	int getValue();
 	void setValue(int fd);

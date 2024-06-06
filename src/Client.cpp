@@ -13,7 +13,6 @@ Client::Client(int _fd): fdObject(_fd), isAuthed(false)
 Client::~Client()
 {
 	// TODO: Remove this line it was added to fix Wextra
-	cout << isAuthed << endl;
 	// cout << "Client: Destructor called" << endl;
 }
 
@@ -68,6 +67,13 @@ bool Client::login(Server &server) {
 		cout << "nickname: " << this->nickname << endl;
 		cout << "username: " << this->username << endl;
 		cout << "realname: " << this->realname << endl;
+
+		string reply = "001 welcome";
+		reply += server.getServerName();
+		reply += " Welcome to the jeffy Network, ";
+		reply += this -> nickname;
+		reply += "\n";
+		this -> fdObject << reply;
 	}
 	catch (std::exception &e)
 	{
@@ -168,4 +174,3 @@ void Client::disconnect() {
 	close(fdObject.getValue());
 	fdObject.setValue(-1);
 }
-

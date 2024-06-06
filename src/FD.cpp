@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:54:34 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/06 11:55:46 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/06 14:07:41 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,9 @@ FD::~FD()
 	// std::cout << "FD: Destructor called" << endl;
 }
 
-void FD::operator<<(std::string str) {
+FD &FD::operator<<(std::string str) {
 	write(fd, str.c_str(), str.size());
+	return *this;
 }
 
 void FD::operator>>(std::string& str) {

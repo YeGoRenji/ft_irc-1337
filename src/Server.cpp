@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/06 11:51:55 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/06 14:17:31 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <cstdio>
 #include <cstring>
 #include <sys/socket.h>
+
+string Server::serverName = "IRatherComeServer.mybasement";
 
 int chk(int status, const std::string msg) {
 	// TODO: use throw ?
@@ -52,6 +54,11 @@ Server::Server(int port, string pass): password(pass)
 Server::~Server()
 {
 	std::cout << "Server: Destructor called" << endl;
+}
+
+string &Server::getServerName()
+{
+	return this -> serverName;
 }
 
 void Server::start() {

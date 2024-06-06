@@ -22,8 +22,10 @@ public:
 	void start();
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string NickName);
+	string& getServerName();
 	
 private:
+	static string serverName;
 	Server();
 	vector<Client> clients;
 	map<string, Channel> channels;
