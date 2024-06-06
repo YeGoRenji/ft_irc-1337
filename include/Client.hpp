@@ -5,6 +5,7 @@
 # include <unistd.h>
 # include "Server.hpp"
 # include "Utility.hpp"
+# include <Replies.hpp>
 
 class Server;
 

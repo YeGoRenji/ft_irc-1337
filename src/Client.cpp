@@ -1,4 +1,4 @@
-#include "Client.hpp"
+#include <Client.hpp>
 
 Client::Client(): isAuthed(false)
 {
@@ -68,12 +68,8 @@ bool Client::login(Server &server) {
 		cout << "username: " << this->username << endl;
 		cout << "realname: " << this->realname << endl;
 
-		string reply = "001 welcome";
-		reply += server.getServerName();
-		reply += " Welcome to the jeffy Network, ";
-		reply += this -> nickname;
-		reply += "\n";
-		this -> fdObject << reply;
+		Replies::RPL_WELCOME(*this, server);
+
 	}
 	catch (std::exception &e)
 	{
