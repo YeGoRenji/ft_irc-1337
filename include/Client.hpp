@@ -17,9 +17,10 @@ public:
 	//void login(Server &server);
 	void setNick(Server &server, vector<string> tokens);
 	void passHandler(Server &server, vector<string> tokens);
-	void setUsernameAndRealName();
+	void setUsernameAndRealName(Server &server, vector<string> vectors);
 	// getters;
 	bool isPassGiven();
+	bool wasWelcomed;
 	int getFd();
 	string getNick();
 	FD &getFdObject();
@@ -30,7 +31,7 @@ private:
 	// authentication thingies
 	bool isAuthed;
 	bool passGiven;
-	bool nickGiven; // TODO : revise this function
+	bool nickGiven;
 	bool userGiven; // TODO : revise this function
 	// user data
 	string nickname;

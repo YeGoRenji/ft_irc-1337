@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/08 16:47:23 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/08 20:15:14 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,13 +88,12 @@ void Server::start() {
 				fds[i].revents = 0;
 			}
 			if (fds[i].revents & POLLIN) {
-				Client currentCLient = clients[i - 1];
+				Client &currentCLient = clients[i - 1];
 				string data;
 
 				currentCLient.getFdObject() >> data;
 				cout << "Got <" << data << ">" << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
-
 				commandsLoop(currentCLient, tokens);
 				fds[i].revents = 0;
 			}
@@ -104,6 +103,8 @@ void Server::start() {
 
 void Server::commandsLoop(Client &currentCLient, vector<string> &tokens)
 {
+	cout << "Client" << currentCLient.getFd() << ": " << currentCLient.isPassGiven() << endl;
+	
 	if (!currentCLient.isPassGiven() && tokens[0] != "PASS")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
 
@@ -111,6 +112,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens)
 		currentCLient.passHandler(*this, tokens);
 	else if (tokens[0] == "NICK")
 		currentCLient.setNick(*this, tokens);
+	else if (tokens[0] == "USER")
+		currentCLient.setUsernameAndRealName(*this, tokens);
 
 	//else if (tokens[1] == "NICK")
 }

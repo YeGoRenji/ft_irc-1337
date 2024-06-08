@@ -6,7 +6,8 @@ Client::Client(): isAuthed(false)
 	// cout << "Client: Default constructor called" << endl;
 }
 
-Client::Client(int _fd): fdObject(_fd), isAuthed(false)
+Client::Client(int _fd):
+fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false)
 {
 	// cout << "Client: Parameter constructor called" << endl;
 }
@@ -59,6 +60,8 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 
 	passGiven = true;
 	isAuthed = passGiven & nickGiven & userGiven;
+	cout << "goooood" << endl;
+	cout << isPassGiven() << endl;
 }
 
 /*
@@ -105,67 +108,72 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 // format : NICKNAME nick
 void Client::setNick(Server &server, vector<string> tokens) {
 
-	if (tokens[1].empty())
+	if (tokens.size() == 1)
 	{
 		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
+		return;
+	}
+
+	if (tokens[1].empty())
+	{
+		Errors::ERR_ERRONEUSNICKNAME(tokens[0], *this, server);
 		return;
 		//throw runtime_error("no nickname was given");
 	}
 
-	if (tokens[0][0] == '#' || tokens[0][0] == ':' || tokens[0][0] == ' ')
+	if (tokens[1][0] == '#' || tokens[1][0] == ':' || tokens[1][0] == ' ')
 	{
-		throw runtime_error("nickname starts with nigger listed characters");
-		// TODO : send an error // dissalowed characters
+		Errors::ERR_ERRONEUSNICKNAME(tokens[1], *this, server);
+		return;
+		//throw runtime_error("nickname starts with nigger listed characters");
 	}
 
 	if (nickNameAlreadyExists(server, tokens[1]))
 	{
-		throw runtime_error("nickname already exists!");
-		// TODO : send an error // nickname already exists
+		Errors::ERR_NICKNAMEINUSE(tokens[1], *this, server);
+		return ;
+		//throw runtime_error("nickname already exists!");
 	}
 
 	this->nickname = tokens[1];
+	nickGiven = true;
+	if (!isAuthed && (passGiven & nickGiven & userGiven))
+		Replies::RPL_WELCOME(*this, server);
+	isAuthed = passGiven & nickGiven & userGiven;
 }
 
-// format : <username> 0 * [:]<realname>
-void Client::setUsernameAndRealName() {
-	stringstream ss;
-	getLineStream(ss);
-	string usernameToken;
-	string realNameToken;
-
-	if (!Utility::match(ss, "USER"))
+// TODO : what the fuck is an ident server in the rfc??
+// format : USER <username> 0 * [:]<realname>
+void Client::setUsernameAndRealName(Server &server, vector<string> tokens)
+{
+	if (userGiven)
 	{
-		// TODO : send an error
-		throw runtime_error("USER command not found");
+		Errors::ERR_ALREADYREGISTERED(*this, server);
+		return;
 	}
 
-	ss >> usernameToken;
-	if (usernameToken.empty())
+	if (tokens.size() < 5)
 	{
-		throw runtime_error("empty username given");
-		// TODO : send an error
+		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
+		return;
 	}
 
+	// TODO : what to do here??
+	/*
 	if (!Utility::match(ss, "0") || !Utility::match(ss, "*"))
 	{
 		// TODO : send an error
 		throw runtime_error("0 or * weren't found");
 	}
+	*/
 
-	getline(ss, realNameToken);
-	realNameToken.erase(0, 1);
-	if (realNameToken[0] == ':')
-		realNameToken.erase(0, 1);
+	this->username = tokens[1];
+	this->realname = tokens[4];
 
-	// TODO : realname minlen must be 1
-	if (realNameToken.empty()) {
-		// TODO : send an error
-		throw runtime_error("realname token empty");
-	}
-
-	this->realname = realNameToken;
-	this->username = usernameToken;
+	userGiven = true;
+	if (!isAuthed && (passGiven & nickGiven & userGiven))
+		Replies::RPL_WELCOME(*this, server);
+	isAuthed = passGiven & nickGiven & userGiven;
 }
 
 void Client::disconnect() {
