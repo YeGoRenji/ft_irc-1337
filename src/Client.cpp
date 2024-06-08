@@ -1,4 +1,5 @@
 #include <Client.hpp>
+#include <Errors.hpp>
 
 Client::Client(): isAuthed(false)
 {
@@ -54,6 +55,7 @@ void Client::authenticate(Server &server) {
 		cout << "Connected" << endl;
 		this->isAuthed = true;
 	} else {
+		Errors::ERR_PASSWDMISMATCH(*this, server);
 		throw runtime_error("Wrong Password");
 		// TODO THROW exception (WRONG PASSWORD)
 	}

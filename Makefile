@@ -13,7 +13,8 @@ SRCS := Client.cpp \
     	Server.cpp \
     	Utility.cpp \
     	Channel.cpp  \
-		Replies.cpp
+		Replies.cpp	  \
+		Errors.cpp
 
 OBJS := $(SRCS:.cpp=.o)
 
