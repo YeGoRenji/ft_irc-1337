@@ -13,23 +13,30 @@ class Client {
 public:
 	Client(int fd);
 	~Client();
+	void disconnect();
+	//void login(Server &server);
+	void setNick(Server &server, vector<string> tokens);
+	void passHandler(Server &server, vector<string> tokens);
+	void setUsernameAndRealName();
+	// getters;
+	bool isPassGiven();
 	int getFd();
 	string getNick();
 	FD &getFdObject();
-	void disconnect();
-	bool login(Server &server);
-	
+
 private:
 	Client();
 	FD fdObject;
+	// authentication thingies
 	bool isAuthed;
+	bool passGiven;
+	bool nickGiven; // TODO : revise this function
+	bool userGiven; // TODO : revise this function
+	// user data
 	string nickname;
 	string realname;
 	string username;
 
-	void setNick(Server &server);
-	void authenticate(Server &server);
-	void setUsernameAndRealName();
 	void getLineStream(stringstream &ss);
 	bool nickNameAlreadyExists(Server &server, string nickname);
 };

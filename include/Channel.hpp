@@ -15,7 +15,7 @@ class Channel {
 public:
 	Channel(string name);
 	~Channel();
-	
+
 private:
 	Channel();
 	string name;

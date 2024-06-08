@@ -35,35 +35,38 @@ void Client::getLineStream(stringstream &ss) {
 }
 
 // format : PASS pass
-void Client::authenticate(Server &server) {
-	string input;
+void Client::passHandler(Server &server, vector<string> tokens) {
 
-	stringstream ss;
-	getLineStream(ss);
-
-	if (!Utility::match(ss, "PASS"))
+	if (this -> passGiven)
 	{
-		// TODO : return some message to the client idk
-		throw runtime_error("PASS command wasn't found!");
+		Errors::ERR_ALREADYREGISTERED(*this, server);
 		return;
+		//throw runtime_error("ERR_ALREADYREGISTERED");
 	}
 
-	ss >> input;
-	cout << "password given <" << input << ">" << endl;
+	if (tokens.size() == 1)
+	{
+		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
+		return;
+		//throw runtime_error("ERR_NEEDMOREPARAMS");
+	}
 
-	if (server.checkPassword(input)) {
-		cout << "Connected" << endl;
-		this->isAuthed = true;
-	} else {
+	if (!server.checkPassword(tokens[1])) {
 		Errors::ERR_PASSWDMISMATCH(*this, server);
-		throw runtime_error("Wrong Password");
-		// TODO THROW exception (WRONG PASSWORD)
+		return;
+		//throw runtime_error("Wrong Password");
 	}
+
+	passGiven = true;
+	isAuthed = passGiven & nickGiven & userGiven;
 }
 
-bool Client::login(Server &server) {
+/*
+void Client::login(Server &server) 
+{
 	try {
-		this->authenticate(server);
+		if (this -> passGiven == false)
+			this->authenticate(server);
 		this->setNick(server);
 		this->setUsernameAndRealName();
 		cout << "nickname: " << this->nickname << endl;
@@ -71,19 +74,23 @@ bool Client::login(Server &server) {
 		cout << "realname: " << this->realname << endl;
 
 		Replies::RPL_WELCOME(*this, server);
-
+		this -> isAuthed = true;
 	}
 	catch (std::exception &e)
 	{
 		cerr << e.what() << endl;
-		return false;
 	}
-	return true;
 }
+*/
 
 string Client::getNick()
 {
 	return (this -> nickname);
+}
+
+bool Client::isPassGiven()
+{
+	return (this -> passGiven);
 }
 
 bool Client::nickNameAlreadyExists(Server &server, string nickname)
@@ -91,40 +98,33 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 	return server.checkUserExistence(nickname);
 }
 
+// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
+// TODO : maybe do this ? uwu? maybe not?
+
+
 // format : NICKNAME nick
-void Client::setNick(Server &server) {
-	stringstream ss;
-	getLineStream(ss);
-	string token;
+void Client::setNick(Server &server, vector<string> tokens) {
 
-	// Skip NICK keyword
-	if (!Utility::match(ss, "NICK")){
-		// TODO : send back an error response
-		throw runtime_error("no NICK command");
-	}
-
-	// Get Nick value
-	ss >> token;
-
-	if (token.empty())
+	if (tokens[1].empty())
 	{
-		// TODO : send an error // dissalowed characters
-		throw runtime_error("no nickname was given");
+		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
+		return;
+		//throw runtime_error("no nickname was given");
 	}
 
-	if (token[0] == '#' || token[0] == ':' || token[0] == ' ')
+	if (tokens[0][0] == '#' || tokens[0][0] == ':' || tokens[0][0] == ' ')
 	{
 		throw runtime_error("nickname starts with nigger listed characters");
 		// TODO : send an error // dissalowed characters
 	}
 
-	if (nickNameAlreadyExists(server, token))
+	if (nickNameAlreadyExists(server, tokens[1]))
 	{
 		throw runtime_error("nickname already exists!");
 		// TODO : send an error // nickname already exists
 	}
 
-	this->nickname = token;
+	this->nickname = tokens[1];
 }
 
 // format : <username> 0 * [:]<realname>

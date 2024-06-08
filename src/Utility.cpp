@@ -8,27 +8,31 @@ bool Utility::match(stringstream &ss, string target)
 	return (keyword == target);
 }
 
-Utility::Utility()
+string Utility::getClientName(Client &client, Server &server)
 {
-	std::cout << "Utility: Default constructor called" << endl;
+	if (!client.getNick().empty())
+		return client.getNick();
+	return server.getServerName();
 }
 
-Utility &Utility::operator=(const Utility &obj)
-{
-	std::cout << "Utility: Copy assignment operator called" << endl;
-	if (this != &obj) {}
-	return (*this);
-}
 
-Utility::Utility(Utility const &obj)
+vector<string> Utility::getCommandTokens(string command)
 {
-	std::cout << "Utility: Copy constructor called" << endl;
-	if (this != &obj)
-		*this = obj;
-}
+	string tmpToken;
+	string tmpTmpToken;
+	vector<string> tokens;
+	stringstream ss(command);
 
-Utility::~Utility()
-{
-	std::cout << "Utility: Destructor called" << endl;
+	while(ss >> tmpToken)
+	{
+		if (tmpToken[0] == ':') 
+		{
+			tmpToken.erase(0, 1);
+			getline(ss, tmpTmpToken);
+			tmpToken += tmpTmpToken;
+		}
+		cout << "Pushing back <" << tmpToken << ">" << endl;
+		tokens.push_back(tmpToken);
+	}
+	return tokens;
 }
-

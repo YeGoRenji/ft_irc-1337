@@ -1,10 +1,12 @@
 #ifndef Server_HPP
 # define Server_HPP
 
-# include "Channel.hpp"
-# include "Client.hpp"
-# include "Hacks.hpp"
-
+# include <Channel.hpp>
+# include <Client.hpp>
+# include <Hacks.hpp>
+# include <Errors.hpp>
+# include <cstdio>
+# include <cstring>
 # include <vector>
 # include <cstdlib>
 # include <unistd.h>
@@ -22,8 +24,9 @@ public:
 	void start();
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string NickName);
+
 	string& getServerName();
-	
+
 private:
 	static string serverName;
 	Server();
@@ -31,6 +34,7 @@ private:
 	map<string, Channel> channels;
 	FD serverSocket;
 	string password;
+	void commandsLoop(Client &currentCLient, vector<string> &tokens);
 
 };
 

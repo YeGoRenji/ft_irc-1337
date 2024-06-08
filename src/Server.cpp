@@ -6,15 +6,12 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/06 14:17:31 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/08 16:47:23 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Client.hpp"
-#include <cstdio>
-#include <cstring>
-#include <sys/socket.h>
 
 string Server::serverName = "IRatherComeServer.mybasement";
 
@@ -63,6 +60,9 @@ string &Server::getServerName()
 
 void Server::start() {
 
+	map<string, void (Client::*)(vector<string>)> commandHandlers;
+	 
+
 	while(69) {
 		pollfd fds[1 + clients.size()];
 
@@ -75,12 +75,9 @@ void Server::start() {
 
 		if (fds[0].revents & POLLIN) {
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
-			if (newClient.login(*this))
-			{
-				clients.push_back(newClient);
-				cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
-				fds[0].revents = 0;
-			}
+			clients.push_back(newClient);
+			cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
+			fds[0].revents = 0;
 		}
 
 		for (size_t i = 1; i < 1 + clients.size(); ++i) {
@@ -91,13 +88,31 @@ void Server::start() {
 				fds[i].revents = 0;
 			}
 			if (fds[i].revents & POLLIN) {
+				Client currentCLient = clients[i - 1];
 				string data;
-				clients[i - 1].getFdObject() >> data;
+
+				currentCLient.getFdObject() >> data;
 				cout << "Got <" << data << ">" << endl;
+				vector<string> tokens = Utility::getCommandTokens(data);
+
+				commandsLoop(currentCLient, tokens);
 				fds[i].revents = 0;
 			}
 		}
 	}
+}
+
+void Server::commandsLoop(Client &currentCLient, vector<string> &tokens)
+{
+	if (!currentCLient.isPassGiven() && tokens[0] != "PASS")
+		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
+
+	if (tokens[0] == "PASS")
+		currentCLient.passHandler(*this, tokens);
+	else if (tokens[0] == "NICK")
+		currentCLient.setNick(*this, tokens);
+
+	//else if (tokens[1] == "NICK")
 }
 
 bool Server::checkPassword(string input) {
