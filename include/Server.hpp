@@ -13,6 +13,12 @@
 # include <sys/socket.h>
 # include <sys/poll.h>
 # include <netinet/in.h>
+# include <cerrno>
+
+// for linux
+# ifndef WAIT_ANY
+#  define WAIT_ANY -1
+# endif
 
 class Client;
 class Channel;
@@ -24,6 +30,7 @@ public:
 	void start();
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string NickName);
+	void quitUser(Client &client);
 
 	string& getServerName();
 

@@ -15,7 +15,7 @@ fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fa
 Client::~Client()
 {
 	// TODO: Remove this line it was added to fix Wextra
-	// cout << "Client: Destructor called" << endl;
+	 cout << "Client: Destructor called" << endl;
 }
 
 int Client::getFd() {

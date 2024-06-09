@@ -19,8 +19,15 @@ public:
 private:
 	Channel();
 	string name;
+	string topic;
 	map<string, Client*> members;
-	// Client* op;
+	// Client* chanOps;
+	/* 
+	 * Client * halfOps
+	 * Client * founder
+	 * TODO : do we need to support these ??
+	 * src : https://modern.ircdocs.horse/#channel-operators
+	*/
 	vector<Message> messages;
 
 };

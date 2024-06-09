@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/08 20:15:14 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/09 22:43:37 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ string &Server::getServerName()
 void Server::start() {
 
 	map<string, void (Client::*)(vector<string>)> commandHandlers;
-	 
+
 
 	while(69) {
 		pollfd fds[1 + clients.size()];
@@ -104,7 +104,7 @@ void Server::start() {
 void Server::commandsLoop(Client &currentCLient, vector<string> &tokens)
 {
 	cout << "Client" << currentCLient.getFd() << ": " << currentCLient.isPassGiven() << endl;
-	
+
 	if (!currentCLient.isPassGiven() && tokens[0] != "PASS")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
 
@@ -114,12 +114,26 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens)
 		currentCLient.setNick(*this, tokens);
 	else if (tokens[0] == "USER")
 		currentCLient.setUsernameAndRealName(*this, tokens);
+	else if (tokens[0] == "QUIT")
+		quitUser(currentCLient);
 
 	//else if (tokens[1] == "NICK")
 }
 
 bool Server::checkPassword(string input) {
 	return this -> password == input;
+}
+
+void Server::quitUser(Client &client)
+{
+	size_t clients_num = clients.size();
+	size_t i = 0;
+
+	while(i < clients_num && (&client != &clients[i]));
+
+	cout << "before num of clients == " << clients.size() << endl;
+	clients.erase(clients.begin() + i);
+	cout << "after num of clients == " << clients.size() << endl;
 }
 
 bool Server::checkUserExistence(string NickName)
