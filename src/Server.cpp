@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/09 22:43:37 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/13 18:02:44 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void Server::start() {
 
 
 	while(69) {
-		pollfd fds[1 + clients.size()];
+		pollfd fds[2 + clients.size()];
 
 		fds[0] = (pollfd){ serverSocket.getValue(), POLLIN, 0 };
 		for (size_t i = 0; i < clients.size(); ++i) {
@@ -78,6 +78,8 @@ void Server::start() {
 			clients.push_back(newClient);
 			cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
 			fds[0].revents = 0;
+			// TODO : explain this issue to youssef
+			fds[clients.size()] = (pollfd){ newClient.getFd(), POLLIN, 0 };
 		}
 
 		for (size_t i = 1; i < 1 + clients.size(); ++i) {
