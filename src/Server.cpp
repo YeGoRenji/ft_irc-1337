@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/13 18:02:44 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/14 16:32:52 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,32 +62,29 @@ void Server::start() {
 
 	map<string, void (Client::*)(vector<string>)> commandHandlers;
 
+	vector<pollfd> fds;
+	fds.push_back((pollfd){ serverSocket.getValue(), POLLIN, 0 });
 
 	while(69) {
-		pollfd fds[2 + clients.size()];
 
-		fds[0] = (pollfd){ serverSocket.getValue(), POLLIN, 0 };
-		for (size_t i = 0; i < clients.size(); ++i) {
-			fds[i + 1] = (pollfd){ clients[i].getFd(), POLLIN, 0 };
-		}
-
-		chk(poll(fds, 1 + clients.size(), WAIT_ANY), "poll failed");
+		chk(poll(fds.data(), fds.size(), WAIT_ANY), "poll failed");
 
 		if (fds[0].revents & POLLIN) {
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
 			clients.push_back(newClient);
 			cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
 			fds[0].revents = 0;
-			// TODO : explain this issue to youssef
-			fds[clients.size()] = (pollfd){ newClient.getFd(), POLLIN, 0 };
+			fds.push_back((pollfd){ newClient.getFd(), POLLIN, 0 });
 		}
 
-		for (size_t i = 1; i < 1 + clients.size(); ++i) {
+		for (size_t i = 1; i < fds.size(); ++i) {
 			if (fds[i].revents & POLLHUP) {
 				cout << "Client " << fds[i].fd << " disconnected" << endl;
-				clients[i - 1].disconnect();
+				clients[i - 1].disconnect(); // TODO : send an error
 				clients.erase(clients.begin() + i - 1);
 				fds[i].revents = 0;
+				fds.erase(fds.begin() + i);
+				break;
 			}
 			if (fds[i].revents & POLLIN) {
 				Client &currentCLient = clients[i - 1];
@@ -96,7 +93,8 @@ void Server::start() {
 				currentCLient.getFdObject() >> data;
 				cout << "Got <" << data << ">" << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
-				commandsLoop(currentCLient, tokens);
+				if (tokens.size())
+					commandsLoop(currentCLient, tokens);
 				fds[i].revents = 0;
 			}
 		}

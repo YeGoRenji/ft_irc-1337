@@ -1,3 +1,3 @@
-segfault
 (echo -en 'PASS 123\r\nNICK jeffy\r\n' ; cat) | nc localhost 6969
-then hitting ctrl-c on linux
+- FIX ctrl-d
+- fix enter segfault on nc
