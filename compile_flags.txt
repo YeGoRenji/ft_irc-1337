@@ -1,1 +1,6 @@
 -Iinclude
+-std=c++98
+-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
+-Wall
+-Wextra
+-Werror
