@@ -42,20 +42,17 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 	{
 		Errors::ERR_ALREADYREGISTERED(*this, server);
 		return;
-		//throw runtime_error("ERR_ALREADYREGISTERED");
 	}
 
 	if (tokens.size() == 1)
 	{
 		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
 		return;
-		//throw runtime_error("ERR_NEEDMOREPARAMS");
 	}
 
 	if (!server.checkPassword(tokens[1])) {
 		Errors::ERR_PASSWDMISMATCH(*this, server);
 		return;
-		//throw runtime_error("Wrong Password");
 	}
 
 	passGiven = true;
@@ -63,28 +60,6 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 	cout << "goooood" << endl;
 	cout << isPassGiven() << endl;
 }
-
-/*
-void Client::login(Server &server) 
-{
-	try {
-		if (this -> passGiven == false)
-			this->authenticate(server);
-		this->setNick(server);
-		this->setUsernameAndRealName();
-		cout << "nickname: " << this->nickname << endl;
-		cout << "username: " << this->username << endl;
-		cout << "realname: " << this->realname << endl;
-
-		Replies::RPL_WELCOME(*this, server);
-		this -> isAuthed = true;
-	}
-	catch (std::exception &e)
-	{
-		cerr << e.what() << endl;
-	}
-}
-*/
 
 string Client::getNick()
 {
@@ -103,7 +78,7 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 
 // The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 // TODO : maybe do this ? uwu? maybe not?
-
+// TODO : check the clients can change their nick!!!
 
 // format : NICKNAME nick
 void Client::setNick(Server &server, vector<string> tokens) {
@@ -157,15 +132,6 @@ void Client::setUsernameAndRealName(Server &server, vector<string> tokens)
 		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
 		return;
 	}
-
-	// TODO : what to do here??
-	/*
-	if (!Utility::match(ss, "0") || !Utility::match(ss, "*"))
-	{
-		// TODO : send an error
-		throw runtime_error("0 or * weren't found");
-	}
-	*/
 
 	this->username = tokens[1];
 	this->realname = tokens[4];

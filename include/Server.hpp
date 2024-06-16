@@ -36,6 +36,8 @@ public:
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &client, vector<pollfd> &fds);
+	void AddClientoChannel(Client &client, vector<string> tokens);
+	bool ChannelAlreadyExists(string name);
 
 	static string serverName;
 	Server();

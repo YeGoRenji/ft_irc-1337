@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/16 14:52:13 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/16 21:55:19 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		currentCLient.setUsernameAndRealName(*this, tokens);
 	else if (tokens[0] == "QUIT")
 		quitUser(currentCLient, fds);
-
-	//else if (tokens[1] == "NICK")
+	else if (tokens[0] == "JOIN")
+		AddClientoChannel(currentCLient, tokens);
 }
 
 bool Server::checkPassword(string input) {
@@ -128,15 +128,11 @@ void Server::quitUser(Client &client, vector<pollfd> &fds)
 
 	while(i < clients_num && (&client != &clients[i]));
 
-	cout << "before num of clients == " << clients.size() << endl;
-
 	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(client);
 
-	clients[i].disconnect(); // TODO : send an error
+	clients[i].disconnect();
 	clients.erase(clients.begin() + i);
 	fds.erase(fds.begin() + i);
-
-	cout << "after num of clients == " << clients.size() << endl;
 }
 
 bool Server::checkUserExistence(string NickName)
@@ -154,4 +150,64 @@ bool Server::checkUserExistence(string NickName)
 	}
 	cout << "NickName wasn't found --, carry on connecting mate" << endl;
 	return (false);
+}
+
+void Server::AddClientoChannel(Client &client, vector<string> tokens)
+{
+	string Channels;
+	string Passwords;
+
+	cout << "tokens size : " << tokens.size() << endl;
+
+	if (tokens.size() == 1)
+	{
+		// the next lines only for debugging purposes
+		map<string, Channel>::iterator it = channels.begin();
+		for(; it != channels.end(); it++)
+			cout << "channel name : " << (it -> second).getChannelName() << endl;
+
+		Errors::ERR_NEEDMOREPARAMS(tokens[0], client, *this);
+		return;
+	}
+
+	cout << "- there are " << channels.size() << " channels in the server" << endl;
+
+	map<string, Channel>::iterator it = channels.begin();
+	for(; it != channels.end(); it++)
+		cout << "channel name : " << (it -> second).getChannelName() << endl;
+
+	// TODO : WACH MAKAYNACH CHI WAY TO CHECK THE EXISTENCE OF CHI ELEMENT FL MAP WIRTH O(1) COMPLEXITY???
+	// imma use count cause I don't wanna use exceptions
+	cout << "channels map size : " << channels.size() << endl;
+	if (tokens.size() == 2) //  channels without passwords in the form 'JOIN #chan[,chan2,chan3..]'
+	{
+		if (!ChannelAlreadyExists(Channels))
+		{
+			cout << "Channel " << tokens[1] << " does not exist" << endl;
+			Channel ch(tokens[1], "");
+			ch.addMember(client);
+			channels.insert(std::pair<string,Channel>(tokens[1], Channel(tokens[1], "")));
+		}
+		else
+		{
+			cout << "Channel " << tokens[1] << " exists" << endl;
+			Channel ch = channels[tokens[1]];
+			ch.addMember(client);
+		}
+		// TODO : check if channel exists
+		cout << "channels map size : " << channels.size() << endl;
+		cout << "channels : " << tokens[1] << endl;
+		cout << "passwords: " << "None" << endl;
+	}
+	else // channels with passwords in the form 'JOIN #chan[,chan2,chan3..] pass[,pass2,pass3..]'
+		 // TODO : handle later
+	{
+		cout << "channels : " << tokens[1] << endl;
+		cout << "passwords: " << tokens[2] << endl;
+	}
+}
+
+bool Server::ChannelAlreadyExists(string name)
+{
+	return (channels.count(name));
 }

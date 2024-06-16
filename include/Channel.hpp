@@ -13,14 +13,24 @@ struct Message {
 
 class Channel {
 public:
-	Channel(string name);
-	~Channel();
-
-private:
 	Channel();
+	Channel(string name, string password); // TODO : add operators
+	// getters
+	const string& getChannelName() const; 
+
+	void addMember(Client &client);
+
+	~Channel();
+private:
 	string name;
-	string topic;
+	string topic; // TODO how to set the topic??
+				  
+	// TODO : why the fuck do we have a string/client here 
+	// NOTE : i decided to put the nickname here
 	map<string, Client*> members;
+	// password
+	bool hasPassword;
+	string password;
 	// Client* chanOps;
 	/* 
 	 * Client * halfOps

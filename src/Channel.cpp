@@ -1,17 +1,33 @@
 #include "Channel.hpp"
 
-Channel::Channel()
+Channel::Channel(): name("default") // op("default")
 {
-	std::cout << "Channel: Default constructor called" << endl;
+	//std::cout << "Channel: Default constructor called" << endl;
 }
 
-Channel::Channel(string name): name(name)//, op(NULL)
+// TODO : add operators
+Channel::Channel(string _name, string _password): name(_name) //, op(NULL)
 {
-	std::cout << "Channel: Parameter constructor called" << endl;
+	this -> hasPassword = !_password.empty();
+	if (this -> hasPassword)
+		this -> password = _password;
+	//std::cout << "Channel: Parameter constructor called" << endl;
+}
+
+// getters
+const string& Channel::getChannelName() const
+{
+	return (this -> name);
+}
+
+
+void Channel::addMember(Client &client)
+{
+	members[client.getNick()] = &client;
 }
 
 Channel::~Channel()
 {
-	std::cout << "Channel: Destructor called" << endl;
+	// TODO : Problem : this gets called a lot, figure out a better way
+	//std::cout << "Channel: Destructor called" << endl;
 }
-
