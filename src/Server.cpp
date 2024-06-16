@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/14 16:32:52 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/16 14:52:13 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void Server::start() {
 			fds.push_back((pollfd){ newClient.getFd(), POLLIN, 0 });
 		}
 
-		for (size_t i = 1; i < fds.size(); ++i) {
+		for (size_t i = fds.size() - 1; i > 0; --i) {
 			if (fds[i].revents & POLLHUP) {
 				cout << "Client " << fds[i].fd << " disconnected" << endl;
 				clients[i - 1].disconnect(); // TODO : send an error
