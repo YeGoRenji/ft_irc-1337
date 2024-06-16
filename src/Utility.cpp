@@ -31,7 +31,6 @@ vector<string> Utility::getCommandTokens(string command)
 			getline(ss, tmpTmpToken);
 			tmpToken += tmpTmpToken;
 		}
-		cout << "Pushing back <" << tmpToken << ">" << endl;
 		tokens.push_back(tmpToken);
 	}
 	return tokens;

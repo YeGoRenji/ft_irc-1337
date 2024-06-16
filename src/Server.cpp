@@ -79,29 +79,26 @@ void Server::start() {
 
 		for (size_t i = fds.size() - 1; i > 0; --i) {
 			if (fds[i].revents & POLLHUP) {
+				Client &currentCLient = clients[i - 1];
 				cout << "Client " << fds[i].fd << " disconnected" << endl;
-				clients[i - 1].disconnect(); // TODO : send an error
-				clients.erase(clients.begin() + i - 1);
-				fds[i].revents = 0;
-				fds.erase(fds.begin() + i);
-				break;
+				quitUser(currentCLient, fds); // TODO : send an error
 			}
-			if (fds[i].revents & POLLIN) {
+			else if (fds[i].revents & POLLIN) {
 				Client &currentCLient = clients[i - 1];
 				string data;
 
 				currentCLient.getFdObject() >> data;
 				cout << "Got <" << data << ">" << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
-				if (tokens.size())
-					commandsLoop(currentCLient, tokens);
 				fds[i].revents = 0;
+				if (tokens.size())
+					commandsLoop(currentCLient, tokens, fds);
 			}
 		}
 	}
 }
 
-void Server::commandsLoop(Client &currentCLient, vector<string> &tokens)
+void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds)
 {
 	cout << "Client" << currentCLient.getFd() << ": " << currentCLient.isPassGiven() << endl;
 
@@ -115,7 +112,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens)
 	else if (tokens[0] == "USER")
 		currentCLient.setUsernameAndRealName(*this, tokens);
 	else if (tokens[0] == "QUIT")
-		quitUser(currentCLient);
+		quitUser(currentCLient, fds);
 
 	//else if (tokens[1] == "NICK")
 }
@@ -124,7 +121,7 @@ bool Server::checkPassword(string input) {
 	return this -> password == input;
 }
 
-void Server::quitUser(Client &client)
+void Server::quitUser(Client &client, vector<pollfd> &fds)
 {
 	size_t clients_num = clients.size();
 	size_t i = 0;
@@ -132,7 +129,13 @@ void Server::quitUser(Client &client)
 	while(i < clients_num && (&client != &clients[i]));
 
 	cout << "before num of clients == " << clients.size() << endl;
+
+	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(client);
+
+	clients[i].disconnect(); // TODO : send an error
 	clients.erase(clients.begin() + i);
+	fds.erase(fds.begin() + i);
+
 	cout << "after num of clients == " << clients.size() << endl;
 }
 

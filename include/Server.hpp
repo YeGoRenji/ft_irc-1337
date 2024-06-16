@@ -30,19 +30,18 @@ public:
 	void start();
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string NickName);
-	void quitUser(Client &client);
 
 	string& getServerName();
 
 private:
+	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
+	void quitUser(Client &client, vector<pollfd> &fds);
+
 	static string serverName;
 	Server();
 	vector<Client> clients;
 	map<string, Channel> channels;
 	FD serverSocket;
 	string password;
-	void commandsLoop(Client &currentCLient, vector<string> &tokens);
-
 };
-
 #endif

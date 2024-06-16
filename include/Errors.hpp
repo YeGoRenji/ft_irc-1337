@@ -32,6 +32,8 @@ public:
 		ONE_ARG_ERRORS
 	#undef X
 
+	static void	CUSTOM_CLIENT_GONE_TO_EDGE(Client &client);
+
 private:
 	Errors();
 	Errors(const Errors &);
