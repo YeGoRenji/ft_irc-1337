@@ -15,5 +15,7 @@ using std::map;
 using std::vector;
 using std::runtime_error;
 using std::find;
+using std::replace;
+using std::min;
 
 #endif

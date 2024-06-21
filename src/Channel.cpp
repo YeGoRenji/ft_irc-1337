@@ -24,6 +24,7 @@ const string& Channel::getChannelName() const
 void Channel::addMember(Client &client)
 {
 	members[client.getNick()] = &client;
+	cout << client.getNick() << " was added to channel " << getChannelName() << endl;
 }
 
 Channel::~Channel()

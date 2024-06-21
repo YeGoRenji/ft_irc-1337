@@ -14,6 +14,7 @@
 # include <sys/poll.h>
 # include <netinet/in.h>
 # include <cerrno>
+# include <cmath>
 
 // for linux
 # ifndef WAIT_ANY
@@ -23,6 +24,11 @@
 class Client;
 class Channel;
 
+struct channelInfo {
+	string name;
+	string password;
+};
+
 class Server {
 public:
 	Server(int port, string pass);
@@ -30,14 +36,14 @@ public:
 	void start();
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string NickName);
-
+	void parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
 	string& getServerName();
 
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &client, vector<pollfd> &fds);
 	void AddClientoChannel(Client &client, vector<string> tokens);
-	bool ChannelAlreadyExists(string name);
+	bool channelAlreadyExists(string name);
 
 	static string serverName;
 	Server();

@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/16 21:55:19 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/21 15:56:42 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,60 +138,82 @@ void Server::quitUser(Client &client, vector<pollfd> &fds)
 bool Server::checkUserExistence(string NickName)
 {
 	vector<Client>::iterator it;
-	cout << "conncted Nicknames list : " << endl;
+//	cerr << "connected Nicknames list : " << endl;
 	for(it = clients.begin(); it != clients.end(); it++)
 	{
-		cout << "<" << it -> getNick() << ">" << endl;
+//		cerr << "<" << it -> getNick() << ">" << endl;
 		if (it -> getNick() == NickName)
 		{
-			cout << "NickName found!!" << endl;
+//			cerr << "NickName found!!" << endl;
 			return true;
 		}
 	}
-	cout << "NickName wasn't found --, carry on connecting mate" << endl;
+//	cerr << "NickName wasn't found --, carry on connecting mate" << endl << endl;
 	return (false);
 }
 
 void Server::AddClientoChannel(Client &client, vector<string> tokens)
 {
-	string Channels;
-	string Passwords;
+	string channelsTokens;
+	string passwordsTokens;
 
-	cout << "tokens size : " << tokens.size() << endl;
+	vector<channelInfo> ch;
 
 	if (tokens.size() == 1)
 	{
 		// the next lines only for debugging purposes
 		map<string, Channel>::iterator it = channels.begin();
+			cerr << "channel name : ";
 		for(; it != channels.end(); it++)
-			cout << "channel name : " << (it -> second).getChannelName() << endl;
+			cerr << "channelName = " << (it -> second).getChannelName() << ", count = " <<  channels.count((it -> second).getChannelName());
 
 		Errors::ERR_NEEDMOREPARAMS(tokens[0], client, *this);
 		return;
 	}
 
-	cout << "- there are " << channels.size() << " channels in the server" << endl;
+	channelsTokens = tokens[1];
+	if (tokens.size() == 3)
+		passwordsTokens = tokens[2];
 
-	map<string, Channel>::iterator it = channels.begin();
-	for(; it != channels.end(); it++)
-		cout << "channel name : " << (it -> second).getChannelName() << endl;
+	parseChannelCommand(ch, channelsTokens, passwordsTokens);
+
+	vector<channelInfo>::iterator it = ch.begin();
+	vector<channelInfo>::iterator ite = ch.begin();
+	for(it; it != ite; it++)
+	{
+		// if passwordless
+			// if !channelexists
+				// create one without a password
+			// adduser to channel
+			// broadcast it
+		// else not
+			// if !channelexists
+				// create one with password
+				// if !password correct
+					// err
+				// adduser to channel
+				// broadcast it
+	}
+	return;
+
 
 	// TODO : WACH MAKAYNACH CHI WAY TO CHECK THE EXISTENCE OF CHI ELEMENT FL MAP WIRTH O(1) COMPLEXITY???
 	// imma use count cause I don't wanna use exceptions
 	cout << "channels map size : " << channels.size() << endl;
+	/*
 	if (tokens.size() == 2) //  channels without passwords in the form 'JOIN #chan[,chan2,chan3..]'
 	{
-		if (!ChannelAlreadyExists(Channels))
+		if (!channelAlreadyExists(Channels))
 		{
-			cout << "Channel " << tokens[1] << " does not exist" << endl;
+			cout << " -> Channel " << tokens[1] << " does not exist" << endl;
 			Channel ch(tokens[1], "");
 			ch.addMember(client);
-			channels.insert(std::pair<string,Channel>(tokens[1], Channel(tokens[1], "")));
+			channels.insert(std::pair<string,Channel>(tokens[1], ch));
 		}
 		else
 		{
-			cout << "Channel " << tokens[1] << " exists" << endl;
-			Channel ch = channels[tokens[1]];
+			cout << " -> Channel " << tokens[1] << " exists" << endl;
+			Channel &ch = channels[tokens[1]];
 			ch.addMember(client);
 		}
 		// TODO : check if channel exists
@@ -205,9 +227,33 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 		cout << "channels : " << tokens[1] << endl;
 		cout << "passwords: " << tokens[2] << endl;
 	}
+	*/
 }
 
-bool Server::ChannelAlreadyExists(string name)
+void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)
+{
+	size_t i;
+	replace(channelsTokens.begin(), channelsTokens.end(), ',', ' ');
+	// TODO : refuse channels with space in their names
+	vector<string> channelNames = Utility::getCommandTokens(channelsTokens);
+	vector<string> passwords = Utility::getCommandTokens(passwordsTokens);
+
+	for (i = 0; i < channelNames.size(); i++)
+		ch.push_back((channelInfo){.name=channelNames[i]});
+
+	size_t min_iter = min(channelNames.size(), passwords.size());
+	cerr << "min iter = " << min_iter << endl;
+	for (i = 0; i < min_iter; i++)
+		ch[i].password = passwords[i];
+
+	for (i = 0; i < channelNames.size(); i++)
+	{
+		cerr << "name = " << ch[i].name << endl;
+		cerr << "pass = " << ch[i].password << endl << endl;
+	}
+}
+
+bool Server::channelAlreadyExists(string name)
 {
 	return (channels.count(name));
 }
