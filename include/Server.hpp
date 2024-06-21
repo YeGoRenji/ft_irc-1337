@@ -43,7 +43,8 @@ private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &client, vector<pollfd> &fds);
 	void AddClientoChannel(Client &client, vector<string> tokens);
-	bool channelAlreadyExists(string name);
+	map<string, Channel>::iterator getChannel(string name);
+	map<string, Channel>::iterator createChannel(string name, string password);
 
 	static string serverName;
 	Server();

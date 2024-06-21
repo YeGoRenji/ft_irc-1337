@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/21 15:56:42 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/21 17:52:09 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,14 +178,25 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 	parseChannelCommand(ch, channelsTokens, passwordsTokens);
 
 	vector<channelInfo>::iterator it = ch.begin();
-	vector<channelInfo>::iterator ite = ch.begin();
-	for(it; it != ite; it++)
+	vector<channelInfo>::iterator ite = ch.end();
+	for(; it != ite; it++)
 	{
-		// if passwordless
-			// if !channelexists
-				// create one without a password
+		cerr << "handling channel : " << it -> name << endl;
+		if (it -> password.empty())
+		{
+			// check if channel exists if not create it
+			map<string, Channel>::iterator currChannel = getChannel(it -> name);
+			if (currChannel == channels.end())
+			{
+				cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
+				currChannel = createChannel(it -> name, it -> password);
+			}
+			else
+				cerr << "channel " << it -> name << " exists!" << endl;
 			// adduser to channel
-			// broadcast it
+			currChannel -> second.addMember(client);
+			// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
+		};
 		// else not
 			// if !channelexists
 				// create one with password
@@ -253,7 +264,13 @@ void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens,
 	}
 }
 
-bool Server::channelAlreadyExists(string name)
+map<string, Channel>::iterator Server::createChannel(string name, string password)
 {
-	return (channels.count(name));
+	channels[name] = Channel(name, password);
+	return channels.find(name);
+}
+
+map<string, Channel>::iterator Server::getChannel(string name)
+{
+	return channels.find(name);
 }

@@ -39,7 +39,6 @@ private:
 	 * src : https://modern.ircdocs.horse/#channel-operators
 	*/
 	vector<Message> messages;
-
 };
 
 #endif
