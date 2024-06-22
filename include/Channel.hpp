@@ -19,6 +19,8 @@ public:
 	const string& getChannelName() const; 
 
 	void addMember(Client &client);
+	bool checkPassword(string userPassLine);
+	bool hasPassword() const;
 
 	~Channel();
 private:
@@ -29,7 +31,6 @@ private:
 	// NOTE : i decided to put the nickname here
 	map<string, Client*> members;
 	// password
-	bool hasPassword;
 	string password;
 	// Client* chanOps;
 	/* 

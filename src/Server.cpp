@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/22 13:21:44 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/22 16:32:31 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,16 +121,16 @@ bool Server::checkPassword(string input) {
 	return this -> password == input;
 }
 
-void Server::quitUser(Client &client, vector<pollfd> &fds)
+void Server::quitUser(Client &currClient, vector<pollfd> &fds)
 {
 	size_t clients_num = clients.size();
 	size_t i = 0;
 
-	while(i < clients_num && (&client != &clients[i]));
+	while(i < clients_num && (&currClient != &clients[i]));
 
-	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(client);
+	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(currClient);
 
-	clients[i].disconnect();
+	currClient.disconnect();
 	clients.erase(clients.begin() + i);
 	fds.erase(fds.begin() + i);
 }
@@ -182,63 +182,38 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 	for(; it != ite; it++)
 	{
 		cerr << "handling channel : " << it -> name << endl;
-		if (it -> password.empty())
+		// check if channel exists if not create it
+		map<string, Channel>::iterator currChannel = getChannel(it -> name);
+		if (currChannel == channels.end())
 		{
-			// check if channel exists if not create it
-			map<string, Channel>::iterator currChannel = getChannel(it -> name);
-			if (currChannel == channels.end())
-			{
-				cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
-				currChannel = createChannel(it -> name, it -> password);
-			}
-			else
-				cerr << "channel " << it -> name << " exists!" << endl;
-			// adduser to channel
-			currChannel -> second.addMember(client);
-			// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
-		};
-		// else not
-			// if !channelexists
-				// create one with password
-				// if !password correct
-					// err
-				// adduser to channel
-				// broadcast it
-	}
-	return;
-
-
-	// TODO : WACH MAKAYNACH CHI WAY TO CHECK THE EXISTENCE OF CHI ELEMENT FL MAP WIRTH O(1) COMPLEXITY???
-	// imma use count cause I don't wanna use exceptions
-	cout << "channels map size : " << channels.size() << endl;
-	/*
-	if (tokens.size() == 2) //  channels without passwords in the form 'JOIN #chan[,chan2,chan3..]'
-	{
-		if (!channelAlreadyExists(Channels))
-		{
-			cout << " -> Channel " << tokens[1] << " does not exist" << endl;
-			Channel ch(tokens[1], "");
-			ch.addMember(client);
-			channels.insert(std::pair<string,Channel>(tokens[1], ch));
+			// TODO : ask someone if we should create any non-existant channel that the user suplied
+			// cause the RFC has an error called ERR_NOSUCHCHANNEL(403)
+			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
+			currChannel = createChannel(it -> name, it -> password);
 		}
 		else
 		{
-			cout << " -> Channel " << tokens[1] << " exists" << endl;
-			Channel &ch = channels[tokens[1]];
-			ch.addMember(client);
+			cerr << "channel " << it -> name << " exists!" << endl;
+			// channel has pass but user didn't supply it
+			if (currChannel -> second.hasPassword() && (it -> password).empty())
+			{
+				Errors::ERR_BADCHANNELKEY(it -> name, client, *this);
+				return;
+			}
+			// user supplied a wrong password
+			if (!currChannel -> second.checkPassword(it -> password))
+			{
+				Errors::ERR_BADCHANNELKEY(it -> name, client, *this);
+				return;
+			}
+			// do nothing, currChannel already points to the right channel
+			// now just add the user to the channel and broadcast
 		}
-		// TODO : check if channel exists
-		cout << "channels map size : " << channels.size() << endl;
-		cout << "channels : " << tokens[1] << endl;
-		cout << "passwords: " << "None" << endl;
+		cout << "gonna add the member now" << endl;
+		// adduser to channel
+		currChannel -> second.addMember(client);
+		// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
 	}
-	else // channels with passwords in the form 'JOIN #chan[,chan2,chan3..] pass[,pass2,pass3..]'
-		 // TODO : handle later
-	{
-		cout << "channels : " << tokens[1] << endl;
-		cout << "passwords: " << tokens[2] << endl;
-	}
-	*/
 }
 
 void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)

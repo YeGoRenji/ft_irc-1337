@@ -15,7 +15,9 @@
 #define ONE_ARG_ERRORS \
 	X(432, ERRONEUSNICKNAME, "Erroneus nickname", nick) \
 	X(433, NICKNAMEINUSE, "Nickname is already in use", nick) \
-	X(461, NEEDMOREPARAMS, "Not enough parameters", command)
+	X(461, NEEDMOREPARAMS, "Not enough parameters", command) \
+	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel)
+	
 
 class Server;
 class Client;

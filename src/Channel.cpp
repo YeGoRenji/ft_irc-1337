@@ -6,11 +6,8 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password): name(_name) //, op(NULL)
+Channel::Channel(string _name, string _password): name(_name), password(_password) //, op(NULL)
 {
-	this -> hasPassword = !_password.empty();
-	if (this -> hasPassword)
-		this -> password = _password;
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
 
@@ -20,11 +17,23 @@ const string& Channel::getChannelName() const
 	return (this -> name);
 }
 
-
 void Channel::addMember(Client &client)
 {
+	// TODO : maybe try to make this a reference later?
 	members[client.getNick()] = &client;
 	cout << client.getNick() << " was added to channel " << getChannelName() << endl;
+}
+
+bool Channel::hasPassword() const
+{
+	return (!password.empty());
+}
+
+bool Channel::checkPassword(string userPassLine)
+{
+	if (password.empty())
+		return (true);
+	return (userPassLine == this -> password);
 }
 
 Channel::~Channel()
