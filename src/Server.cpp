@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/22 17:29:52 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/22 18:15:38 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,10 @@ void Server::start() {
 			else if (fds[i].revents & POLLIN) {
 				Client &currentCLient = getClientFromFd(fds[i].fd);
 				string data;
-
+				cout << "DATA COMING" << endl;
+				//fcntl(fd, F_SETFL, O_NONBLOCK);
 				currentCLient.getFdObject() >> data;
-				cout << "Got <" << data << ">" << endl;
+				cout << "Got <" << data << "> from Client " << currentCLient.getFd() << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
 				fds[i].revents = 0;
 				if (tokens.size())
@@ -102,8 +103,6 @@ void Server::start() {
 
 void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds)
 {
-	cout << "Client" << currentCLient.getFd() << ": " << currentCLient.isPassGiven() << endl;
-
 	if (!currentCLient.isPassGiven() && tokens[0] != "PASS")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
 
@@ -223,15 +222,8 @@ void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens,
 		ch.push_back((channelInfo){.name=channelNames[i]});
 
 	size_t min_iter = min(channelNames.size(), passwords.size());
-	cerr << "min iter = " << min_iter << endl;
 	for (i = 0; i < min_iter; i++)
 		ch[i].password = passwords[i];
-
-	for (i = 0; i < channelNames.size(); i++)
-	{
-		cerr << "name = " << ch[i].name << endl;
-		cerr << "pass = " << ch[i].password << endl << endl;
-	}
 }
 
 map<string, Channel>::iterator Server::createChannel(string name, string password)
