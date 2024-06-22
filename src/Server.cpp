@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/22 16:32:31 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/22 16:48:09 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,8 @@ void Server::quitUser(Client &currClient, vector<pollfd> &fds)
 
 	currClient.disconnect();
 	clients.erase(clients.begin() + i);
-	fds.erase(fds.begin() + i);
+	// +1 cause fds[0] is server socket
+	fds.erase(fds.begin() + i + 1);
 }
 
 bool Server::checkUserExistence(string NickName)
