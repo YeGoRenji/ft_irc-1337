@@ -28,8 +28,8 @@ objs:
 	@mkdir objs
 
 $(NAME): $(OBJS) objs/main.o
-	@echo "👍🏿"
 	$(CXX) $^ $(CXXFLAGS) -o $@ $(INCLUDE)
+	@echo "👍🏿"
 
 $(OBJSFOLDER)%.o: src/%.cpp include/%.hpp
 	@echo "⚙️  Compiling $<..."

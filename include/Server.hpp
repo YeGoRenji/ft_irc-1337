@@ -35,9 +35,10 @@ public:
 	~Server();
 	void start();
 	bool checkPassword(string passLine);
-	bool checkUserExistence(string NickName);
+	bool checkUserExistence(string nickName);
 	void parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
 	string& getServerName();
+	Client &getClientFromFd(int fd);
 
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
@@ -48,7 +49,7 @@ private:
 
 	static string serverName;
 	Server();
-	vector<Client> clients;
+	map<string, Client> clients;
 	map<string, Channel> channels;
 	FD serverSocket;
 	string password;

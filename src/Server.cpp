@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/22 16:48:09 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/22 17:29:52 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,20 +71,22 @@ void Server::start() {
 
 		if (fds[0].revents & POLLIN) {
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
-			clients.push_back(newClient);
-			cout << "New client connected " << newClient.getFd() << ", size = " << clients.size() << endl;
+			int newClientFd = newClient.getFd();
+			// clients.push_back(newClient);
+			clients.insert(make_pair(newClient.getNick(), newClient));
+			cout << "New client connected " << newClientFd << ", size = " << clients.size() << endl;
 			fds[0].revents = 0;
-			fds.push_back((pollfd){ newClient.getFd(), POLLIN, 0 });
+			fds.push_back((pollfd){ newClientFd, POLLIN, 0 });
 		}
 
 		for (size_t i = fds.size() - 1; i > 0; --i) {
 			if (fds[i].revents & POLLHUP) {
-				Client &currentCLient = clients[i - 1];
+				Client &currentCLient = getClientFromFd(fds[i].fd);
 				cout << "Client " << fds[i].fd << " disconnected" << endl;
-				quitUser(currentCLient, fds); // TODO : send an error
+				quitUser(currentCLient, fds);
 			}
 			else if (fds[i].revents & POLLIN) {
-				Client &currentCLient = clients[i - 1];
+				Client &currentCLient = getClientFromFd(fds[i].fd);
 				string data;
 
 				currentCLient.getFdObject() >> data;
@@ -123,34 +125,26 @@ bool Server::checkPassword(string input) {
 
 void Server::quitUser(Client &currClient, vector<pollfd> &fds)
 {
-	size_t clients_num = clients.size();
-	size_t i = 0;
+	size_t fds_num = fds.size();
+	size_t i = 1;
 
-	while(i < clients_num && (&currClient != &clients[i]));
+	while(i < fds_num && (fds[i].fd != currClient.getFd())) {
+		cerr << "Comparing " << fds[i].fd << " to " << currClient.getFd() << endl;
+		i++;
+	}
+	// cerr << "Compared after while " << fds[i].fd << " to " << currClient.getFd() << endl;
 
 	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(currClient);
 
 	currClient.disconnect();
-	clients.erase(clients.begin() + i);
-	// +1 cause fds[0] is server socket
-	fds.erase(fds.begin() + i + 1);
+	clients.erase(currClient.getNick());
+	cerr << "i = " << i << endl;
+	fds.erase(fds.begin() + i);
 }
 
-bool Server::checkUserExistence(string NickName)
+bool Server::checkUserExistence(string nickName)
 {
-	vector<Client>::iterator it;
-//	cerr << "connected Nicknames list : " << endl;
-	for(it = clients.begin(); it != clients.end(); it++)
-	{
-//		cerr << "<" << it -> getNick() << ">" << endl;
-		if (it -> getNick() == NickName)
-		{
-//			cerr << "NickName found!!" << endl;
-			return true;
-		}
-	}
-//	cerr << "NickName wasn't found --, carry on connecting mate" << endl << endl;
-	return (false);
+	return (clients.find(nickName) != clients.end());
 }
 
 void Server::AddClientoChannel(Client &client, vector<string> tokens)
@@ -250,4 +244,18 @@ map<string, Channel>::iterator Server::createChannel(string name, string passwor
 map<string, Channel>::iterator Server::getChannel(string name)
 {
 	return channels.find(name);
+}
+
+Client &Server::getClientFromFd(int fd)
+{
+	map<string, Client>::iterator it = clients.begin();
+
+	for(; it != clients.end(); it++)
+	{
+		if (it -> second.getFd() == fd)
+		{
+			return (it -> second);
+		}
+	}
+	return (it -> second);
 }
