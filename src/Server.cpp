@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/21 17:52:09 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/22 13:21:44 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,9 +266,10 @@ void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens,
 
 map<string, Channel>::iterator Server::createChannel(string name, string password)
 {
-	channels[name] = Channel(name, password);
-	return channels.find(name);
+    pair<map<string, Channel>::iterator, bool> result = channels.insert(make_pair(name, Channel(name, password)));
+    return result.first;
 }
+
 
 map<string, Channel>::iterator Server::getChannel(string name)
 {

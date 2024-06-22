@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:54:34 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/10 00:19:49 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/22 14:51:07 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,12 @@ FD &FD::operator<<(std::string str) {
 
 void FD::operator>>(std::string& str) {
 	char buffer[1024] = { 0 };
+	// TODO: implement 
 	str.clear();
-	read(fd, buffer, sizeof(buffer));
+	int bytesRead = read(fd, buffer, sizeof(buffer) - 1);
+	if (bytesRead <= 0)
+		return; // TODO: Need to more stuff in this case
+	buffer[bytesRead] = 0;
 	str += buffer;
 	cout << str;
 	str.erase(find(str.begin(), str.end(), '\r'), str.end());
