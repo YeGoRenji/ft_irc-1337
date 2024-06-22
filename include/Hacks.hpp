@@ -5,6 +5,8 @@
 # include <sstream>
 # include <map>
 # include <vector>
+# include <algorithm>
+# include <fcntl.h>
 
 using std::cout;
 using std::stringstream;

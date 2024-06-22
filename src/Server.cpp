@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/22 18:15:38 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/22 20:50:30 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ Server::Server(int port, string pass): password(pass)
 	serverSocket.setValue(chk(socket(AF_INET, SOCK_STREAM, 0), "Couldn't open socket"));
 
 	cout << "Server socket : " << serverSocket.getValue() << endl;
+	fcntl(serverSocket.getValue(), F_SETFL, O_NONBLOCK);
 
 	int yes = 1;
 
@@ -72,6 +73,7 @@ void Server::start() {
 		if (fds[0].revents & POLLIN) {
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
 			int newClientFd = newClient.getFd();
+			fcntl(newClientFd, F_SETFL, O_NONBLOCK);
 			// clients.push_back(newClient);
 			clients.insert(make_pair(newClient.getNick(), newClient));
 			cout << "New client connected " << newClientFd << ", size = " << clients.size() << endl;
@@ -84,12 +86,12 @@ void Server::start() {
 				Client &currentCLient = getClientFromFd(fds[i].fd);
 				cout << "Client " << fds[i].fd << " disconnected" << endl;
 				quitUser(currentCLient, fds);
+				break;
 			}
 			else if (fds[i].revents & POLLIN) {
 				Client &currentCLient = getClientFromFd(fds[i].fd);
 				string data;
-				cout << "DATA COMING" << endl;
-				//fcntl(fd, F_SETFL, O_NONBLOCK);
+				cout << "DATA COMING to client: " << currentCLient.getNick() << endl;
 				currentCLient.getFdObject() >> data;
 				cout << "Got <" << data << "> from Client " << currentCLient.getFd() << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
@@ -219,7 +221,7 @@ void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens,
 	vector<string> passwords = Utility::getCommandTokens(passwordsTokens);
 
 	for (i = 0; i < channelNames.size(); i++)
-		ch.push_back((channelInfo){.name=channelNames[i]});
+		ch.push_back((channelInfo){.name=channelNames[i], .password=""});
 
 	size_t min_iter = min(channelNames.size(), passwords.size());
 	for (i = 0; i < min_iter; i++)
@@ -249,5 +251,6 @@ Client &Server::getClientFromFd(int fd)
 			return (it -> second);
 		}
 	}
+	cerr << "\033[31;1;4mBUG:\033[0m did not find client with fd " << fd << endl;
 	return (it -> second);
 }
