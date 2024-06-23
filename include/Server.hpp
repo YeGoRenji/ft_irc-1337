@@ -33,6 +33,7 @@ public:
 	void parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
 	string& getServerName();
 	map<int, Client>::iterator getClientFromNick(string &nick);
+	static string serverName;
 
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
@@ -41,7 +42,6 @@ private:
 	map<string, Channel>::iterator getChannel(string name);
 	map<string, Channel>::iterator createChannel(string name, string password);
 
-	static string serverName;
 	Server();
 	map<int, Client> clients;
 	map<string, Channel> channels;

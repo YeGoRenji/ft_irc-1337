@@ -5,6 +5,9 @@
 #include<Client.hpp>
 #include<Server.hpp>
 
+//#define SIMPLE_REPLIES
+//	X(001, WELCOME, "Welcome to the jeffy Network, ") 
+
 class Server;
 class Client;
 

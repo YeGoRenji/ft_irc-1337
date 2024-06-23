@@ -11,6 +11,7 @@ Channel::Channel(string _name, string _password): name(_name), password(_passwor
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
 
+
 // getters
 const string& Channel::getChannelName() const
 {
@@ -46,9 +47,21 @@ void Channel::addOperator(Client &client)
 {
 	if (find(chanOps.begin(), chanOps.end(), &client) != chanOps.end())
 	{
-		cout << "---------- wtf " << endl;
 		return; // TODO : do we need to send an error or something here (e.g trying re-make an op)
 	}
 	chanOps.push_back(&client);
-	cout << "------- successfully added an chanOp" << endl;
+}
+
+void Channel::broadcast(string message)
+{
+	map<string, Client*>::iterator member_it = members.begin();
+	map<string, Client*>::iterator member_ite = members.end();
+	
+	message += "\r\n";
+
+	for (; member_it != member_ite; member_it++)
+	{
+		FD member_fd = member_it -> second -> getFd();
+		member_fd << message;
+	}
 }

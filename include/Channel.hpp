@@ -22,6 +22,7 @@ public:
 	bool checkPassword(string userPassLine);
 	bool hasPassword() const;
 	void addOperator(Client &client);
+	void broadcast(string message);
 
 	~Channel();
 private:

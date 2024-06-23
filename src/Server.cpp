@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/23 16:24:56 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/23 17:18:35 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,26 +75,20 @@ void Server::start() {
 			int newClientFd = newClient.getFd();
 			fcntl(newClientFd, F_SETFL, O_NONBLOCK);
 			// clients.push_back(newClient);
-			cout << "Before client connected size = " << clients.size() << endl;
 			clients.insert(make_pair(newClientFd, newClient));
-			cout << "New client connected " << newClientFd << ", size = " << clients.size() << endl;
 			fds[0].revents = 0;
 			fds.push_back((pollfd){ newClientFd, POLLIN, 0 });
 		}
 
 		for (size_t i = fds.size() - 1; i > 0; --i) {
+			Client &currentCLient = clients[fds[i].fd];
 			if (fds[i].revents & POLLHUP) {
-				cout << "POLLHUP from " << fds[i].fd << endl;
-				Client &currentCLient = clients[fds[i].fd];
-				cout << "Client " << currentCLient.getNick() << " fd: " << fds[i].fd << " disconnected" << endl;
+				//Client &currentCLient = clients[fds[i].fd];
 				quitUser(currentCLient, fds);
-				break;
 			}
 			else if (fds[i].revents & POLLIN) {
-				cout << "POLLIN from " << fds[i].fd << endl;
-				Client &currentCLient = clients[fds[i].fd];
+			//	Client &currentCLient = clients[fds[i].fd];
 				string data;
-				cout << "DATA COMING to client: " << currentCLient.getNick() << " fd : " << currentCLient.getFd() << endl;
 				currentCLient.getFdObject() >> data;
 				cout << "Got <" << data << "> from Client " << currentCLient.getFd() << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
@@ -182,13 +176,13 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 		{
 			// TODO : ask someone if we should create any non-existant channel that the user suplied
 			// cause the RFC has an error called ERR_NOSUCHCHANNEL(403)
-			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
+//			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
 			currChannel = createChannel(it -> name, it -> password);
 			currChannel -> second.addOperator(client);
 		}
 		else
 		{
-			cerr << "channel " << it -> name << " exists!" << endl;
+//			cerr << "channel " << it -> name << " exists!" << endl;
 			// channel has pass but user didn't supply it
 			if (currChannel -> second.hasPassword() && (it -> password).empty())
 			{
@@ -204,8 +198,9 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 			// do nothing, currChannel already points to the right channel
 			// now just add the user to the channel and broadcast
 		}
-		cout << "gonna add the member now" << endl;
 		// adduser to channel
+		// TODO : fix this after making x macroes for replies!!
+		currChannel -> second.broadcast("a nigger has joined");
 		currChannel -> second.addMember(client);
 		// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
 	}
@@ -242,7 +237,6 @@ map<string, Channel>::iterator Server::getChannel(string name)
 map<int, Client>::iterator Server::getClientFromNick(string &nick)
 {
 	map<int, Client>::iterator it = clients.begin();
-	cerr << "size = " << clients.size() << endl;
 
 	for(; it != clients.end(); it++)
 	{

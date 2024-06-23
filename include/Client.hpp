@@ -12,8 +12,8 @@ class Server;
 
 class Client {
 public:
-	Client(int fd);
 	Client();
+	Client(int fd);
 	~Client();
 	void disconnect();
 	//void login(Server &server);
