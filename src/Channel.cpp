@@ -41,3 +41,14 @@ Channel::~Channel()
 	// TODO : Problem : this gets called a lot, figure out a better way
 	//std::cout << "Channel: Destructor called" << endl;
 }
+
+void Channel::addOperator(Client &client)
+{
+	if (find(chanOps.begin(), chanOps.end(), &client) != chanOps.end())
+	{
+		cout << "---------- wtf " << endl;
+		return; // TODO : do we need to send an error or something here (e.g trying re-make an op)
+	}
+	chanOps.push_back(&client);
+	cout << "------- successfully added an chanOp" << endl;
+}

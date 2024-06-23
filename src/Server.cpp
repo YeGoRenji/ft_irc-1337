@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/23 13:14:06 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/23 16:24:56 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,25 +129,15 @@ bool Server::checkPassword(string input) {
 
 void Server::quitUser(Client &currClient, vector<pollfd> &fds)
 {
-	// size_t fds_num = fds.size();
-	// size_t i = 1;
 	vector<pollfd>::iterator it = fds.begin();
 
 	while (it != fds.end() && it->fd != currClient.getFd())
 		it++;
-	// while(i < fds_num && (fds[i].fd != currClient.getFd())) {
-	// 	cerr << "Comparing " << fds[i].fd << " to " << currClient.getFd() << endl;
-	// 	i++;
-	// }
-	// cerr << "Compared after while " << fds[i].fd << " to " << currClient.getFd() << endl;
 
 	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(currClient);
 
 	currClient.disconnect();
 	clients.erase(it->fd);
-	cerr << "Size after erase: " << clients.size() << endl;
-	// cerr << "i = " << i << endl;
-	cerr << "Removing fd = " << it->fd << endl;
 	fds.erase(it);
 }
 
@@ -194,6 +184,7 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 			// cause the RFC has an error called ERR_NOSUCHCHANNEL(403)
 			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
 			currChannel = createChannel(it -> name, it -> password);
+			currChannel -> second.addOperator(client);
 		}
 		else
 		{
