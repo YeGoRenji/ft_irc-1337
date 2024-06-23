@@ -1,17 +1,19 @@
 #ifndef Client_HPP
 # define Client_HPP
-# include "FD.hpp"
-# include "Hacks.hpp"
+# include <FD.hpp>
+# include <Hacks.hpp>
 # include <unistd.h>
-# include "Server.hpp"
-# include "Utility.hpp"
+# include <Server.hpp>
+# include <Utility.hpp>
 # include <Replies.hpp>
+#include <Errors.hpp>
 
 class Server;
 
 class Client {
 public:
 	Client(int fd);
+	Client();
 	~Client();
 	void disconnect();
 	//void login(Server &server);
@@ -26,7 +28,6 @@ public:
 	FD &getFdObject();
 
 private:
-	Client();
 	FD fdObject;
 	// authentication thingies
 	bool isAuthed;

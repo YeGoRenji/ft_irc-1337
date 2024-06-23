@@ -1,7 +1,7 @@
 #include <Client.hpp>
-#include <Errors.hpp>
 
-Client::Client(): isAuthed(false)
+Client::Client():
+fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false)
 {
 	// cout << "Client: Default constructor called" << endl;
 }

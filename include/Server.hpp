@@ -5,16 +5,10 @@
 # include <Client.hpp>
 # include <Hacks.hpp>
 # include <Errors.hpp>
-# include <cstdio>
-# include <cstring>
-# include <vector>
-# include <cstdlib>
 # include <unistd.h>
 # include <sys/socket.h>
 # include <sys/poll.h>
 # include <netinet/in.h>
-# include <cerrno>
-# include <cmath>
 
 // for linux
 # ifndef WAIT_ANY
@@ -38,7 +32,7 @@ public:
 	bool checkUserExistence(string nickName);
 	void parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
 	string& getServerName();
-	Client &getClientFromFd(int fd);
+	map<int, Client>::iterator getClientFromNick(string &nick);
 
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
@@ -49,7 +43,7 @@ private:
 
 	static string serverName;
 	Server();
-	map<string, Client> clients;
+	map<int, Client> clients;
 	map<string, Channel> channels;
 	FD serverSocket;
 	string password;

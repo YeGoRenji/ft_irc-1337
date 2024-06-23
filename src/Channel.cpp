@@ -1,4 +1,4 @@
-#include "Channel.hpp"
+#include <Channel.hpp>
 
 Channel::Channel(): name("default") // op("default")
 {
