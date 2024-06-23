@@ -21,8 +21,17 @@ const string& Channel::getChannelName() const
 void Channel::addMember(Client &client)
 {
 	// TODO : maybe try to make this a reference later?
+	// cerr << "Addr = " << &client << endl;
 	members[client.getNick()] = &client;
+	// cerr << client.getNick().size() << endl;
 	cout << client.getNick() << " was added to channel " << getChannelName() << endl;
+}
+
+void Channel::removeMember(string &nick)
+{
+	if (!hasMember(nick))
+		return ;
+	members.erase(nick);
 }
 
 bool Channel::hasPassword() const
@@ -61,7 +70,10 @@ void Channel::broadcast(string message)
 
 	for (; member_it != member_ite; member_it++)
 	{
-		FD member_fd = member_it -> second -> getFd();
-		member_fd << message;
+		member_it -> second -> getFdObject() << message;
 	}
+}
+
+bool Channel::hasMember(string &nick) {
+	return (members.find(nick) != members.end());
 }

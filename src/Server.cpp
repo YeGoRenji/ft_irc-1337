@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/23 17:18:35 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/23 18:04:48 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,24 +70,30 @@ void Server::start() {
 
 		chk(poll(fds.data(), fds.size(), WAIT_ANY), "poll failed");
 
+		cerr << "BEFORE IF" << endl;
+
 		if (fds[0].revents & POLLIN) {
+			cerr << "Before..." << endl;
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
+			cerr << "After..." << endl;
 			int newClientFd = newClient.getFd();
 			fcntl(newClientFd, F_SETFL, O_NONBLOCK);
 			// clients.push_back(newClient);
-			clients.insert(make_pair(newClientFd, newClient));
+			clients[newClientFd] = newClient;
+			// clients.insert(make_pair(, newClient));
 			fds[0].revents = 0;
 			fds.push_back((pollfd){ newClientFd, POLLIN, 0 });
 		}
 
+		cerr << "AFTER IF" << endl;
+
 		for (size_t i = fds.size() - 1; i > 0; --i) {
-			Client &currentCLient = clients[fds[i].fd];
 			if (fds[i].revents & POLLHUP) {
-				//Client &currentCLient = clients[fds[i].fd];
+				Client &currentCLient = clients[fds[i].fd];
 				quitUser(currentCLient, fds);
 			}
 			else if (fds[i].revents & POLLIN) {
-			//	Client &currentCLient = clients[fds[i].fd];
+				Client &currentCLient = clients[fds[i].fd];
 				string data;
 				currentCLient.getFdObject() >> data;
 				cout << "Got <" << data << "> from Client " << currentCLient.getFd() << endl;
@@ -129,6 +135,12 @@ void Server::quitUser(Client &currClient, vector<pollfd> &fds)
 		it++;
 
 	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(currClient);
+
+	for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		string nick = currClient.getNick();
+		it->second.removeMember(nick);
+	}
 
 	currClient.disconnect();
 	clients.erase(it->fd);

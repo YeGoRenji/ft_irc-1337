@@ -3,19 +3,19 @@
 Client::Client():
 fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false)
 {
-	// cout << "Client: Default constructor called" << endl;
+	cout << "Client: Default constructor called" << endl;
 }
 
 Client::Client(int _fd):
 fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false)
 {
-	// cout << "Client: Parameter constructor called" << endl;
+	cout << "Client: Parameter constructor called" << endl;
 }
 
 Client::~Client()
 {
 	// TODO: Remove this line it was added to fix Wextra
-	// cout << "Client: Destructor called" << endl;
+	cout << "Client: Destructor called" << endl;
 }
 
 int Client::getFd() {

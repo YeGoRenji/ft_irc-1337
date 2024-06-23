@@ -19,16 +19,17 @@ public:
 	const string& getChannelName() const; 
 
 	void addMember(Client &client);
+	void removeMember(string &nick);
 	bool checkPassword(string userPassLine);
 	bool hasPassword() const;
+	bool hasMember(string &nick);
 	void addOperator(Client &client);
 	void broadcast(string message);
-
 	~Channel();
 private:
 	string name;
 	string topic; // TODO how to set the topic??
-				  
+
 	map<string, Client*> members;
 	vector<Client*> chanOps;
 	// password
