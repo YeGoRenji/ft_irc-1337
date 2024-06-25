@@ -6,6 +6,11 @@
 
 class Client;
 
+enum BroadCastAction {
+	JOIN,
+	PART
+};
+
 struct Message {
 	Client *sender;
 	string body;
@@ -25,7 +30,7 @@ public:
 	bool hasMember(string &nick);
 	void addOperator(Client &client);
 	void broadcastMessage(string message);
-	void broadcastJoiner(Client &joiner);
+	void broadcastAction(Client &joiner, BroadCastAction action);
 	~Channel();
 private:
 	string name;

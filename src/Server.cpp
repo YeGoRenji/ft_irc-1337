@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/25 16:00:52 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/25 16:24:19 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		currentCLient.setUsernameAndRealName(*this, tokens);
 	else if (tokens[0] == "QUIT")
 		quitUser(currentCLient, fds);
-	else if (tokens[0] == "JOIN") // TODO : STILL NOT FINISHED
+	else if (tokens[0] == "JOIN") // TODO : DEFINITALLY STILL NOT FINISHED
 		AddClientoChannel(currentCLient, tokens);
 	else if (tokens[0] == "PART")
 		RemoveClientFromChannel(currentCLient, tokens); // TODO : STILL NOT FINISHED
@@ -214,7 +214,7 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 		}
 		// adduser to channel
 		// TODO : fix this after making x macroes for replies!!
-		currChannel -> second.broadcastJoiner(client);
+		currChannel -> second.broadcastAction(client, JOIN);
 		currChannel -> second.addMember(client);
 		// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
 	}
@@ -282,6 +282,7 @@ void Server::RemoveClientFromChannel(Client &client, vector<string> tokens)
 	 		return Errors::ERR_NOTONCHANNEL(channelName, client, *this);
 
 		ch -> second.removeMember(clientNick);
-		// TODO: check if we should send an error and broadcast to limechat
+		// TODO: something is missing in the message sent here
+		ch -> second.broadcastAction(client, PART);
 	}
 }

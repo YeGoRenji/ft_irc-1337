@@ -61,9 +61,13 @@ void Channel::addOperator(Client &client)
 	chanOps.push_back(&client);
 }
 
-void Channel::broadcastJoiner(Client &joiner)
+void Channel::broadcastAction(Client &joiner, BroadCastAction action)
 {
 	string reply = ":";
+	const char *toStr[2] = {
+		"JOIN",
+		"PART"
+	};
 
 	reply += joiner.getNick();
 	reply += "!";
@@ -71,7 +75,7 @@ void Channel::broadcastJoiner(Client &joiner)
 	reply += "@";
 	reply += joiner.getIp();
 	reply += " ";
-	reply += "JOIN";
+	reply += toStr[action];
 	reply += " ";
 	reply += this -> name;
 	reply += "\r\n";

@@ -1,3 +1,8 @@
 (echo -en 'PASS 123\r\nNICK jeffy\r\n' ; cat) | nc localhost 6969
 - FIX ctrl-d
 - fix enter segfault on nc
+
+
+
+JOIN COMMAND:
+Note that this command also accepts the special argument of ("0", 0x30) instead of any of the usual parameters, which requests that the sending client leave all channels they are currently connected to. The server will process this command as though the client had sent a PART command for each channel they are a member of.

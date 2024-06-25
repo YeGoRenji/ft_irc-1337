@@ -8,6 +8,8 @@
 # include <algorithm>
 # include <fcntl.h>
 
+# define NAME(token) #token
+
 using std::cout;
 using std::stringstream;
 using std::cerr;
