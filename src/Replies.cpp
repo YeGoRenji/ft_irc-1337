@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 15:14:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/25 14:42:46 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/25 15:53:19 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,19 @@ void Replies::RPL_WELCOME(Client &client, Server &server)
 }
 
 
-void Replies::RPL_CUSTOM_CLIENT_JOINED(string channel, Client &client, Server &server)
+void Replies::RPL_CUSTOM_CLIENT_JOINED(string channel, Client &joiner, Client &client)
 {
 	FD fd = client.getFdObject();
-
-	static_cast<void>(server);
 
 	string reply = ":";
 	// string reply = "069 ";
 	// reply += Utility::getClientName(client, server);
 	// reply += " :";
-	reply += client.getNick();
+	reply += joiner.getNick();
 	reply += "!";
-	reply += client.getUsername();
+	reply += joiner.getUsername();
 	reply += "@";
-	reply += client.getIp();
+	reply += joiner.getIp();
 	reply += " ";
 	reply += "JOIN";
 	reply += " ";

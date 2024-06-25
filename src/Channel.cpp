@@ -61,13 +61,29 @@ void Channel::addOperator(Client &client)
 	chanOps.push_back(&client);
 }
 
-void Channel::broadcast(string message)
+void Channel::broadcastJoiner(Client &joiner)
+{
+	string reply = ":";
+
+	reply += joiner.getNick();
+	reply += "!";
+	reply += joiner.getUsername();
+	reply += "@";
+	reply += joiner.getIp();
+	reply += " ";
+	reply += "JOIN";
+	reply += " ";
+	reply += this -> name;
+	reply += "\r\n";
+
+	broadcastMessage(reply);
+}
+
+void Channel::broadcastMessage(string message)
 {
 	map<string, Client*>::iterator member_it = members.begin();
 	map<string, Client*>::iterator member_ite = members.end();
 	
-	message += "\r\n";
-
 	for (; member_it != member_ite; member_it++)
 	{
 		member_it -> second -> getFdObject() << message;

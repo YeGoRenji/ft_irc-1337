@@ -24,7 +24,8 @@ public:
 	bool hasPassword() const;
 	bool hasMember(string &nick);
 	void addOperator(Client &client);
-	void broadcast(string message);
+	void broadcastMessage(string message);
+	void broadcastJoiner(Client &joiner);
 	~Channel();
 private:
 	string name;

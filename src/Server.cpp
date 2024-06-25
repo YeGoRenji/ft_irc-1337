@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/25 10:58:13 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/25 16:00:52 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,9 +214,8 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 		}
 		// adduser to channel
 		// TODO : fix this after making x macroes for replies!!
-		currChannel -> second.broadcast("a nigger has joined");
+		currChannel -> second.broadcastJoiner(client);
 		currChannel -> second.addMember(client);
-		Replies::RPL_CUSTOM_CLIENT_JOINED(currChannel->second.getChannelName(), client, *this);
 		// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
 	}
 }
