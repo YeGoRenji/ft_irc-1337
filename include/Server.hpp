@@ -41,6 +41,7 @@ private:
 	void AddClientoChannel(Client &client, vector<string> tokens);
 	map<string, Channel>::iterator getChannel(string name);
 	map<string, Channel>::iterator createChannel(string name, string password);
+	void RemoveClientFromChannel(Client &client, vector<string> tokens);
 
 	Server();
 	map<int, Client> clients;

@@ -6,8 +6,9 @@ fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fal
 	cout << "Client: Default constructor called" << endl;
 }
 
+// TODO: ip should be dynamic not always "localhost"
 Client::Client(int _fd):
-fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false)
+fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("localhost")
 {
 	cout << "Client: Parameter constructor called" << endl;
 }
@@ -139,6 +140,16 @@ void Client::setUsernameAndRealName(Server &server, vector<string> tokens)
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
 		Replies::RPL_WELCOME(*this, server);
 	isAuthed = passGiven & nickGiven & userGiven;
+}
+
+string &Client::getIp()
+{
+	return (this->ip);
+}
+
+string Client::getUsername()
+{
+	return (this->username);
 }
 
 void Client::disconnect() {

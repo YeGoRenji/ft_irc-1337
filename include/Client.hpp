@@ -25,7 +25,9 @@ public:
 	bool wasWelcomed;
 	int getFd();
 	string getNick();
+	string getUsername();
 	FD &getFdObject();
+	string &getIp();
 
 private:
 	FD fdObject;
@@ -38,6 +40,7 @@ private:
 	string nickname;
 	string realname;
 	string username;
+	string ip;
 
 	void getLineStream(stringstream &ss);
 	bool nickNameAlreadyExists(Server &server, string nickname);

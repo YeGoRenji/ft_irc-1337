@@ -6,10 +6,11 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/23 18:04:48 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/25 10:58:13 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Replies.hpp"
 #include <Server.hpp>
 #include <Client.hpp>
 
@@ -70,12 +71,8 @@ void Server::start() {
 
 		chk(poll(fds.data(), fds.size(), WAIT_ANY), "poll failed");
 
-		cerr << "BEFORE IF" << endl;
-
 		if (fds[0].revents & POLLIN) {
-			cerr << "Before..." << endl;
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
-			cerr << "After..." << endl;
 			int newClientFd = newClient.getFd();
 			fcntl(newClientFd, F_SETFL, O_NONBLOCK);
 			// clients.push_back(newClient);
@@ -85,7 +82,6 @@ void Server::start() {
 			fds.push_back((pollfd){ newClientFd, POLLIN, 0 });
 		}
 
-		cerr << "AFTER IF" << endl;
 
 		for (size_t i = fds.size() - 1; i > 0; --i) {
 			if (fds[i].revents & POLLHUP) {
@@ -119,8 +115,14 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		currentCLient.setUsernameAndRealName(*this, tokens);
 	else if (tokens[0] == "QUIT")
 		quitUser(currentCLient, fds);
-	else if (tokens[0] == "JOIN")
+	else if (tokens[0] == "JOIN") // TODO : STILL NOT FINISHED
 		AddClientoChannel(currentCLient, tokens);
+	else if (tokens[0] == "PART")
+		RemoveClientFromChannel(currentCLient, tokens); // TODO : STILL NOT FINISHED
+	else
+	{
+		cerr << "lach msayft command khawi a wld l 9a7ba" << endl;
+	}
 }
 
 bool Server::checkPassword(string input) {
@@ -214,6 +216,7 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 		// TODO : fix this after making x macroes for replies!!
 		currChannel -> second.broadcast("a nigger has joined");
 		currChannel -> second.addMember(client);
+		Replies::RPL_CUSTOM_CLIENT_JOINED(currChannel->second.getChannelName(), client, *this);
 		// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
 	}
 }
@@ -258,4 +261,28 @@ map<int, Client>::iterator Server::getClientFromNick(string &nick)
 		}
 	}
 	return it;
+}
+
+void Server::RemoveClientFromChannel(Client &client, vector<string> tokens)
+{
+	size_t tokens_len = tokens.size();
+	string command = tokens[0];
+	if (tokens_len == 1)
+		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
+	
+	string channelName;
+	for(size_t i = 1; i < tokens_len; i++)
+	{
+		channelName = tokens[i];
+		map<string, Channel>::iterator ch = getChannel(channelName);
+		if (ch == channels.end())
+			 return Errors::ERR_NOSUCHCHANNEL(channelName, client, *this);
+
+		string clientNick = client.getNick();
+		if (!ch -> second.hasMember(clientNick))
+	 		return Errors::ERR_NOTONCHANNEL(channelName, client, *this);
+
+		ch -> second.removeMember(clientNick);
+		// TODO: check if we should send an error and broadcast to limechat
+	}
 }

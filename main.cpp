@@ -1,17 +1,16 @@
 #include "Server.hpp"
+
 void	check_port(string port)
 {
-	for (int a = 0; port[a]; a++)
+	for (size_t i = 0; i < port.size(); i++)
 	{
-		if (!isdigit(port[a]))
+		if (!isdigit(port[i]))
 		{
 			cerr << "\e[033;0;31m	⚡︎   ❌ Error PORT ❌	⚡\e[0m" << endl;
 			exit(1);
 		}
 	}
 }
-
-
 
 int main (int argc, char **argv) {
 

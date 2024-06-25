@@ -31,14 +31,13 @@
 	}
 	ONE_ARG_ERRORS
 
-
-	void Errors::CUSTOM_CLIENT_GONE_TO_EDGE(Client &client)
-	{
-
-		FD fd = client.getFdObject();
-
-		string error = "ERROR :Client gone to edge";
-		error += "\r\n";
-		fd << error; \
-	}
 #undef X
+
+void Errors::CUSTOM_CLIENT_GONE_TO_EDGE(Client &client)
+{
+	FD fd = client.getFdObject();
+
+	string error = "ERROR :Client gone to edge";
+	error += "\r\n";
+	fd << error; \
+}

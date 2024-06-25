@@ -14,6 +14,7 @@ class Client;
 class Replies {
 public:
 	static void RPL_WELCOME(Client &client, Server &server);
+	static void RPL_CUSTOM_CLIENT_JOINED(string channel, Client &client, Server &server);
 
 private:
 	Replies();

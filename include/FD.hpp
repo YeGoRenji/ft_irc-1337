@@ -1,9 +1,7 @@
 #ifndef FD_HPP
 # define FD_HPP
-# include <iostream>
 # include <unistd.h>
 # include <Hacks.hpp>
-# include <algorithm>
 
 using std::string;
 
