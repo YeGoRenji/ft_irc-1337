@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 15:14:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 16:33:34 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:38:17 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,37 @@ void Replies::RPL_TOPIC(Channel &channel, Client &client, Server &server)
 
 }
 
+void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
+{
+	FD fd = client.getFdObject();
+
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 353 ";
+	reply += Utility::getClientName(client, server);
+	reply += " = ";
+	reply += channel.getChannelName();
+	reply += " :";
+	reply += Utility::constructMemberList(channel.getMembers(), "");
+	reply += Utility::constructMemberList(channel.getChanOps(), "@");
+	reply += "\r\n";
+
+	fd << reply;
+}
 
 
+void Replies::RPL_ENDOFNAMES(Channel &channel, Client &client, Server &server)
+{
+	FD fd = client.getFdObject();
 
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 366 ";
+	reply += Utility::getClientName(client, server);
+	reply += " ";
+	reply += channel.getChannelName();
+	reply += " :End of /NAMES list";
+	reply += "\r\n";
+
+	fd << reply;
+}

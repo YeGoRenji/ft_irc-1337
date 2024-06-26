@@ -30,6 +30,7 @@ void Channel::removeMember(Client &client, string reason)
 
 	broadcastAction(client, reason, PART);
 	members.erase(nick);
+	chanOps.erase(nick);
 }
 
 bool Channel::hasPassword() const
@@ -52,11 +53,11 @@ Channel::~Channel()
 
 void Channel::addOperator(Client &client)
 {
-	if (find(chanOps.begin(), chanOps.end(), &client) != chanOps.end())
+	if (chanOps.find(client.getNick()) != chanOps.end())
 	{
 		return; // TODO : do we need to send an error or something here (e.g trying re-make an op)
 	}
-	chanOps.push_back(&client);
+	chanOps[client.getNick()] = &client;
 }
 
 void Channel::broadcastAction(Client &client, string reason, BroadCastAction action)
@@ -104,14 +105,7 @@ bool Channel::hasMember(string &nick) {
 }
 
 bool Channel::isOperator(string &nick) {
-	vector<Client *>::iterator cliIt = chanOps.begin();
-	vector<Client *>::iterator cliIte = chanOps.end();
-
-	for (; cliIt != cliIte; ++cliIt)
-		if ((*cliIt)->getNick() == nick)
-			return true;
-
-	return false;
+	return (chanOps.find(nick) != chanOps.end());
 }
 
 bool Channel::isValidName(string &name) {
@@ -128,6 +122,12 @@ bool Channel::isValidName(string &name) {
 	return true;
 }
 
+void Channel::sendClientsList(Channel &channel, Client &client, Server &server)
+{
+	Replies::RPL_NAMREPLY(channel, client, server);
+	Replies::RPL_ENDOFNAMES(channel, client, server);
+}
+
 // getters
 const string& Channel::getChannelName() const
 {
@@ -137,6 +137,14 @@ const string& Channel::getChannelName() const
 const string& Channel::getTopic() const
 {
 	return (this -> topic);
+}
+
+map<string, Client*> &Channel::getMembers() {
+	return (this -> members);
+}
+
+map<string, Client*> &Channel::getChanOps() {
+	return (this -> chanOps);
 }
 
 // setters

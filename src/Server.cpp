@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 16:33:20 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:43:06 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	else if (tokens[0] == "JOIN") // TODO : DEFINITALLY STILL NOT FINISHED
 		AddClientoChannel(currentCLient, tokens);
 	else if (tokens[0] == "PART")
-		RemoveClientFromChannel(currentCLient, tokens); // TODO : STILL NOT FINISHED
+		RemoveClientFromChannels(currentCLient, tokens); // TODO : STILL NOT FINISHED
 	else if (tokens[0] == "KICK")
 		KickClientFromChannel(currentCLient, tokens);
 	else
@@ -217,6 +217,7 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 		channelIt -> second.addMember(client);
 		if (!channelIt->second.getTopic().empty())
 			Replies::RPL_TOPIC(channelIt->second, client, *this);
+		channelIt -> second.sendClientsList(channelIt->second, client, *this);
 		// channelIt -> second.broadcastAction(client, JOIN);
 	}
 }
@@ -263,7 +264,7 @@ map<int, Client>::iterator Server::getClientFromNick(string &nick)
 	return it;
 }
 
-void Server::RemoveClientFromChannel(Client &client, vector<string> &tokens)
+void Server::RemoveClientFromChannels(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
 	string command = tokens[0];
