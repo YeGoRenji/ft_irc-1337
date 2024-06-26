@@ -6,17 +6,11 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password): name(_name), password(_password) //, op(NULL)
+Channel::Channel(string _name, string _password): name(_name), topic("+65-59"), password(_password) // TODO: remove topic()
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
 
-
-// getters
-const string& Channel::getChannelName() const
-{
-	return (this -> name);
-}
 
 void Channel::addMember(Client &client)
 {
@@ -132,4 +126,21 @@ bool Channel::isValidName(string &name) {
 		return false;
 
 	return true;
+}
+
+// getters
+const string& Channel::getChannelName() const
+{
+	return (this -> name);
+}
+
+const string& Channel::getTopic() const
+{
+	return (this -> topic);
+}
+
+// setters
+void Channel::setTopic(string topic)
+{
+	this -> topic = topic;
 }

@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 16:00:43 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 16:33:20 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,8 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 		}
 		// adduser to channel
 		channelIt -> second.addMember(client);
+		if (!channelIt->second.getTopic().empty())
+			Replies::RPL_TOPIC(channelIt->second, client, *this);
 		// channelIt -> second.broadcastAction(client, JOIN);
 	}
 }

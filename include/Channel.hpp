@@ -22,6 +22,10 @@ public:
 	Channel(string name, string password); // TODO : add operators
 	// getters
 	const string& getChannelName() const;
+	const string& getTopic() const;
+
+	// setters
+	void setTopic(string topic);
 
 	void addMember(Client &client);
 	void removeMember(Client &client, string reason);
@@ -36,7 +40,7 @@ public:
 	~Channel();
 private:
 	string name;
-	string topic; // TODO how to set the topic??
+	string topic;
 
 	map<string, Client*> members;
 	vector<Client*> chanOps;

@@ -10,12 +10,14 @@
 
 class Server;
 class Client;
+class Channel;
 
 class Replies {
 public:
 	static void RPL_WELCOME(Client &client, Server &server);
 	static void RPL_YOURHOST(Client &client, Server &server);
-	static void RPL_CUSTOM_CLIENT_JOINED(string channel, Client &joiner, Client &client);
+	static void RPL_TOPIC(Channel &channel, Client &client, Server &server);
+	// static void RPL_CUSTOM_CLIENT_JOINED(string channel, Client &joiner, Client &client);
 
 private:
 	Replies();
