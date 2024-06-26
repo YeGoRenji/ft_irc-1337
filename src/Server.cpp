@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/25 16:24:19 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 12:05:48 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,7 @@ bool Server::checkUserExistence(string nickName)
 
 void Server::AddClientoChannel(Client &client, vector<string> tokens)
 {
+	// TODO: Refactor this method !
 	string channelsTokens;
 	string passwordsTokens;
 
@@ -185,26 +186,25 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 	{
 		cerr << "handling channel : " << it -> name << endl;
 		// check if channel exists if not create it
-		map<string, Channel>::iterator currChannel = getChannel(it -> name);
-		if (currChannel == channels.end())
+		map<string, Channel>::iterator channelIt = getChannel(it -> name);
+		if (channelIt == channels.end())
 		{
-			// TODO : ask someone if we should create any non-existant channel that the user suplied
 			// cause the RFC has an error called ERR_NOSUCHCHANNEL(403)
 //			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
-			currChannel = createChannel(it -> name, it -> password);
-			currChannel -> second.addOperator(client);
+			channelIt = createChannel(it -> name, it -> password);
+			channelIt -> second.addOperator(client);
 		}
 		else
 		{
 //			cerr << "channel " << it -> name << " exists!" << endl;
 			// channel has pass but user didn't supply it
-			if (currChannel -> second.hasPassword() && (it -> password).empty())
+			if (channelIt -> second.hasPassword() && (it -> password).empty())
 			{
 				Errors::ERR_BADCHANNELKEY(it -> name, client, *this);
 				return;
 			}
 			// user supplied a wrong password
-			if (!currChannel -> second.checkPassword(it -> password))
+			if (!channelIt -> second.checkPassword(it -> password))
 			{
 				Errors::ERR_BADCHANNELKEY(it -> name, client, *this);
 				return;
@@ -214,8 +214,8 @@ void Server::AddClientoChannel(Client &client, vector<string> tokens)
 		}
 		// adduser to channel
 		// TODO : fix this after making x macroes for replies!!
-		currChannel -> second.broadcastAction(client, JOIN);
-		currChannel -> second.addMember(client);
+		channelIt -> second.addMember(client);
+		channelIt -> second.broadcastAction(client, JOIN);
 		// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
 	}
 }
@@ -268,7 +268,7 @@ void Server::RemoveClientFromChannel(Client &client, vector<string> tokens)
 	string command = tokens[0];
 	if (tokens_len == 1)
 		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
-	
+
 	string channelName;
 	for(size_t i = 1; i < tokens_len; i++)
 	{
@@ -281,8 +281,8 @@ void Server::RemoveClientFromChannel(Client &client, vector<string> tokens)
 		if (!ch -> second.hasMember(clientNick))
 	 		return Errors::ERR_NOTONCHANNEL(channelName, client, *this);
 
-		ch -> second.removeMember(clientNick);
 		// TODO: something is missing in the message sent here
 		ch -> second.broadcastAction(client, PART);
+		ch -> second.removeMember(clientNick);
 	}
 }

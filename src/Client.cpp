@@ -113,8 +113,14 @@ void Client::setNick(Server &server, vector<string> tokens) {
 	this->nickname = tokens[1];
 	nickGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
-		Replies::RPL_WELCOME(*this, server);
+		this -> beWelcomed(server);
 	isAuthed = passGiven & nickGiven & userGiven;
+}
+
+void Client::beWelcomed(Server &server)
+{
+	Replies::RPL_WELCOME(*this, server);
+	Replies::RPL_YOURHOST(*this, server);
 }
 
 // TODO : what the fuck is an ident server in the rfc??
@@ -138,7 +144,7 @@ void Client::setUsernameAndRealName(Server &server, vector<string> tokens)
 
 	userGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
-		Replies::RPL_WELCOME(*this, server);
+		this -> beWelcomed(server);
 	isAuthed = passGiven & nickGiven & userGiven;
 }
 

@@ -4,7 +4,10 @@
 	void Errors::ERR_##MACRO(Client &client, Server &server) { \
 		FD fd = client.getFdObject(); \
 		\
-		string error = #code; \
+		string error = ":"; \
+		error += server.getServerName(); \
+		error += " "; \
+		error += #code; \
 		error += " "; \
 		error += Utility::getClientName(client, server); \
 		error += " :"; \
@@ -19,7 +22,10 @@
 	void Errors::ERR_##MACRO(string param, Client &client, Server &server) { \
 		FD fd = client.getFdObject(); \
 		\
-		string error = #code; \
+		string error = ":"; \
+		error += server.getServerName(); \
+		error += " "; \
+		error += #code; \
 		error += " "; \
 		error += Utility::getClientName(client, server); \
 		error += " "; \

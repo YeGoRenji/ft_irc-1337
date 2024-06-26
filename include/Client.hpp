@@ -20,6 +20,7 @@ public:
 	void setNick(Server &server, vector<string> tokens);
 	void passHandler(Server &server, vector<string> tokens);
 	void setUsernameAndRealName(Server &server, vector<string> vectors);
+	void beWelcomed(Server &server);
 	// getters;
 	bool isPassGiven();
 	bool wasWelcomed;
