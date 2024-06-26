@@ -272,9 +272,10 @@ void Server::RemoveClientFromChannel(Client &client, vector<string> &tokens)
 		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
 
 	string channelName;
-	for(size_t i = 1; i < tokens_len; i++)
+	for(size_t i = 1; i < tokens_len - 1; i++)
 	{
 		channelName = tokens[i];
+		cerr << "trying to leave <" << channelName << ">" << endl;
 		map<string, Channel>::iterator ch = getChannel(channelName);
 		if (ch == channels.end())
 			 return Errors::ERR_NOSUCHCHANNEL(channelName, client, *this);
