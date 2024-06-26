@@ -153,7 +153,7 @@ string &Client::getIp()
 	return (this->ip);
 }
 
-string Client::getUsername()
+string &Client::getUsername()
 {
 	return (this->username);
 }

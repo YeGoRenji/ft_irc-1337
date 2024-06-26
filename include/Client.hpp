@@ -26,7 +26,7 @@ public:
 	bool wasWelcomed;
 	int getFd();
 	string &getNick();
-	string getUsername();
+	string &getUsername();
 	FD &getFdObject();
 	string &getIp();
 
