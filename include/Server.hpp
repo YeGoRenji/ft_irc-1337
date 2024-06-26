@@ -38,10 +38,11 @@ public:
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &client, vector<pollfd> &fds);
-	void AddClientoChannel(Client &client, vector<string> tokens);
+	void AddClientoChannel(Client &client, vector<string> &tokens);
 	map<string, Channel>::iterator getChannel(string name);
 	map<string, Channel>::iterator createChannel(string name, string password);
-	void RemoveClientFromChannel(Client &client, vector<string> tokens);
+	void RemoveClientFromChannel(Client &client, vector<string> &tokens);
+	void KickClientFromChannel(Client &client, vector<string> &tokens);
 
 	Server();
 	map<int, Client> clients;

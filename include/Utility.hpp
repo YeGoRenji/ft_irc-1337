@@ -10,7 +10,7 @@ class Server;
 class Utility {
 public:
 	static bool match(stringstream &ss, string target);
-	static string getClientName(Client &client, Server &Server);
+	static string &getClientName(Client &client, Server &Server);
 	static vector<string> getCommandTokens(string);
 
 private:

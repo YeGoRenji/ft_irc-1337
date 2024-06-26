@@ -18,7 +18,8 @@
 	X(433, NICKNAMEINUSE, "Nickname is already in use", nick) \
 	X(442, NOTONCHANNEL, "You're not on that channel", channel) \
 	X(461, NEEDMOREPARAMS, "Not enough parameters", command) \
-	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel)
+	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel) \
+	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel)
 
 class Server;
 class Client;

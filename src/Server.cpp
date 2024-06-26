@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 12:05:48 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 13:17:28 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		AddClientoChannel(currentCLient, tokens);
 	else if (tokens[0] == "PART")
 		RemoveClientFromChannel(currentCLient, tokens); // TODO : STILL NOT FINISHED
+	else if (tokens[0] == "KICK")
+		KickClientFromChannel(currentCLient, tokens);
 	else
 	{
 		cerr << "lach msayft command khawi a wld l 9a7ba" << endl;
@@ -154,7 +156,7 @@ bool Server::checkUserExistence(string nickName)
 	return (getClientFromNick(nickName) != clients.end());
 }
 
-void Server::AddClientoChannel(Client &client, vector<string> tokens)
+void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 {
 	// TODO: Refactor this method !
 	string channelsTokens;
@@ -262,7 +264,7 @@ map<int, Client>::iterator Server::getClientFromNick(string &nick)
 	return it;
 }
 
-void Server::RemoveClientFromChannel(Client &client, vector<string> tokens)
+void Server::RemoveClientFromChannel(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
 	string command = tokens[0];
@@ -285,4 +287,31 @@ void Server::RemoveClientFromChannel(Client &client, vector<string> tokens)
 		ch -> second.broadcastAction(client, PART);
 		ch -> second.removeMember(clientNick);
 	}
+}
+
+void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
+{
+	size_t tokens_len = tokens.size();
+	string &command = tokens[0];
+
+	if (tokens_len < 3)
+		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
+
+	string &channel = tokens[1];
+
+	map<string, Channel>::iterator chIt = getChannel(channel);
+
+	if (chIt == channels.end())
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
+
+	Channel &channelObj = chIt->second;
+
+	if (!channelObj.hasMember(client.getNick()))
+		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
+
+	if (!channelObj.isOperator(client.getNick()))
+		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
+
+
+	// TODO: KICK THE USER
 }

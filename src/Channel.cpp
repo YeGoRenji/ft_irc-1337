@@ -87,7 +87,7 @@ void Channel::broadcastMessage(string message)
 {
 	map<string, Client*>::iterator member_it = members.begin();
 	map<string, Client*>::iterator member_ite = members.end();
-	
+
 	for (; member_it != member_ite; member_it++)
 	{
 		member_it -> second -> getFdObject() << message;
@@ -96,4 +96,15 @@ void Channel::broadcastMessage(string message)
 
 bool Channel::hasMember(string &nick) {
 	return (members.find(nick) != members.end());
+}
+
+bool Channel::isOperator(string &nick) {
+	vector<Client *>::iterator cliIt = chanOps.begin();
+	vector<Client *>::iterator cliIte = chanOps.end();
+
+	for (; cliIt != cliIte; ++cliIt)
+		if ((*cliIt)->getNick() == nick)
+			return true;
+
+	return false;
 }

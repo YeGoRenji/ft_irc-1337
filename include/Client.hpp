@@ -25,7 +25,7 @@ public:
 	bool isPassGiven();
 	bool wasWelcomed;
 	int getFd();
-	string getNick();
+	string &getNick();
 	string getUsername();
 	FD &getFdObject();
 	string &getIp();

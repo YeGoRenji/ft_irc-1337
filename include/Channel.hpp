@@ -21,7 +21,7 @@ public:
 	Channel();
 	Channel(string name, string password); // TODO : add operators
 	// getters
-	const string& getChannelName() const; 
+	const string& getChannelName() const;
 
 	void addMember(Client &client);
 	void removeMember(string &nick);
@@ -31,6 +31,7 @@ public:
 	void addOperator(Client &client);
 	void broadcastMessage(string message);
 	void broadcastAction(Client &joiner, BroadCastAction action);
+	bool isOperator(string &nick);
 	~Channel();
 private:
 	string name;

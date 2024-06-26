@@ -61,7 +61,7 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 	cout << isPassGiven() << endl;
 }
 
-string Client::getNick()
+string &Client::getNick()
 {
 	return (this -> nickname);
 }

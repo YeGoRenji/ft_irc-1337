@@ -8,7 +8,7 @@ bool Utility::match(stringstream &ss, string target)
 	return (keyword == target);
 }
 
-string Utility::getClientName(Client &client, Server &server)
+string &Utility::getClientName(Client &client, Server &server)
 {
 	if (!client.getNick().empty())
 		return client.getNick();
@@ -25,7 +25,7 @@ vector<string> Utility::getCommandTokens(string command)
 
 	while(ss >> tmpToken)
 	{
-		if (tmpToken[0] == ':') 
+		if (tmpToken[0] == ':')
 		{
 			tmpToken.erase(0, 1);
 			getline(ss, tmpTmpToken);
