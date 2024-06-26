@@ -32,16 +32,21 @@ public:
 	void broadcastMessage(string message);
 	void broadcastAction(Client &joiner, BroadCastAction action);
 	bool isOperator(string &nick);
+
+	void invite(Client* client);
+
 	~Channel();
 private:
-	string name;
-	string topic; // TODO how to set the topic??
+	string					name;
+	string					topic; // TODO how to set the topic??
 
-	map<string, Client*> members;
-	vector<Client*> chanOps;
+	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
+	
+	map<string, Client*>	members;
+	vector<Client*>			chanOps;
 	// password
-	string password;
-	vector<Message> messages;
+	string					password;
+	vector<Message>			messages;
 };
 
 #endif

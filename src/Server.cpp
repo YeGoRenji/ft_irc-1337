@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 13:17:28 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 18:49:28 by sakarkal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Replies.hpp"
+#include "Replies.RPLINVI.hpp"
 #include <Server.hpp>
 #include <Client.hpp>
 
@@ -121,6 +121,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		RemoveClientFromChannel(currentCLient, tokens); // TODO : STILL NOT FINISHED
 	else if (tokens[0] == "KICK")
 		KickClientFromChannel(currentCLient, tokens);
+	else if (tokens[0] == "INVITE")
+		InviteClientFromChannel(currentCLient, tokens);
 	else
 	{
 		cerr << "lach msayft command khawi a wld l 9a7ba" << endl;
@@ -299,6 +301,50 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 	string &channel = tokens[1];
 
+	if (channel[0] != '#') // NEED to check the return error 
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this)
+
+	map<string, Channel>::iterator chIt = getChannel(channel);
+
+	if (chIt == channels.end())
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
+
+	Channel &channelObj = chIt->second;
+
+	if (!channelObj.hasMember(client.getNick()))
+		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
+
+	if (!channelObj.isOperator(client.getNick()))
+		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
+	
+	string &kickedNick = tokens[2];
+
+	if (!channelObj.hasMember(kickedNick))
+		return Errors::ERR_USERNOTINCHANNEL(kickedNick, channel, client, *this);
+
+	// TODO: KICK THE USER
+	/*
+		send the message to ALL and then erase the user from the channel 
+	*/
+}
+
+/* 
+ 			todo above 
+void Channel::invite(Client* client) {
+    _invited.push_back(client);
+}
+
+*/
+void Server::InviteClientFromChannel(Client &client, vector<string> &tokens) // TODO : work on this later
+{
+	size_t tokens_len = tokens.size();
+	string &command = tokens[0];
+
+	if (tokens_len < 2)
+		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
+
+	string &channel = tokens[1];
+
 	map<string, Channel>::iterator chIt = getChannel(channel);
 
 	if (chIt == channels.end())
@@ -312,6 +358,18 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 
+	string &invitedNick = tokens[2];
 
-	// TODO: KICK THE USER
+	if (channelObj.hasMember(invitedNick))
+		return Errors::ERR_USERONCHANNEL(invitedNick, channel, client, *this);
+
+	
+	Replies::RPL_INVITING(invitedNick, channel, client, *this);
+
+	// TODO: INVITE THE USER
+	/*
+		Add user to idk attribute about invitedusers or somthing !!
+		search for "todo above" 		
+	*/
+	
 }

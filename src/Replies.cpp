@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 15:14:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 11:48:19 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 16:16:01 by sakarkal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,22 @@ void Replies::RPL_YOURHOST(Client &client, Server &server)
 	reply += " :Your host is ";
 	reply += Server::serverName;
 	reply += ", running version 6.9";
+	reply += "\r\n";
+	fd << reply;
+}
+
+void Replies::RPL_INVITING(string &nick, string &channel, Client &client, Server &server)
+{
+	FD fd = client.getFdObject();
+
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 341 ";
+	reply += Utility::getClientName(client, server);
+	reply += " ";
+	reply += nick;
+	reply += " ";
+	reply += channel;
 	reply += "\r\n";
 	fd << reply;
 }
