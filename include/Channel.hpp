@@ -24,14 +24,15 @@ public:
 	const string& getChannelName() const;
 
 	void addMember(Client &client);
-	void removeMember(string &nick);
+	void removeMember(Client &client, string reason);
 	bool checkPassword(string userPassLine);
 	bool hasPassword() const;
 	bool hasMember(string &nick);
 	void addOperator(Client &client);
 	void broadcastMessage(string message);
-	void broadcastAction(Client &joiner, BroadCastAction action);
+	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
+	static bool isValidName(string &name);
 	~Channel();
 private:
 	string name;

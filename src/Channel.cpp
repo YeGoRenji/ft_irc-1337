@@ -25,12 +25,16 @@ void Channel::addMember(Client &client)
 	members[client.getNick()] = &client;
 	// cerr << client.getNick().size() << endl;
 	cout << client.getNick() << " was added to channel " << getChannelName() << endl;
+	broadcastAction(client, "", JOIN);
 }
 
-void Channel::removeMember(string &nick)
+void Channel::removeMember(Client &client, string reason)
 {
+	string &nick = client.getNick();
 	if (!hasMember(nick))
 		return ;
+
+	broadcastAction(client, reason, PART);
 	members.erase(nick);
 }
 
@@ -61,7 +65,7 @@ void Channel::addOperator(Client &client)
 	chanOps.push_back(&client);
 }
 
-void Channel::broadcastAction(Client &joiner, BroadCastAction action)
+void Channel::broadcastAction(Client &client, string reason, BroadCastAction action)
 {
 	string reply = ":";
 	const char *toStr[2] = {
@@ -69,15 +73,22 @@ void Channel::broadcastAction(Client &joiner, BroadCastAction action)
 		"PART"
 	};
 
-	reply += joiner.getNick();
+	reply += client.getNick();
 	reply += "!";
-	reply += joiner.getUsername();
+	reply += client.getUsername();
 	reply += "@";
-	reply += joiner.getIp();
+	reply += client.getIp();
 	reply += " ";
 	reply += toStr[action];
 	reply += " ";
 	reply += this -> name;
+	if (!reason.empty()) {
+		reply += " ";
+		if (reason.find(' ') != string::npos)
+			reply += ":";
+		reply += reason;
+	}
+	cerr << "BROADCASTING <" << reply << ">" << endl;
 	reply += "\r\n";
 
 	broadcastMessage(reply);
@@ -107,4 +118,18 @@ bool Channel::isOperator(string &nick) {
 			return true;
 
 	return false;
+}
+
+bool Channel::isValidName(string &name) {
+
+	if (name.empty())
+		return false;
+
+	if (name[0] != '#')
+		return false;
+
+	if (name.find_first_of(" ,\x07") != string::npos)
+		return false;
+
+	return true;
 }

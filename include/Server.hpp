@@ -37,7 +37,7 @@ public:
 
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
-	void quitUser(Client &client, vector<pollfd> &fds);
+	void quitUser(Client &currClient, vector<pollfd> &fds, string reason);
 	void AddClientoChannel(Client &client, vector<string> &tokens);
 	map<string, Channel>::iterator getChannel(string name);
 	map<string, Channel>::iterator createChannel(string name, string password);
