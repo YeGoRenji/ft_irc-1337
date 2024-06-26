@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 15:14:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 17:38:17 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 19:41:49 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 void Replies::RPL_WELCOME(Client &client, Server &server)
 {
-	FD fd = client.getFdObject();
-
 	string reply = ":";
 	reply += server.getServerName();
 	reply += " 001 ";
@@ -25,14 +23,13 @@ void Replies::RPL_WELCOME(Client &client, Server &server)
 	reply += " Network, ";
 	reply += client.getNick();
 	reply += "\r\n";
-	fd << reply;
+
+	client << reply;
 }
 
 
 // void Replies::RPL_CUSTOM_CLIENT_JOINED(string channel, Client &joiner, Client &client)
 // {
-// 	FD fd = client.getFdObject();
-
 // 	string reply = ":";
 // 	reply += joiner.getNick();
 // 	reply += "!";
@@ -45,13 +42,11 @@ void Replies::RPL_WELCOME(Client &client, Server &server)
 // 	reply += channel;
 // 	reply += "\r\n";
 
-// 	fd << reply;
+// 	client << reply;
 // }
 
 void Replies::RPL_YOURHOST(Client &client, Server &server)
 {
-	FD fd = client.getFdObject();
-
 	string reply = ":";
 	reply += server.getServerName();
 	reply += " 002 ";
@@ -60,14 +55,13 @@ void Replies::RPL_YOURHOST(Client &client, Server &server)
 	reply += Server::serverName;
 	reply += ", running version 6.9";
 	reply += "\r\n";
-	fd << reply;
+
+	client << reply;
 }
 
 
 void Replies::RPL_TOPIC(Channel &channel, Client &client, Server &server)
 {
-	FD fd = client.getFdObject();
-
 	string reply = ":";
 	reply += server.getServerName();
 	reply += " 332 ";
@@ -77,14 +71,12 @@ void Replies::RPL_TOPIC(Channel &channel, Client &client, Server &server)
 	reply += " :";
 	reply += channel.getTopic();
 	reply += "\r\n";
-	fd << reply;
 
+	client << reply;
 }
 
 void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 {
-	FD fd = client.getFdObject();
-
 	string reply = ":";
 	reply += server.getServerName();
 	reply += " 353 ";
@@ -96,14 +88,12 @@ void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 	reply += Utility::constructMemberList(channel.getChanOps(), "@");
 	reply += "\r\n";
 
-	fd << reply;
+	client << reply;
 }
 
 
 void Replies::RPL_ENDOFNAMES(Channel &channel, Client &client, Server &server)
 {
-	FD fd = client.getFdObject();
-
 	string reply = ":";
 	reply += server.getServerName();
 	reply += " 366 ";
@@ -113,5 +103,5 @@ void Replies::RPL_ENDOFNAMES(Channel &channel, Client &client, Server &server)
 	reply += " :End of /NAMES list";
 	reply += "\r\n";
 
-	fd << reply;
+	client << reply;
 }

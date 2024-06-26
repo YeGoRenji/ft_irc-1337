@@ -148,6 +148,21 @@ void Client::setUsernameAndRealName(Server &server, vector<string> tokens)
 	isAuthed = passGiven & nickGiven & userGiven;
 }
 
+Client &Client::operator<<(std::string str) {
+	fdObject << str;
+	return (*this);
+}
+
+void Client::operator>>(std::string& str) {
+	fdObject >> str;
+}
+
+void Client::disconnect() {
+	close(fdObject.getValue());
+	fdObject.setValue(-1);
+}
+
+// getters
 string &Client::getIp()
 {
 	return (this->ip);
@@ -156,9 +171,4 @@ string &Client::getIp()
 string &Client::getUsername()
 {
 	return (this->username);
-}
-
-void Client::disconnect() {
-	close(fdObject.getValue());
-	fdObject.setValue(-1);
 }

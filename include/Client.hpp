@@ -30,6 +30,9 @@ public:
 	FD &getFdObject();
 	string &getIp();
 
+	Client &operator<<(std::string);
+	void operator>>(std::string&);
+
 private:
 	FD fdObject;
 	// authentication thingies

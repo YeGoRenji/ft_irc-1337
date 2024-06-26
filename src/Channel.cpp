@@ -96,7 +96,7 @@ void Channel::broadcastMessage(string message)
 
 	for (; member_it != member_ite; member_it++)
 	{
-		member_it -> second -> getFdObject() << message;
+		*(member_it -> second) << message;
 	}
 }
 

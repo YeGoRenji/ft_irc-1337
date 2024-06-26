@@ -1,3 +1,5 @@
 when last operator exits
 
+validate channel name using channel.isValidName()
+
 non blocking

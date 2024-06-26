@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 17:43:06 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/26 19:44:47 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void Server::start() {
 			else if (fds[i].revents & POLLIN) {
 				Client &currentCLient = clients[fds[i].fd];
 				string data;
-				currentCLient.getFdObject() >> data;
+				currentCLient >> data;
 				cout << "Got <" << data << "> from Client " << currentCLient.getFd() << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
 				fds[i].revents = 0;
