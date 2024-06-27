@@ -152,6 +152,11 @@ size_t Channel::getMemberCount() const
 	return (members.size());
 }
 
+size_t Channel::getChanOpCount() const
+{
+	return (chanOps.size());
+}
+
 // setters
 void Channel::setTopic(string topic)
 {

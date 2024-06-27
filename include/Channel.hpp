@@ -27,10 +27,12 @@ public:
 	map<string, Client*> &getMembers();
 	map<string, Client*> &getChanOps();
 	size_t getMemberCount() const;
+	size_t getChanOpCount() const;
 
 	// setters
 	void setTopic(string topic);
 
+	// Methods
 	void addMember(Client &client);
 	void removeMember(Client &client, string reason);
 	bool checkPassword(string userPassLine);
@@ -41,8 +43,8 @@ public:
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
 	void sendClientsList(Channel &channel, Client &client, Server &server);
-
 	static bool isValidName(string &name);
+
 	~Channel();
 private:
 	string name;
