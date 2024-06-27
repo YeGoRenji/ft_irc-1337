@@ -33,12 +33,29 @@ public:
 	void broadcastAction(Client &joiner, BroadCastAction action);
 	bool isOperator(string &nick);
 
-	void invite(Client* client);
+
+	void	setTopic(string& newTopic, string& setter);
+
+	string	&getTopic() {
+        return topic;
+    }
+
+    string	&getTopicSetter() {
+        return topicSetter;
+    }
+
+    time_t			getTopicSetTime() {
+        return topicSetTime;
+    }
+
+	// void invite(Client* client);
 
 	~Channel();
 private:
 	string					name;
 	string					topic; // TODO how to set the topic??
+	string					topicSetter;
+    time_t					topicSetTime;
 
 	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
 	

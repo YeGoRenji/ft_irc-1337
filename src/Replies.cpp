@@ -6,7 +6,7 @@
 /*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 15:14:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 16:16:01 by sakarkal         ###   ########.fr       */
+/*   Updated: 2024/06/27 21:03:44 by sakarkal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,56 @@ void Replies::RPL_INVITING(string &nick, string &channel, Client &client, Server
 	reply += nick;
 	reply += " ";
 	reply += channel;
+	reply += "\r\n";
+	fd << reply;
+}
+
+void	Replies::RPL_NOTOPIC(string &channel, Client &client, Server &server)
+{
+	FD fd = client.getFdObject();
+
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 331 ";
+	reply += Utility::getClientName(client, server);
+	reply += " ";
+	reply += channel;
+	reply += " :No topic is set";
+	reply += "\r\n";
+	fd << reply;
+}
+
+
+void	Replies::RPL_TOPIC(string &channel, string &topic, Client &client, Server &server)
+{
+	FD fd = client.getFdObject();
+
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 332 ";
+	reply += Utility::getClientName(client, server);
+	reply += " ";
+	reply += channel;
+	reply += " :";
+	reply += topic;
+	reply += "\r\n";
+	fd << reply;
+}
+
+void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Client &client, Server &server)
+{
+	FD fd = client.getFdObject();
+
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 333 ";
+	reply += Utility::getClientName(client, server);
+	reply += " ";
+	reply += channel;
+	reply += " ";
+	reply += setter;
+	reply += " ";
+	reply += std::to_string(time); // ila kant forbidden nbedlooha 
 	reply += "\r\n";
 	fd << reply;
 }

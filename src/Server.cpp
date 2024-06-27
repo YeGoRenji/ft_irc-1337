@@ -6,7 +6,7 @@
 /*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/27 16:27:08 by sakarkal         ###   ########.fr       */
+/*   Updated: 2024/06/27 21:24:59 by sakarkal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -365,12 +365,60 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens) // 
 		return Errors::ERR_USERONCHANNEL(invitedNick, channel, client, *this);
 
 	
+	
 	Replies::RPL_INVITING(invitedNick, channel, client, *this);
-
+	// channelObj.addMember()
 	// TODO: INVITE THE USER
 	/*
 		Add user to idk attribute about invitedusers or somthing !!
 		search for "todo above" 		
 	*/
+	
+}
+
+void Server::TopicClientFromChannel(Client &client, vector<string> &tokens) // TODO : still not working........
+{
+	size_t tokens_len = tokens.size(); // TOPIC #channel :new_topic
+	string &command = tokens[0];
+
+	if (tokens_len < 2)
+		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
+
+	string &channel = tokens[1];
+
+	map<string, Channel>::iterator chIt = getChannel(channel);
+
+	if (chIt == channels.end())
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
+
+	Channel &channelObj = chIt->second;
+	
+	if (!channelObj.hasMember(client.getNick()))
+		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
+
+	if (!channelObj.isOperator(client.getNick()))
+		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
+	
+	string &newTopic = tokens[2];
+	
+	channelObj.setTopic(newTopic, client.getNick());
+
+	if (tokens[2].empty())
+		Replies::RPL_NOTOPIC(channel, client, *this);
+	else
+	{
+		Replies::RPL_TOPIC(channel, newTopic, client, *this);
+		Replies::RPL_TOPICWHOTIME(channel, channelObj.getTopicSetter(), channelObj.getTopicSetTime(), client, *this);
+	}
+
+	
+	
+	// TODO: SET THE TOPIC
+	/*
+		set the topic of the channel
+	*/
+
+	
+
 	
 }

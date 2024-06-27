@@ -43,6 +43,7 @@ private:
 	map<string, Channel>::iterator createChannel(string name, string password);
 	void RemoveClientFromChannel(Client &client, vector<string> &tokens);
 	void KickClientFromChannel(Client &client, vector<string> &tokens);
+	void TopicClientFromChannel(Client &client, vector<string> &tokens);
 	void InviteClientFromChannel(Client &client, vector<string> &tokens);
 
 	Server();

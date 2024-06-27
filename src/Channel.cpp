@@ -108,3 +108,23 @@ bool Channel::isOperator(string &nick) {
 
 	return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void	Channel::setTopic(string &newTopic, string &setter)
+{
+	this->topic = newTopic;
+	this->topicSetter = setter;
+	this->topicSetTime = time(0);
+}
