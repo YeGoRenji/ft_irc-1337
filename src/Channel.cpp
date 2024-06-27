@@ -147,6 +147,11 @@ map<string, Client*> &Channel::getChanOps() {
 	return (this -> chanOps);
 }
 
+size_t Channel::getMemberCount() const
+{
+	return (members.size());
+}
+
 // setters
 void Channel::setTopic(string topic)
 {

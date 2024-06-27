@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 19:44:47 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/27 15:45:22 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	else if (tokens[0] == "JOIN") // TODO : DEFINITALLY STILL NOT FINISHED
 		AddClientoChannel(currentCLient, tokens);
 	else if (tokens[0] == "PART")
-		RemoveClientFromChannels(currentCLient, tokens); // TODO : STILL NOT FINISHED
+		handlePART(currentCLient, tokens); // TODO : STILL NOT FINISHED
 	else if (tokens[0] == "KICK")
 		KickClientFromChannel(currentCLient, tokens);
 	else
@@ -140,11 +140,16 @@ void Server::quitUser(Client &currClient, vector<pollfd> &fds, string reason)
 
 	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(currClient);
 
+	vector<Channel *> joinedChannels;
 	for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
-		string nick = currClient.getNick();
-		it->second.removeMember(currClient, reason);
+		if (it->second.hasMember(currClient.getNick()))
+			joinedChannels.push_back(&it->second);
 	}
+
+
+	for (size_t i = 0; i < joinedChannels.size(); ++i)
+		RemoveMemberFromChannel(*joinedChannels[i], currClient, reason);
 
 	currClient.disconnect();
 	clients.erase(it->fd);
@@ -264,7 +269,7 @@ map<int, Client>::iterator Server::getClientFromNick(string &nick)
 	return it;
 }
 
-void Server::RemoveClientFromChannels(Client &client, vector<string> &tokens)
+void Server::handlePART(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
 	string command = tokens[0];
@@ -295,7 +300,7 @@ void Server::RemoveClientFromChannels(Client &client, vector<string> &tokens)
 		// TODO: something is missing in the message sent here
 		// ch -> second.broadcastAction(client, PART);
 		cerr << "Removing " << client.getNick() << " from channel " << channelName << ", Reason: " << reason << endl;
-		ch -> second.removeMember(client, reason);
+		RemoveMemberFromChannel(ch->second, client, reason);
 	}
 }
 
@@ -324,4 +329,11 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 
 	// TODO: KICK THE USER
+}
+
+void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string reason)
+{
+	channel.removeMember(client, reason);
+	if (channel.getMemberCount() == 0)
+		channels.erase(channel.getChannelName());
 }

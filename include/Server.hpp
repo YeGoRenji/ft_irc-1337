@@ -41,8 +41,9 @@ private:
 	void AddClientoChannel(Client &client, vector<string> &tokens);
 	map<string, Channel>::iterator getChannel(string name);
 	map<string, Channel>::iterator createChannel(string name, string password);
-	void RemoveClientFromChannels(Client &client, vector<string> &tokens);
+	void handlePART(Client &client, vector<string> &tokens);
 	void KickClientFromChannel(Client &client, vector<string> &tokens);
+	void RemoveMemberFromChannel(Channel &channel, Client &client, string reason);
 
 	Server();
 	map<int, Client> clients;

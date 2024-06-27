@@ -26,6 +26,7 @@ public:
 	const string& getTopic() const;
 	map<string, Client*> &getMembers();
 	map<string, Client*> &getChanOps();
+	size_t getMemberCount() const;
 
 	// setters
 	void setTopic(string topic);
