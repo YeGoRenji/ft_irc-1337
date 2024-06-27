@@ -6,11 +6,11 @@
 /*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/26 18:49:28 by sakarkal         ###   ########.fr       */
+/*   Updated: 2024/06/27 16:27:08 by sakarkal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Replies.RPLINVI.hpp"
+#include "Replies.hpp"
 #include <Server.hpp>
 #include <Client.hpp>
 
@@ -302,7 +302,7 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 	string &channel = tokens[1];
 
 	if (channel[0] != '#') // NEED to check the return error 
-		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this)
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	map<string, Channel>::iterator chIt = getChannel(channel);
 
@@ -322,6 +322,7 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 	if (!channelObj.hasMember(kickedNick))
 		return Errors::ERR_USERNOTINCHANNEL(kickedNick, channel, client, *this);
 
+	channelObj.removeMember(kickedNick);
 	// TODO: KICK THE USER
 	/*
 		send the message to ALL and then erase the user from the channel 

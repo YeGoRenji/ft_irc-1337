@@ -16,6 +16,7 @@ public:
 	static void RPL_WELCOME(Client &client, Server &server);
 	static void RPL_YOURHOST(Client &client, Server &server);
 	static void RPL_CUSTOM_CLIENT_JOINED(string channel, Client &joiner, Client &client);
+	static void RPL_INVITING(string &nick, string &channel, Client &client, Server &server);
 
 private:
 	Replies();
