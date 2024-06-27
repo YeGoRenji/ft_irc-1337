@@ -116,6 +116,9 @@ bool Channel::isValidName(string &name) {
 	if (name[0] != '#')
 		return false;
 
+	if (name.size() == 1)
+		return false;
+
 	if (name.find_first_of(" ,\x07") != string::npos)
 		return false;
 

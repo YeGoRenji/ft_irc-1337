@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/27 16:37:07 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/27 17:04:12 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,11 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 	for(; it != ite; it++)
 	{
 		cerr << "handling channel : " << it -> name << endl;
+		if (!Channel::isValidName(it->name))
+		{
+			Errors::ERR_NOSUCHCHANNEL(it->name, client, *this);
+			continue;
+		}
 		// check if channel exists if not create it
 		map<string, Channel>::iterator channelIt = getChannel(it -> name);
 		if (channelIt == channels.end())
