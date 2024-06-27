@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/27 17:04:12 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/27 20:11:52 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void Server::start() {
 				Client &currentCLient = clients[fds[i].fd];
 				string data;
 				currentCLient >> data;
-				cout << "\nGot <" << data << "> from Client " << currentCLient.getFd() << endl;
+				cout << "\nGot <" << data << "> from Client " << currentCLient.getFd() << " (" << currentCLient.getNick() << ") " << &currentCLient << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
 				fds[i].revents = 0;
 				if (tokens.size())

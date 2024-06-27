@@ -18,7 +18,7 @@ void Channel::addMember(Client &client)
 	// cerr << "Addr = " << &client << endl;
 	members[client.getNick()] = &client;
 	// cerr << client.getNick().size() << endl;
-	cout << client.getNick() << " was added to channel " << getChannelName() << endl;
+	cout << client.getNick() << " (" << &client << ") was added to channel " << getChannelName() << endl;
 	broadcastAction(client, "", JOIN);
 }
 
