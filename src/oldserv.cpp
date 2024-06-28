@@ -27,7 +27,7 @@ int main()
 
 	chk(bind(socketFd, (sockaddr *)&address, sizeof(address)), "Couldn't bind socket to address");
 
-	chk(listen(socketFd, 10), "Couldn't Listen to socket");
+	chk(listen(socketFd, 128), "Couldn't Listen to socket");
 
 	int clientFd = chk(accept(socketFd, NULL, NULL), "Couldn't accept connection 1");
 	puts("Accepted Connection 1");

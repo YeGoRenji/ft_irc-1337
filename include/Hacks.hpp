@@ -10,6 +10,8 @@
 
 # define NAME(token) #token
 
+# define CONTAINS(buffer, str) (buffer.find(str) != string::npos)
+
 using std::cout;
 using std::stringstream;
 using std::cerr;

@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:54:34 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/23 16:49:53 by afatimi          ###   ########.fr       */
+/*   Updated: 2024/06/28 15:14:40 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ FD::FD(): fd(-1)
 
 FD::FD(int _fd): fd(_fd)
 {
+	fcntl(fd, F_SETFL, O_NONBLOCK);
 	// std::cout << "FD: Parameter constructor called" << endl;
 }
 
@@ -49,21 +50,28 @@ FD &FD::operator<<(std::string str) {
 	return *this;
 }
 
-void FD::operator>>(std::string& str) {
-	char buffer[1024] = { 0 };
-	// TODO: implement 
-	str.clear();
-	//cout << "Reading from fd " << fd << "..." << endl;
-	int bytesRead = read(fd, buffer, sizeof(buffer) - 1);
-	//cout << "READ !" << endl;
-	if (bytesRead <= 0) {
-	//	cerr << "read is 0 or negative" << endl;
-		return; // TODO: Need to more stuff in this case
+void FD::operator>>(std::string& buffer) {
+	// char buffer[1024] = { 0 };
+	char byte;
+
+	buffer.clear();
+
+	size_t l = buffer.size();
+	while (l < 2 || !(buffer[l - 2] == '\r' && buffer[l - 1] == '\n') )
+	{
+		int byteRead = read(fd, &byte, 1);
+		// cerr << "READ <" << byte << ">" << endl;
+		if (byteRead == -1)
+		{
+			cerr << "Read Got -1" << endl;
+			break;
+		}
+		if (byteRead)
+			buffer += byte;
+		l = buffer.size();
 	}
-	buffer[bytesRead] = 0;
-	str += buffer;
-	//cout << str;
-	str.erase(find(str.begin(), str.end(), '\r'), str.end());
+
+	buffer.erase(buffer.find("\r\n"));
 }
 
 int FD::getValue() {
@@ -72,4 +80,6 @@ int FD::getValue() {
 
 void FD::setValue(int fd) {
 	this->fd = fd;
+	if (fd >= 0)
+		fcntl(fd, F_SETFL, O_NONBLOCK);
 }

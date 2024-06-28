@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/27 20:11:52 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/28 14:41:05 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ Server::Server(int port, string pass): password(pass)
 	serverSocket.setValue(chk(socket(AF_INET, SOCK_STREAM, 0), "Couldn't open socket"));
 
 	cout << "Server socket : " << serverSocket.getValue() << endl;
-	fcntl(serverSocket.getValue(), F_SETFL, O_NONBLOCK);
 
 	int yes = 1;
 
@@ -74,7 +73,6 @@ void Server::start() {
 		if (fds[0].revents & POLLIN) {
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
 			int newClientFd = newClient.getFd();
-			fcntl(newClientFd, F_SETFL, O_NONBLOCK);
 			// clients.push_back(newClient);
 			clients[newClientFd] = newClient;
 			// clients.insert(make_pair(, newClient));
