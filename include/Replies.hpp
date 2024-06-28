@@ -10,6 +10,7 @@
 
 class Server;
 class Client;
+class Channel;
 
 class Replies {
 public:
@@ -20,7 +21,9 @@ public:
 	static void RPL_NOTOPIC(string &channel, Client &client, Server &server);
 	static void RPL_TOPIC(string &channel, string &topic, Client &client, Server &server);
 	static void RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Client &client, Server &server);
-
+	static void RPL_NAMREPLY(Channel &channel, Client &client, Server &server);
+	static void RPL_ENDOFNAMES(Channel &channel, Client &client, Server &server);
+  
 	static void notifyInvite(Client &inviter, Client &invited, string &channelName);
 
 private:

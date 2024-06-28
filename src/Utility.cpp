@@ -15,7 +15,6 @@ string &Utility::getClientName(Client &client, Server &server)
 	return server.getServerName();
 }
 
-
 vector<string> Utility::getCommandTokens(string command)
 {
 	string tmpToken;
@@ -34,4 +33,20 @@ vector<string> Utility::getCommandTokens(string command)
 		tokens.push_back(tmpToken);
 	}
 	return tokens;
+}
+
+
+string Utility::constructMemberList(map<string, Client *> &members, const string prefix)
+{
+	string str;
+	map<string, Client*>::iterator it = members.begin();
+	map<string, Client*>::iterator ite = members.end();
+
+	for (; it != ite; ++it)
+	{
+		str += prefix;
+		str += it->second->getNick();
+		str += " ";
+	}
+	return str;
 }

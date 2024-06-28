@@ -16,6 +16,8 @@ public:
 	Client(int fd);
 	~Client();
 	void disconnect();
+	void leaveAllChannels(Server &server, string reason);
+
 	//void login(Server &server);
 	void setNick(Server &server, vector<string> tokens);
 	void passHandler(Server &server, vector<string> tokens);
@@ -26,9 +28,13 @@ public:
 	bool wasWelcomed;
 	int getFd();
 	string &getNick();
-	string getUsername();
+	string &getUsername();
 	FD &getFdObject();
 	string &getIp();
+
+
+	Client &operator<<(std::string);
+	void operator>>(std::string&);
 
 private:
 	FD fdObject;

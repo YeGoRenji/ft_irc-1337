@@ -6,17 +6,11 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password): name(_name), password(_password) //, op(NULL)
+Channel::Channel(string _name, string _password): name(_name), topic("+65-59"), password(_password) // TODO: remove topic()
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
 
-
-// getters
-const string& Channel::getChannelName() const
-{
-	return (this -> name);
-}
 
 void Channel::addMember(Client &client)
 {
@@ -24,14 +18,19 @@ void Channel::addMember(Client &client)
 	// cerr << "Addr = " << &client << endl;
 	members[client.getNick()] = &client;
 	// cerr << client.getNick().size() << endl;
-	cout << client.getNick() << " was added to channel " << getChannelName() << endl;
+	cout << client.getNick() << " (" << &client << ") was added to channel " << getChannelName() << endl;
+	broadcastAction(client, "", JOIN);
 }
 
-void Channel::removeMember(string &nick)
+void Channel::removeMember(Client &client, string reason)
 {
+	string &nick = client.getNick();
 	if (!hasMember(nick))
 		return ;
+
+	broadcastAction(client, reason, PART);
 	members.erase(nick);
+	chanOps.erase(nick);
 }
 
 bool Channel::hasPassword() const
@@ -54,14 +53,14 @@ Channel::~Channel()
 
 void Channel::addOperator(Client &client)
 {
-	if (find(chanOps.begin(), chanOps.end(), &client) != chanOps.end())
+	if (chanOps.find(client.getNick()) != chanOps.end())
 	{
 		return; // TODO : do we need to send an error or something here (e.g trying re-make an op)
 	}
-	chanOps.push_back(&client);
+	chanOps[client.getNick()] = &client;
 }
 
-void Channel::broadcastAction(Client &joiner, BroadCastAction action)
+void Channel::broadcastAction(Client &client, string reason, BroadCastAction action)
 {
 	string reply = ":";
 	const char *toStr[2] = {
@@ -69,15 +68,22 @@ void Channel::broadcastAction(Client &joiner, BroadCastAction action)
 		"PART"
 	};
 
-	reply += joiner.getNick();
+	reply += client.getNick();
 	reply += "!";
-	reply += joiner.getUsername();
+	reply += client.getUsername();
 	reply += "@";
-	reply += joiner.getIp();
+	reply += client.getIp();
 	reply += " ";
 	reply += toStr[action];
 	reply += " ";
 	reply += this -> name;
+	if (!reason.empty()) {
+		reply += " ";
+		if (reason.find(' ') != string::npos)
+			reply += ":";
+		reply += reason;
+	}
+	cerr << "BROADCASTING <" << reply << ">" << endl;
 	reply += "\r\n";
 
 	broadcastMessage(reply);
@@ -90,7 +96,7 @@ void Channel::broadcastMessage(string message)
 
 	for (; member_it != member_ite; member_it++)
 	{
-		member_it -> second -> getFdObject() << message;
+		*(member_it -> second) << message;
 	}
 }
 
@@ -99,28 +105,25 @@ bool Channel::hasMember(string &nick) {
 }
 
 bool Channel::isOperator(string &nick) {
-	vector<Client *>::iterator cliIt = chanOps.begin();
-	vector<Client *>::iterator cliIte = chanOps.end();
-
-	for (; cliIt != cliIte; ++cliIt)
-		if ((*cliIt)->getNick() == nick)
-			return true;
-
-	return false;
+	return (chanOps.find(nick) != chanOps.end());
 }
 
+bool Channel::isValidName(string &name) {
 
+	if (name.empty())
+		return false;
+  
+	if (name[0] != '#')
+		return false;
 
+	if (name.size() == 1)
+		return false;
 
+	if (name.find_first_of(" ,\x07") != string::npos)
+		return false;
 
-
-
-
-
-
-
-
-
+	return true;
+}
 
 void	Channel::setTopic(string &newTopic, string &setter)
 {
@@ -128,4 +131,45 @@ void	Channel::setTopic(string &newTopic, string &setter)
 	this->topic = newTopic;
 	this->topicSetter = setter;
 	this->topicSetTime = time(0);
+}
+
+void Channel::sendClientsList(Channel &channel, Client &client, Server &server)
+{
+	Replies::RPL_NAMREPLY(channel, client, server);
+	Replies::RPL_ENDOFNAMES(channel, client, server);
+}
+
+// getters
+const string& Channel::getChannelName() const
+{
+	return (this -> name);
+}
+
+const string& Channel::getTopic() const
+{
+	return (this -> topic);
+}
+
+map<string, Client*> &Channel::getMembers() {
+	return (this -> members);
+}
+
+map<string, Client*> &Channel::getChanOps() {
+	return (this -> chanOps);
+}
+
+size_t Channel::getMemberCount() const
+{
+	return (members.size());
+}
+
+size_t Channel::getChanOpCount() const
+{
+	return (chanOps.size());
+}
+
+// setters
+void Channel::setTopic(string topic)
+{
+	this -> topic = topic;
 }

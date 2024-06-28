@@ -1,16 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/28 18:50:07 by sakarkal         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "Replies.hpp"
+#include <Replies.hpp>
 #include <Server.hpp>
 #include <Client.hpp>
 
@@ -32,7 +20,6 @@ Server::Server(int port, string pass): password(pass)
 	serverSocket.setValue(chk(socket(AF_INET, SOCK_STREAM, 0), "Couldn't open socket"));
 
 	cout << "Server socket : " << serverSocket.getValue() << endl;
-	fcntl(serverSocket.getValue(), F_SETFL, O_NONBLOCK);
 
 	int yes = 1;
 
@@ -74,7 +61,6 @@ void Server::start() {
 		if (fds[0].revents & POLLIN) {
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
 			int newClientFd = newClient.getFd();
-			fcntl(newClientFd, F_SETFL, O_NONBLOCK);
 			// clients.push_back(newClient);
 			clients[newClientFd] = newClient;
 			// clients.insert(make_pair(, newClient));
@@ -86,13 +72,13 @@ void Server::start() {
 		for (size_t i = fds.size() - 1; i > 0; --i) {
 			if (fds[i].revents & POLLHUP) {
 				Client &currentCLient = clients[fds[i].fd];
-				quitUser(currentCLient, fds);
+				quitUser(currentCLient, fds, "Leaving...");
 			}
 			else if (fds[i].revents & POLLIN) {
 				Client &currentCLient = clients[fds[i].fd];
 				string data;
-				currentCLient.getFdObject() >> data;
-				cout << "Got <" << data << "> from Client " << currentCLient.getFd() << endl;
+				currentCLient >> data;
+				cout << "\nGot <" << data << "> from Client " << currentCLient.getFd() << " (" << currentCLient.getNick() << ") " << &currentCLient << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
 				fds[i].revents = 0;
 				if (tokens.size())
@@ -114,11 +100,11 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	else if (tokens[0] == "USER")
 		currentCLient.setUsernameAndRealName(*this, tokens);
 	else if (tokens[0] == "QUIT")
-		quitUser(currentCLient, fds);
+		quitUser(currentCLient, fds, tokens.size() == 2 ? tokens[1] : "Leaving...");
 	else if (tokens[0] == "JOIN") // TODO : DEFINITALLY STILL NOT FINISHED
 		AddClientoChannel(currentCLient, tokens);
 	else if (tokens[0] == "PART")
-		RemoveClientFromChannel(currentCLient, tokens); // TODO : STILL NOT FINISHED
+		handlePART(currentCLient, tokens); // TODO : STILL NOT FINISHED
 	else if (tokens[0] == "KICK")
 		KickClientFromChannel(currentCLient, tokens);
 	else if (tokens[0] == "INVITE")
@@ -135,7 +121,7 @@ bool Server::checkPassword(string input) {
 	return this -> password == input;
 }
 
-void Server::quitUser(Client &currClient, vector<pollfd> &fds)
+void Server::quitUser(Client &currClient, vector<pollfd> &fds, string reason)
 {
 	vector<pollfd>::iterator it = fds.begin();
 
@@ -144,14 +130,10 @@ void Server::quitUser(Client &currClient, vector<pollfd> &fds)
 
 	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(currClient);
 
-	for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
-	{
-		string nick = currClient.getNick();
-		it->second.removeMember(nick);
-	}
-
+	currClient.leaveAllChannels(*this, reason);
 	currClient.disconnect();
-	clients.erase(it->fd);
+
+	clients.erase(currClient.getFd());
 	fds.erase(it);
 }
 
@@ -162,7 +144,7 @@ bool Server::checkUserExistence(string nickName)
 
 void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 {
-	// TODO: Refactor this method !
+	// TODO: Refactor this method so it looks like RemoveClientFromChannel
 	string channelsTokens;
 	string passwordsTokens;
 
@@ -191,11 +173,20 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 	for(; it != ite; it++)
 	{
 		cerr << "handling channel : " << it -> name << endl;
+		if (it->name == "0")
+		{
+			client.leaveAllChannels(*this, "Left all channels...");
+			continue ;
+		}
+		if (!Channel::isValidName(it->name))
+		{
+			Errors::ERR_NOSUCHCHANNEL(it->name, client, *this);
+			continue;
+		}
 		// check if channel exists if not create it
 		map<string, Channel>::iterator channelIt = getChannel(it -> name);
 		if (channelIt == channels.end())
 		{
-			// cause the RFC has an error called ERR_NOSUCHCHANNEL(403)
 //			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
 			channelIt = createChannel(it -> name, it -> password);
 			channelIt -> second.addOperator(client);
@@ -219,10 +210,11 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 			// now just add the user to the channel and broadcast
 		}
 		// adduser to channel
-		// TODO : fix this after making x macroes for replies!!
 		channelIt -> second.addMember(client);
-		channelIt -> second.broadcastAction(client, JOIN);
-		// broadcast it // TODO : mn l a7san that user should be broadcasted before adding the user to the channel!
+		if (!channelIt->second.getTopic().empty())
+			Replies::RPL_TOPIC(channelIt->second, client, *this);
+		channelIt -> second.sendClientsList(channelIt->second, client, *this);
+		// channelIt -> second.broadcastAction(client, JOIN);
 	}
 }
 
@@ -268,17 +260,26 @@ map<int, Client>::iterator Server::getClientFromNick(string &nick)
 	return it;
 }
 
-void Server::RemoveClientFromChannel(Client &client, vector<string> &tokens)
+void Server::handlePART(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
 	string command = tokens[0];
 	if (tokens_len == 1)
 		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
 
+	string reason = "Client gone to edge";
+
+	if (tokens_len == 3) {
+		reason = tokens.back();
+	}
+
+	vector<channelInfo> ch;
+	parseChannelCommand(ch, tokens[1], "");
+
 	string channelName;
-	for(size_t i = 1; i < tokens_len; i++)
+	for(size_t i = 0; i < ch.size(); i++)
 	{
-		channelName = tokens[i];
+		channelName = ch[i].name;
 		map<string, Channel>::iterator ch = getChannel(channelName);
 		if (ch == channels.end())
 			 return Errors::ERR_NOSUCHCHANNEL(channelName, client, *this);
@@ -288,8 +289,9 @@ void Server::RemoveClientFromChannel(Client &client, vector<string> &tokens)
 	 		return Errors::ERR_NOTONCHANNEL(channelName, client, *this);
 
 		// TODO: something is missing in the message sent here
-		ch -> second.broadcastAction(client, PART);
-		ch -> second.removeMember(clientNick);
+		// ch -> second.broadcastAction(client, PART);
+		cerr << "Removing " << client.getNick() << " from channel " << channelName << ", Reason: " << reason << endl;
+		RemoveMemberFromChannel(ch->second, client, reason);
 	}
 }
 
@@ -326,6 +328,7 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 	channelObj.removeMember(kickedNick);
 	// TODO: KICK THE USER
+
 	/*
 		send the message to ALL and then erase the user from the channel 
 	*/
@@ -382,7 +385,7 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	
 }
 
-void Server::TopicClientFromChannel(Client &client, vector<string> &tokens) // TODO : still not working........
+void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size(); // TOPIC #channel :new_topic
 	string &command = tokens[0];
@@ -422,5 +425,16 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens) // T
 		Replies::RPL_TOPIC(channel, newTopic, client, *this);
 		Replies::RPL_TOPICWHOTIME(channel, channelObj.getTopicSetter(), channelObj.getTopicSetTime(), client, *this);
 	}
-	
+  
+}
+
+void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string reason)
+{
+	channel.removeMember(client, reason);
+	if (channel.getMemberCount() == 0)
+		channels.erase(channel.getChannelName());
+}
+
+map<string, Channel> &Server::getChannels() {
+	return (this -> channels);
 }

@@ -12,6 +12,7 @@ public:
 	static bool match(stringstream &ss, string target);
 	static string &getClientName(Client &client, Server &Server);
 	static vector<string> getCommandTokens(string);
+	static string constructMemberList(map<string, Client *> &members, const string prefix);
 
 private:
 	Utility();
