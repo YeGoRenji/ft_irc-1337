@@ -21,6 +21,8 @@ public:
 	static void RPL_TOPIC(string &channel, string &topic, Client &client, Server &server);
 	static void RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Client &client, Server &server);
 
+	static void notifyInvite(Client &inviter, Client &invited, string &channelName);
+
 private:
 	Replies();
 	Replies(const Replies &);

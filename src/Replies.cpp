@@ -6,7 +6,7 @@
 /*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 15:14:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/27 21:03:44 by sakarkal         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:50:44 by sakarkal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,4 +132,29 @@ void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Cli
 	reply += std::to_string(time); // ila kant forbidden nbedlooha 
 	reply += "\r\n";
 	fd << reply;
+}
+
+
+
+
+// NOTIFICATIONS
+void Replies::notifyInvite(Client &inviter, Client &invited, string &channelName)
+{
+	string reply = ":";
+
+	reply += inviter.getNick();
+	reply += "!";
+	reply += inviter.getUsername();
+	reply += "@";
+	reply += inviter.getIp();
+	reply += " ";
+	reply += "INVITE";
+	reply += " ";
+	reply += invited.getNick();
+	reply += " ";
+	reply += channelName;
+	reply += "\r\n";
+
+	// TODO: change this to only invited << reply; after merge
+	invited.getFdObject() << reply;
 }

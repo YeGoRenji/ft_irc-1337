@@ -124,6 +124,7 @@ bool Channel::isOperator(string &nick) {
 
 void	Channel::setTopic(string &newTopic, string &setter)
 {
+	cerr << "Setting topic to " << newTopic << " by " << setter << endl;
 	this->topic = newTopic;
 	this->topicSetter = setter;
 	this->topicSetTime = time(0);

@@ -6,7 +6,7 @@
 /*   By: sakarkal <sakarkal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/27 21:24:59 by sakarkal         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:50:07 by sakarkal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		KickClientFromChannel(currentCLient, tokens);
 	else if (tokens[0] == "INVITE")
 		InviteClientFromChannel(currentCLient, tokens);
+	else if (tokens[0] == "TOPIC")
+		TopicClientFromChannel(currentCLient, tokens);
 	else
 	{
 		cerr << "lach msayft command khawi a wld l 9a7ba" << endl;
@@ -336,15 +338,16 @@ void Channel::invite(Client* client) {
 }
 
 */
-void Server::InviteClientFromChannel(Client &client, vector<string> &tokens) // TODO : work on this later
+
+void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
 	string &command = tokens[0];
 
-	if (tokens_len < 2)
+	if (tokens_len < 3)
 		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
 
-	string &channel = tokens[1];
+	string &channel = tokens[2];
 
 	map<string, Channel>::iterator chIt = getChannel(channel);
 
@@ -359,7 +362,7 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens) // 
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 
-	string &invitedNick = tokens[2];
+	string &invitedNick = tokens[1];
 
 	if (channelObj.hasMember(invitedNick))
 		return Errors::ERR_USERONCHANNEL(invitedNick, channel, client, *this);
@@ -367,9 +370,12 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens) // 
 	
 	
 	Replies::RPL_INVITING(invitedNick, channel, client, *this);
-	// channelObj.addMember()
+	Client &invited = getClientFromNick(invitedNick)->second;
+	Replies::notifyInvite(client, invited, channel);
+	// Replies::notifyInvite(Client &inviter, Client &invited, string &channelName);
 	// TODO: INVITE THE USER
 	/*
+		// channelObj.addInvitedUser()
 		Add user to idk attribute about invitedusers or somthing !!
 		search for "todo above" 		
 	*/
@@ -399,26 +405,22 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens) // T
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 	
-	string &newTopic = tokens[2];
 	
-	channelObj.setTopic(newTopic, client.getNick());
 
-	if (tokens[2].empty())
-		Replies::RPL_NOTOPIC(channel, client, *this);
+	if (tokens_len == 2)
+	{
+		if (channelObj.getTopic().empty())
+			Replies::RPL_NOTOPIC(channel, client, *this);
+		else
+			Replies::RPL_TOPIC(channel, channelObj.getTopic(), client, *this);
+	}
 	else
 	{
+		string &newTopic = tokens[2];
+
+		channelObj.setTopic(newTopic, client.getNick());
 		Replies::RPL_TOPIC(channel, newTopic, client, *this);
 		Replies::RPL_TOPICWHOTIME(channel, channelObj.getTopicSetter(), channelObj.getTopicSetTime(), client, *this);
 	}
-
-	
-	
-	// TODO: SET THE TOPIC
-	/*
-		set the topic of the channel
-	*/
-
-	
-
 	
 }
