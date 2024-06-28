@@ -162,6 +162,22 @@ void Client::disconnect() {
 	fdObject.setValue(-1);
 }
 
+void Client::leaveAllChannels(Server &server, string reason)
+{
+	map<string, Channel> &channels = server.getChannels();
+
+
+	vector<Channel *> joinedChannels;
+	for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		if (it->second.hasMember(nickname))
+			joinedChannels.push_back(&it->second);
+	}
+
+	for (size_t i = 0; i < joinedChannels.size(); ++i)
+		server.RemoveMemberFromChannel(*joinedChannels[i], *this, reason);
+}
+
 // getters
 string &Client::getIp()
 {

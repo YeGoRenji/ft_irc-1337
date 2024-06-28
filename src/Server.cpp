@@ -6,7 +6,7 @@
 /*   By: ylyoussf <ylyoussf@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 21:39:27 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/28 14:41:05 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:50:23 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,19 +138,10 @@ void Server::quitUser(Client &currClient, vector<pollfd> &fds, string reason)
 
 	Errors::CUSTOM_CLIENT_GONE_TO_EDGE(currClient);
 
-	vector<Channel *> joinedChannels;
-	for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
-	{
-		if (it->second.hasMember(currClient.getNick()))
-			joinedChannels.push_back(&it->second);
-	}
-
-
-	for (size_t i = 0; i < joinedChannels.size(); ++i)
-		RemoveMemberFromChannel(*joinedChannels[i], currClient, reason);
-
+	currClient.leaveAllChannels(*this, reason);
 	currClient.disconnect();
-	clients.erase(it->fd);
+
+	clients.erase(currClient.getFd());
 	fds.erase(it);
 }
 
@@ -190,6 +181,11 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 	for(; it != ite; it++)
 	{
 		cerr << "handling channel : " << it -> name << endl;
+		if (it->name == "0")
+		{
+			client.leaveAllChannels(*this, "Left all channels...");
+			continue ;
+		}
 		if (!Channel::isValidName(it->name))
 		{
 			Errors::ERR_NOSUCHCHANNEL(it->name, client, *this);
@@ -339,4 +335,8 @@ void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string re
 	channel.removeMember(client, reason);
 	if (channel.getMemberCount() == 0)
 		channels.erase(channel.getChannelName());
+}
+
+map<string, Channel> &Server::getChannels() {
+	return (this -> channels);
 }

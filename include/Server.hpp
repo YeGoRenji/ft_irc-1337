@@ -31,9 +31,13 @@ public:
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string nickName);
 	void parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
+	void RemoveMemberFromChannel(Channel &channel, Client &client, string reason);
+	static string serverName;
+
+	// getter
 	string& getServerName();
 	map<int, Client>::iterator getClientFromNick(string &nick);
-	static string serverName;
+	map<string, Channel> &getChannels();
 
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
@@ -43,7 +47,6 @@ private:
 	map<string, Channel>::iterator createChannel(string name, string password);
 	void handlePART(Client &client, vector<string> &tokens);
 	void KickClientFromChannel(Client &client, vector<string> &tokens);
-	void RemoveMemberFromChannel(Channel &channel, Client &client, string reason);
 
 	Server();
 	map<int, Client> clients;
