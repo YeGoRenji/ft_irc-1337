@@ -2,7 +2,7 @@ CXX := c++
 
 NAME := ircserv
 
-CXXFLAGS := -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address -ggdb3
+CXXFLAGS := -Wall -Wextra -Werror -std=c++98 -fsanitize=address -ggdb3
 
 OBJSFOLDER := objs/
 

@@ -209,11 +209,13 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 			// do nothing, currChannel already points to the right channel
 			// now just add the user to the channel and broadcast
 		}
+		Channel &channelObj = channelIt->second;
 		// adduser to channel
-		channelIt -> second.addMember(client);
+		channelObj.addMember(client);
 		if (!channelIt->second.getTopic().empty())
-			Replies::RPL_TOPIC(channelIt->second, client, *this);
-		channelIt -> second.sendClientsList(channelIt->second, client, *this);
+			Replies::RPL_TOPIC(channelObj.getChannelName(), channelObj.getTopic(), client, *this);
+		//						channel, channelObj.getTopic(), client, *this
+		channelObj.sendClientsList(channelIt->second, client, *this);
 		// channelIt -> second.broadcastAction(client, JOIN);
 	}
 }
@@ -326,7 +328,27 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 	if (!channelObj.hasMember(kickedNick))
 		return Errors::ERR_USERNOTINCHANNEL(kickedNick, channel, client, *this);
 
-	channelObj.removeMember(kickedNick);
+	string reason = "Kicked by " + client.getNick();
+
+	if (tokens_len == 4) {
+		reason = tokens.back();
+	}
+
+	// loop 3la number of clients 
+	// 	ila kan dak l client kayn f list dyal l channel
+	// 		notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
+	// 		RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
+
+	for (size_t i = 0; i < channelObj.getMemberCount(); i++)
+	{
+		if (channelObj.hasMember(kickedNick))
+		{
+			Replies::notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
+			RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
+		}
+	} 
+	Replies::notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
+	RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
 	// TODO: KICK THE USER
 
 	/*
