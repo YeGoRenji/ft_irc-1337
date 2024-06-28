@@ -46,20 +46,20 @@ void Replies::RPL_YOURHOST(Client &client, Server &server)
 	client << reply;
 }
 
-void Replies::RPL_TOPIC(Channel &channel, Client &client, Server &server)
-{
-	string reply = ":";
-	reply += server.getServerName();
-	reply += " 332 ";
-	reply += Utility::getClientName(client, server);
-	reply += " ";
-	reply += channel.getChannelName();
-	reply += " :";
-	reply += channel.getTopic();
-	reply += "\r\n";
+// void Replies::RPL_TOPIC(Channel &channel, Client &client, Server &server)
+// {
+// 	string reply = ":";
+// 	reply += server.getServerName();
+// 	reply += " 332 ";
+// 	reply += Utility::getClientName(client, server);
+// 	reply += " ";
+// 	reply += channel.getChannelName();
+// 	reply += " :";
+// 	reply += channel.getTopic();
+// 	reply += "\r\n";
 
-	client << reply;
-}
+// 	client << reply;
+// }
 
 void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 {
@@ -179,4 +179,25 @@ void Replies::notifyInvite(Client &inviter, Client &invited, string &channelName
 	reply += "\r\n";
   
 	invited << reply;
+}
+
+
+void Replies::notifyKick(Client &kicker, Client &kicked, string &channelName)
+{
+	string reply = ":";
+
+	reply += kicker.getNick();
+	reply += "!";
+	reply += kicker.getUsername();
+	reply += "@";
+	reply += kicker.getIp();
+	reply += " ";
+	reply += "KICK";
+	reply += " ";
+	reply += channelName;
+	reply += " ";
+	reply += kicked.getNick();
+	reply += "\r\n";
+  
+	kicked << reply;
 }

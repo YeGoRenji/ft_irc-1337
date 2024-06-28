@@ -22,7 +22,7 @@ public:
 	Channel();
 	Channel(string name, string password); // TODO : add operators
 	// getters
-	const string& getChannelName() const;
+	string& getChannelName() ;
 	const string& getTopic() const;
 	map<string, Client*> &getMembers();
 	map<string, Client*> &getChanOps();

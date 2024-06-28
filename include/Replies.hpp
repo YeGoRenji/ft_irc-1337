@@ -25,6 +25,7 @@ public:
 	static void RPL_ENDOFNAMES(Channel &channel, Client &client, Server &server);
   
 	static void notifyInvite(Client &inviter, Client &invited, string &channelName);
+	static void notifyKick(Client &kicker, Client &kicked, string &channelName);
 
 private:
 	Replies();

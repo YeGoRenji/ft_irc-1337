@@ -6,7 +6,7 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password): name(_name), topic("+65-59"), password(_password) // TODO: remove topic()
+Channel::Channel(string _name, string _password): name(_name), password(_password) // TODO: remove topic()
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
@@ -140,7 +140,7 @@ void Channel::sendClientsList(Channel &channel, Client &client, Server &server)
 }
 
 // getters
-const string& Channel::getChannelName() const
+string& Channel::getChannelName() 
 {
 	return (this -> name);
 }
