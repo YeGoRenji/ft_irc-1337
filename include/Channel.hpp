@@ -42,19 +42,40 @@ public:
 	void broadcastMessage(string message);
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
-	void sendClientsList(Channel &channel, Client &client, Server &server);
+  void sendClientsList(Channel &channel, Client &client, Server &server);
 	static bool isValidName(string &name);
+
+
+	void	setTopic(string& newTopic, string& setter);
+
+	string	&getTopic() {
+        return topic;
+    }
+
+    string	&getTopicSetter() {
+        return topicSetter;
+    }
+
+    time_t			getTopicSetTime() {
+        return topicSetTime;
+    }
+
+	// void invite(Client* client);
 
 	~Channel();
 private:
-	string name;
-	string topic;
+	string					name;
+	string					topic;
+	string					topicSetter;
+  time_t					topicSetTime;
 
-	map<string, Client*> members;
+	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
+	
+	map<string, Client*>	members;
 	map<string, Client*> chanOps;
 	// password
-	string password;
-	vector<Message> messages;
+	string					password;
+	vector<Message>			messages;
 };
 
 #endif

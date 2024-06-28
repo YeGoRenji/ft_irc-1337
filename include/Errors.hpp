@@ -19,7 +19,11 @@
 	X(442, NOTONCHANNEL, "You're not on that channel", channel) \
 	X(461, NEEDMOREPARAMS, "Not enough parameters", command) \
 	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel) \
-	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel)
+	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel) \
+
+#define TWO_ARG_ERRORS \
+	X(443, USERONCHANNEL, "is already on channel", nick, channel) \
+	X(441, USERNOTINCHANNEL, "They aren't on that channel", nick, channel) 
 
 class Server;
 class Client;
@@ -34,6 +38,11 @@ public:
 	#define X(code, MACRO, message, param) \
 		static void ERR_##MACRO(string param, Client &client, Server &server);
 		ONE_ARG_ERRORS
+	#undef X
+
+	#define X(code, MACRO, message, param, param2) \
+		static void ERR_##MACRO(string param, string param2, Client &client, Server &server);
+		TWO_ARG_ERRORS
 	#undef X
 
 	static void	CUSTOM_CLIENT_GONE_TO_EDGE(Client &client);

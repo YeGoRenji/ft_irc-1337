@@ -112,7 +112,7 @@ bool Channel::isValidName(string &name) {
 
 	if (name.empty())
 		return false;
-
+  
 	if (name[0] != '#')
 		return false;
 
@@ -123,6 +123,14 @@ bool Channel::isValidName(string &name) {
 		return false;
 
 	return true;
+}
+
+void	Channel::setTopic(string &newTopic, string &setter)
+{
+	cerr << "Setting topic to " << newTopic << " by " << setter << endl;
+	this->topic = newTopic;
+	this->topicSetter = setter;
+	this->topicSetTime = time(0);
 }
 
 void Channel::sendClientsList(Channel &channel, Client &client, Server &server)
