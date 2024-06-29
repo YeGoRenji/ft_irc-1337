@@ -224,6 +224,7 @@ void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens,
 {
 	size_t i;
 	replace(channelsTokens.begin(), channelsTokens.end(), ',', ' ');
+	replace(passwordsTokens.begin(), passwordsTokens.end(), ',', ' ');
 	// TODO : refuse channels with space in their names
 	vector<string> channelNames = Utility::getCommandTokens(channelsTokens);
 	vector<string> passwords = Utility::getCommandTokens(passwordsTokens);
