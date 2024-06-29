@@ -86,13 +86,13 @@ void Channel::broadcastAction(Client &client, string reason, BroadCastAction act
 	cerr << "BROADCASTING <" << reply << ">" << endl;
 	reply += "\r\n";
 
-	broadcastMessage(reply);
+	broadcastMessageToGroup(reply, getMembers());
 }
 
-void Channel::broadcastMessage(string message)
+void Channel::broadcastMessageToGroup(string message, map<string, Client*> &group)
 {
-	map<string, Client*>::iterator member_it = members.begin();
-	map<string, Client*>::iterator member_ite = members.end();
+	map<string, Client*>::iterator member_it = group.begin();
+	map<string, Client*>::iterator member_ite = group.end();
 
 	for (; member_it != member_ite; member_it++)
 	{

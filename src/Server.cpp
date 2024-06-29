@@ -111,10 +111,10 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		InviteClientFromChannel(currentCLient, tokens);
 	else if (tokens[0] == "TOPIC")
 		TopicClientFromChannel(currentCLient, tokens);
+	else if (tokens[0] == "PRIVMSG")
+		handlePrivMsg(currentCLient, tokens);
 	else
-	{
 		cerr << "lach msayft command khawi a wld l 9a7ba" << endl;
-	}
 }
 
 bool Server::checkPassword(string input) {
@@ -256,9 +256,7 @@ map<int, Client>::iterator Server::getClientFromNick(string &nick)
 	for(; it != clients.end(); it++)
 	{
 		if (it -> second.getNick() == nick)
-		{
 			return (it);
-		}
 	}
 	return it;
 }
@@ -308,7 +306,7 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 	string &channel = tokens[1];
 
-	if (channel[0] != '#') // NEED to check the return error 
+	if (channel[0] != '#') // NEED to check the return error
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	map<string, Channel>::iterator chIt = getChannel(channel);
@@ -323,7 +321,7 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
-	
+
 	string &kickedNick = tokens[2];
 
 	if (!channelObj.hasMember(kickedNick))
@@ -331,9 +329,8 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 	string reason = "Kicked by " + client.getNick();
 
-	if (tokens_len == 4) {
+	if (tokens_len == 4)
 		reason = tokens.back();
-	}
 
 	// loop 3la number of clients 
 	// 	ila kan dak l client kayn f list dyal l channel
@@ -347,18 +344,14 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 			Replies::notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
 			RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
 		}
-	} 
-	Replies::notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
-	RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
-	// TODO: KICK THE USER
-
-	/*
-		send the message to ALL and then erase the user from the channel 
-	*/
+	}
+	Client &kickedCLient = (*channelObj.getMembers()[kickedNick]);
+	Replies::notifyKick(client, kickedCLient,  channel);
+	RemoveMemberFromChannel(channelObj, kickedCLient, reason);
 }
 
 /* 
- 			todo above 
+ 			TODO above 
 void Channel::invite(Client* client) {
     _invited.push_back(client);
 }
@@ -393,8 +386,6 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	if (channelObj.hasMember(invitedNick))
 		return Errors::ERR_USERONCHANNEL(invitedNick, channel, client, *this);
 
-	
-	
 	Replies::RPL_INVITING(invitedNick, channel, client, *this);
 	Client &invited = getClientFromNick(invitedNick)->second;
 	Replies::notifyInvite(client, invited, channel);
@@ -403,7 +394,7 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	/*
 		// channelObj.addInvitedUser()
 		Add user to idk attribute about invitedusers or somthing !!
-		search for "todo above" 		
+		search for "TODO L: above" 		
 	*/
 	
 }
@@ -424,14 +415,12 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	Channel &channelObj = chIt->second;
-	
+
 	if (!channelObj.hasMember(client.getNick()))
 		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
 
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
-	
-	
 
 	if (tokens_len == 2)
 	{
@@ -448,7 +437,6 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 		Replies::RPL_TOPIC(channel, newTopic, client, *this);
 		Replies::RPL_TOPICWHOTIME(channel, channelObj.getTopicSetter(), channelObj.getTopicSetTime(), client, *this);
 	}
-  
 }
 
 void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string reason)
@@ -460,4 +448,78 @@ void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string re
 
 map<string, Channel> &Server::getChannels() {
 	return (this -> channels);
+}
+
+void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
+{
+	if (tokens.size() == 1)
+		return Errors::ERR_NORECIPIENT(tokens[0], sender, *this);
+
+	else if (tokens.size() == 2)
+		return Errors::ERR_NOTEXTTOSEND(sender, *this);
+
+	// targets could either be [a] channel[s] or user[s]
+	string targetsTokens = tokens[1];
+	string message = tokens[2];
+
+	// TODO : make the following into a utility function
+	// TODO : and rename Utility::getCommandTokens to SplitTokens
+	replace(targetsTokens.begin(), targetsTokens.end(), ',', ' ');
+	vector<string> targets = Utility::getCommandTokens(targetsTokens);
+
+	vector<string>::iterator targetNamesIt = targets.begin();
+	vector<string>::iterator targetNamesIte = targets.end();
+	for(; targetNamesIt != targetNamesIte; targetNamesIt++)
+	{
+		string targetName = *targetNamesIt;
+		bool chanOpsOnly;
+		// check for a first special charater and erase it if exists
+		while (targetName[0] == '%' || targetName[0] == '@')
+		{
+			chanOpsOnly = true;
+			targetName.erase(0, 1);
+			cout << "targetName <" << targetName << ">" << endl;
+		}
+
+		if (this -> hasChannel(targetName))
+		{
+			Channel &ch = getChannel(targetName) -> second;
+			map<string, Client*> *targetMembersGroup;
+			if (chanOpsOnly)
+				targetMembersGroup = &(ch.getChanOps());
+			else
+				targetMembersGroup = &(ch.getMembers());
+
+			// TODO : check the channels modes and send ERR_CANNOTSENDTOCHAN if needed
+
+			//broadcastMessageToGroup(, targetMembersGroup);
+		}
+		else if (this -> hasMember(targetName))
+		{
+			map<int, Client>::iterator ClientIt = getClientFromNick(targetName);
+
+			string reply = ":";
+			reply += sender.getNick();
+			reply += " PRIVMSG ";
+			reply += targetName;
+			reply += " :";
+			reply += message;
+			reply += "\r\n";
+
+			cerr << reply << endl;
+			ClientIt -> second << reply;
+			sender << reply; // TODO : check if you need this
+		}
+		else
+			return Errors::ERR_NOSUCHNICK(targetName, sender, *this);
+	}
+}
+
+bool Server::hasMember(string &nick) {
+	return (getClientFromNick(nick) != clients.end());
+}
+
+bool Server::hasChannel(string ChannelName)
+{
+	return (getChannel(ChannelName) != channels.end());
 }

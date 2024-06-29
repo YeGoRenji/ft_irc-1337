@@ -8,13 +8,15 @@
 
 #define SIMPLE_ERRORS \
 	X(69, CUSTOM_NOT_AUTHED, "Client is not authenticated") \
+	X(412, NOTEXTTOSEND, "No text to send") \
 	X(431, NONICKNAMEGIVEN, "No nickname given") \
 	X(462, ALREADYREGISTERED, "You may not reregister") \
 	X(464, PASSWDMISMATCH, "Password incorrect")
 
 #define ONE_ARG_ERRORS \
-	X(432, ERRONEUSNICKNAME, "Erroneus nickname", nick) \
+	X(401, NOSUCHNICK, "No such nick/channel", nick) \
 	X(403, NOSUCHCHANNEL, "No such channel", channel) \
+	X(432, ERRONEUSNICKNAME, "Erroneus nickname", nick) \
 	X(433, NICKNAMEINUSE, "Nickname is already in use", nick) \
 	X(442, NOTONCHANNEL, "You're not on that channel", channel) \
 	X(461, NEEDMOREPARAMS, "Not enough parameters", command) \
@@ -46,6 +48,7 @@ public:
 	#undef X
 
 	static void	CUSTOM_CLIENT_GONE_TO_EDGE(Client &client);
+	static void	ERR_NORECIPIENT(string command, Client &client, Server &server);
 
 private:
 	Errors();

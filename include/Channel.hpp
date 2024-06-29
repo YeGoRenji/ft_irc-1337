@@ -39,10 +39,10 @@ public:
 	bool hasPassword() const;
 	bool hasMember(string &nick);
 	void addOperator(Client &client);
-	void broadcastMessage(string message);
+	void broadcastMessageToGroup(string message, map<string, Client*> &group);
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
-  void sendClientsList(Channel &channel, Client &client, Server &server);
+	void sendClientsList(Channel &channel, Client &client, Server &server);
 	static bool isValidName(string &name);
 
 

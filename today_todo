@@ -1,2 +1,4 @@
-if we don't send a "\r\n" at the end of the command (e.g using nc) server kaybda yt9a7bn
-getIp() is still hardcoded to "localhost", implement a decent one already
+- if we don't send a "\r\n" at the end of the command (e.g using nc) server kaybda yt9a7bn
+- getIp() is still hardcoded to "localhost", implement a decent one already
+- complete PRIVMSG to a channel
+- test l errors dial PRIVMSG to a user using nc
