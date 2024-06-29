@@ -220,6 +220,7 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 	}
 }
 
+// TODO: Change methode name
 void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)
 {
 	size_t i;
@@ -322,11 +323,10 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
-	
-	string &kickedNick = tokens[2];
 
-	if (!channelObj.hasMember(kickedNick))
-		return Errors::ERR_USERNOTINCHANNEL(kickedNick, channel, client, *this);
+	vector<channelInfo> kickedUsers;
+
+	parseChannelCommand(kickedUsers, tokens[2], "");
 
 	string reason = "Kicked by " + client.getNick();
 
@@ -334,26 +334,19 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 		reason = tokens.back();
 	}
 
-	// loop 3la number of clients 
-	// 	ila kan dak l client kayn f list dyal l channel
-	// 		notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
-	// 		RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
-
-	for (size_t i = 0; i < channelObj.getMemberCount(); i++)
+	for (size_t i = 0; i < kickedUsers.size(); i++)
 	{
-		if (channelObj.hasMember(kickedNick))
+		if (!channelObj.hasMember(client.getNick()))
+			return Errors::ERR_NOTONCHANNEL(channel, client, *this);
+		if (!channelObj.hasMember(kickedUsers[i].name))
 		{
-			Replies::notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
-			RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
+			Errors::ERR_USERNOTINCHANNEL(kickedUsers[i].name, channel, client, *this);
+			continue;
 		}
-	} 
-	Replies::notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
-	RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
-	// TODO: KICK THE USER
+		Replies::notifyKick(client, (*channelObj.getMembers()[kickedUsers[i].name]), channel);
+		RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedUsers[i].name]), reason);
+	}
 
-	/*
-		send the message to ALL and then erase the user from the channel 
-	*/
 }
 
 /* 
@@ -397,7 +390,7 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	Replies::RPL_INVITING(invitedNick, channel, client, *this);
 	Client &invited = getClientFromNick(invitedNick)->second;
 	Replies::notifyInvite(client, invited, channel);
-	// Replies::notifyInvite(Client &inviter, Client &invited, string &channelName);
+
 	// TODO: INVITE THE USER
 	/*
 		// channelObj.addInvitedUser()

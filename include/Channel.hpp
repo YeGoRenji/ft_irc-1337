@@ -63,6 +63,9 @@ public:
 	// void invite(Client* client);
 
 	~Channel();
+
+
+
 private:
 	string					name;
 	string					topic;
