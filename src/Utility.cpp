@@ -15,6 +15,12 @@ string &Utility::getClientName(Client &client, Server &server)
 	return server.getServerName();
 }
 
+vector<string> Utility::splitTokensByChar(string tokens, char c)
+{
+	replace(tokens.begin(), tokens.end(), c, ' ');
+	return getCommandTokens(tokens);
+}
+
 vector<string> Utility::getCommandTokens(string command)
 {
 	string tmpToken;
@@ -34,7 +40,6 @@ vector<string> Utility::getCommandTokens(string command)
 	}
 	return tokens;
 }
-
 
 string Utility::constructMemberList(map<string, Client *> &members, const string prefix)
 {

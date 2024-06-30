@@ -223,11 +223,12 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)
 {
 	size_t i;
-	replace(channelsTokens.begin(), channelsTokens.end(), ',', ' ');
-	replace(passwordsTokens.begin(), passwordsTokens.end(), ',', ' ');
 	// TODO : refuse channels with space in their names
-	vector<string> channelNames = Utility::getCommandTokens(channelsTokens);
-	vector<string> passwords = Utility::getCommandTokens(passwordsTokens);
+	vector<string> channelNames = Utility::splitTokensByChar(channelsTokens, ',');
+	vector<string> passwords = Utility::splitTokensByChar(passwordsTokens, ',');
+
+	cerr << "channels size = " << channelNames.size() << endl;
+	cerr << "passwords size = " << passwords.size() << endl;
 
 	for (i = 0; i < channelNames.size(); i++)
 		ch.push_back((channelInfo){.name=channelNames[i], .password=""});
@@ -464,8 +465,7 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 
 	// TODO : make the following into a utility function
 	// TODO : and rename Utility::getCommandTokens to SplitTokens
-	replace(targetsTokens.begin(), targetsTokens.end(), ',', ' ');
-	vector<string> targets = Utility::getCommandTokens(targetsTokens);
+	vector<string> targets = Utility::splitTokensByChar(targetsTokens, ',');
 
 	vector<string>::iterator targetNamesIt = targets.begin();
 	vector<string>::iterator targetNamesIte = targets.end();
