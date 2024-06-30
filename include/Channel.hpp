@@ -15,6 +15,7 @@ enum BroadCastAction {
 struct Message {
 	Client *sender;
 	string body;
+	// TODO : might wanna add the time here
 };
 
 class Channel {
@@ -39,7 +40,7 @@ public:
 	bool hasPassword() const;
 	bool hasMember(string &nick);
 	void addOperator(Client &client);
-	void broadcastMessageToGroup(string message, map<string, Client*> &group);
+	void broadcastMessageToGroup(string message, map<string, Client*> &group, string senderName);
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
 	void sendClientsList(Channel &channel, Client &client, Server &server);
@@ -70,7 +71,7 @@ private:
   time_t					topicSetTime;
 
 	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
-	
+
 	map<string, Client*>	members;
 	map<string, Client*> chanOps;
 	// password

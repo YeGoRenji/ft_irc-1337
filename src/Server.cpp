@@ -490,7 +490,20 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 
 			// TODO : check the channels modes and send ERR_CANNOTSENDTOCHAN if needed
 
-			//broadcastMessageToGroup(, targetMembersGroup);
+			string reply = ":";
+			reply += sender.getNick();
+			reply += "!";
+			reply += sender.getUsername();
+			reply += "@";
+			reply += sender.getIp();
+			reply += " PRIVMSG ";
+			reply += ch.getChannelName();
+			reply += " :";
+			reply += message;
+			reply += "\r\n";
+
+			ch.broadcastMessageToGroup(reply, *targetMembersGroup, sender.getNick());
+
 		}
 		else if (this -> hasMember(targetName))
 		{
