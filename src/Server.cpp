@@ -460,8 +460,8 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 		return Errors::ERR_NOTEXTTOSEND(sender, *this);
 
 	// targets could either be [a] channel[s] or user[s]
-	string targetsTokens = tokens[1];
-	string message = tokens[2];
+	string &targetsTokens = tokens[1];
+	string &message = tokens[2];
 
 	// TODO : make the following into a utility function
 	// TODO : and rename Utility::getCommandTokens to SplitTokens
@@ -500,16 +500,7 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 			if (receiverIt -> second.getNick() == sender.getNick())
 				continue;
 
-			string reply = ":";
-			reply += sender.getNick();
-			reply += " PRIVMSG ";
-			reply += targetName;
-			reply += " :";
-			reply += message;
-			reply += "\r\n";
-
-			cerr << reply << endl;
-			receiverIt -> second << reply;
+			Replies::RPL_PRIVMSG(sender, receiverIt -> second, message);
 		}
 		else
 			return Errors::ERR_NOSUCHNICK(targetName, sender, *this);

@@ -160,6 +160,20 @@ void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Cli
 	fd << reply;
 }
 
+void Replies::RPL_PRIVMSG(Client &sender, Client &recevier, string &message)
+{
+		string reply = ":";
+
+		reply += sender.getNick();
+		reply += " PRIVMSG ";
+		reply += recevier.getNick();
+		reply += " :";
+		reply += message;
+		reply += "\r\n";
+
+		recevier << reply;
+}
+
 // NOTIFICATIONS
 void Replies::notifyInvite(Client &inviter, Client &invited, string &channelName)
 {
