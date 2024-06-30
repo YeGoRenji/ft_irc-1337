@@ -463,8 +463,6 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 	string &targetsTokens = tokens[1];
 	string &message = tokens[2];
 
-	// TODO : make the following into a utility function
-	// TODO : and rename Utility::getCommandTokens to SplitTokens
 	vector<string> targets = Utility::splitTokensByChar(targetsTokens, ',');
 
 	vector<string>::iterator targetNamesIt = targets.begin();

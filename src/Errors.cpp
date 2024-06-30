@@ -72,7 +72,7 @@ void Errors::ERR_NORECIPIENT(string command, Client &client, Server &server)
 {
 	string error = ":"; \
 	error += server.getServerName(); \
-	error += " 441 "; \
+	error += " 411 "; \
 	error += Utility::getClientName(client, server); \
 	error += " "; \
 	error += ":No recipient given (";
