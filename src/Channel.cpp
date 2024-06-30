@@ -128,6 +128,11 @@ bool Channel::isValidName(string &name) {
 	return true;
 }
 
+void Channel::addMessage(string sender, string message)
+{
+	messages.push_back((Message){sender, message});
+}
+
 void	Channel::setTopic(string &newTopic, string &setter)
 {
 	cerr << "Setting topic to " << newTopic << " by " << setter << endl;

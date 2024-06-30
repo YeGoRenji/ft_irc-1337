@@ -13,7 +13,7 @@ enum BroadCastAction {
 };
 
 struct Message {
-	Client *sender;
+	string sender;
 	string body;
 	// TODO : might wanna add the time here
 };
@@ -44,8 +44,8 @@ public:
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
 	void sendClientsList(Channel &channel, Client &client, Server &server);
+	void addMessage(string sender, string message);
 	static bool isValidName(string &name);
-
 
 	void	setTopic(string& newTopic, string& setter);
 

@@ -490,6 +490,8 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 
 			// TODO : check the channels modes and send ERR_CANNOTSENDTOCHAN if needed
 
+
+			// TODO : refractor this garbage
 			string reply = ":";
 			reply += sender.getNick();
 			reply += "!";
@@ -503,7 +505,7 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 			reply += "\r\n";
 
 			ch.broadcastMessageToGroup(reply, *targetMembersGroup, sender.getNick());
-
+			ch.addMessage(sender.getNick(), message);
 		}
 		else if (this -> hasMember(targetName))
 		{
