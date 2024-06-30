@@ -2,5 +2,4 @@
 - getIp() is still hardcoded to "localhost", implement a decent one already
 - complete PRIVMSG to a channel
 - test l errors dial PRIVMSG to a user using nc
-- refractor getCommandTokens in handlePrivMsg and in the part function
 - make a custom reply for PRIVMSG between users (dms)

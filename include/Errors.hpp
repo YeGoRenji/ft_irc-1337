@@ -14,7 +14,7 @@
 	X(464, PASSWDMISMATCH, "Password incorrect")
 
 #define ONE_ARG_ERRORS \
-	X(401, NOSUCHNICK, "No such nick/channel", nick) \
+	X(401, NOSUCHNICK, "No such nick/channel", recevier) \
 	X(403, NOSUCHCHANNEL, "No such channel", channel) \
 	X(432, ERRONEUSNICKNAME, "Erroneus nickname", nick) \
 	X(433, NICKNAMEINUSE, "Nickname is already in use", nick) \

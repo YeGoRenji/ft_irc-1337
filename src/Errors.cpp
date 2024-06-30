@@ -11,6 +11,7 @@
 		error += " :"; \
 		error += message; \
 		error += "\r\n"; \
+		\
 		client << error; \
 	}
 	SIMPLE_ERRORS
@@ -29,6 +30,7 @@
 		error += " :"; \
 		error += message; \
 		error += "\r\n"; \
+		\
 		client << error; \
 	}
 	ONE_ARG_ERRORS
@@ -52,6 +54,7 @@
 		error += " :"; \
 		error += message; \
 		error += "\r\n"; \
+		\
 		fd << error; \
 	}
 	TWO_ARG_ERRORS

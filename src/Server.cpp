@@ -496,7 +496,9 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 		}
 		else if (this -> hasMember(targetName))
 		{
-			map<int, Client>::iterator ClientIt = getClientFromNick(targetName);
+			map<int, Client>::iterator receiverIt = getClientFromNick(targetName);
+			if (receiverIt -> second.getNick() == sender.getNick())
+				continue;
 
 			string reply = ":";
 			reply += sender.getNick();
@@ -507,8 +509,7 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 			reply += "\r\n";
 
 			cerr << reply << endl;
-			ClientIt -> second << reply;
-			sender << reply; // TODO : check if you need this
+			receiverIt -> second << reply;
 		}
 		else
 			return Errors::ERR_NOSUCHNICK(targetName, sender, *this);
