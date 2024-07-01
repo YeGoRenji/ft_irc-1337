@@ -1,3 +1,4 @@
 - if we don't send a "\r\n" at the end of the command (e.g using nc) server kaybda yt9a7bn
 - getIp() is still hardcoded to "localhost", implement a decent one already
+- implement the command string in each client instead of the server
 - send all channel messages on client join

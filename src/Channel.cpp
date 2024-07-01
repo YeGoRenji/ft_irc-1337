@@ -84,7 +84,6 @@ void Channel::broadcastAction(Client &client, string reason, BroadCastAction act
 		reply += reason;
 	}
 	cerr << "BROADCASTING <" << reply << ">" << endl;
-	reply += "\r\n";
 
 	broadcastMessageToGroup(reply, getMembers(), "");
 }

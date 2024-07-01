@@ -10,7 +10,6 @@
 		error += Utility::getClientName(client, server); \
 		error += " :"; \
 		error += message; \
-		error += "\r\n"; \
 		\
 		client << error; \
 	}
@@ -29,7 +28,6 @@
 		error += param; \
 		error += " :"; \
 		error += message; \
-		error += "\r\n"; \
 		\
 		client << error; \
 	}
@@ -53,7 +51,6 @@
 		error += param2; \
 		error += " :"; \
 		error += message; \
-		error += "\r\n"; \
 		\
 		fd << error; \
 	}
@@ -64,7 +61,6 @@
 void Errors::CUSTOM_CLIENT_GONE_TO_EDGE(Client &client)
 {
 	string error = "ERROR :Client gone to edge";
-	error += "\r\n";
 	client << error; \
 }
 

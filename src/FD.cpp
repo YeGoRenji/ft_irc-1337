@@ -46,6 +46,7 @@ FD::~FD()
 }
 
 FD &FD::operator<<(std::string str) {
+	str += "\r\n";
 	write(fd, str.c_str(), str.size());
 	return *this;
 }

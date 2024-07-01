@@ -502,7 +502,6 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 			reply += ch.getChannelName();
 			reply += " :";
 			reply += message;
-			reply += "\r\n";
 
 			ch.broadcastMessageToGroup(reply, *targetMembersGroup, sender.getNick());
 			ch.addMessage(sender.getNick(), message);
