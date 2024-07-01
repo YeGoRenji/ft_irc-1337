@@ -77,8 +77,8 @@ void Server::start() {
 			else if (fds[i].revents & POLLIN) {
 				Client &currentCLient = clients[fds[i].fd];
 				string data;
+
 				currentCLient >> data;
-				cout << "\nGot <" << data << "> from Client " << currentCLient.getFd() << " (" << currentCLient.getNick() << ") " << &currentCLient << endl;
 				vector<string> tokens = Utility::getCommandTokens(data);
 				fds[i].revents = 0;
 				if (tokens.size())
@@ -92,6 +92,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 {
 	if (!currentCLient.isPassGiven() && tokens[0] != "PASS")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
+
+	cerr << "token size : " << tokens[0].size() << endl;
 
 	if (tokens[0] == "PASS")
 		currentCLient.passHandler(*this, tokens);
@@ -114,7 +116,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	else if (tokens[0] == "PRIVMSG")
 		handlePrivMsg(currentCLient, tokens);
 	else
-		cerr << "lach msayft command khawi a wld l 9a7ba" << endl;
+		cerr << "ach had l command dzb???" << endl;
 }
 
 bool Server::checkPassword(string input) {

@@ -154,7 +154,17 @@ Client &Client::operator<<(std::string str) {
 }
 
 void Client::operator>>(std::string& str) {
-	fdObject >> str;
+	string buffer;
+	fdObject >> buffer;
+	command += buffer;
+
+	cerr << "\nGot <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
+	if (!CONTAINS(command, "\r\n"))
+		return;
+
+	str = string(command.begin(), command.end() - 2);
+	cerr << "str : <" << str << ">" << endl;
+	command.clear();
 }
 
 void Client::disconnect() {

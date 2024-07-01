@@ -38,6 +38,7 @@ public:
 
 private:
 	FD fdObject;
+	string	command;
 	// authentication thingies
 	bool isAuthed;
 	bool passGiven;

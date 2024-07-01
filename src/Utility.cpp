@@ -28,6 +28,9 @@ vector<string> Utility::getCommandTokens(string command)
 	vector<string> tokens;
 	stringstream ss(command);
 
+	if (!command.size())
+		return tokens;
+
 	while(ss >> tmpToken)
 	{
 		if (tmpToken[0] == ':')

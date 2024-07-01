@@ -49,6 +49,7 @@ public:
 
 	void	setTopic(string& newTopic, string& setter);
 
+	// TODO : move l body dial had l 9lawi to the cpp file
 	string	&getTopic() {
         return topic;
     }

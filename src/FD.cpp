@@ -72,7 +72,7 @@ void FD::operator>>(std::string& buffer) {
 		l = buffer.size();
 	}
 
-	buffer.erase(buffer.find("\r\n"));
+//	buffer.erase(buffer.find("\r\n"));
 }
 
 int FD::getValue() {
