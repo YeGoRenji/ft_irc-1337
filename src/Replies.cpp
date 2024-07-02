@@ -201,3 +201,24 @@ void Replies::notifyKick(Client &kicker, Client &kicked, string &channelName)
   
 	kicked << reply;
 }
+
+void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString)
+{
+	string reply = ":";
+
+	reply += client.getNick();
+	reply += "!";
+	reply += client.getUsername();
+	reply += "@";
+	reply += client.getIp();
+	reply += " ";
+	reply += "KICK";
+	reply += " ";
+	reply += channel;
+	reply += " ";
+	reply += modeString;
+	reply += "\r\n";
+  
+	client << reply;
+
+}

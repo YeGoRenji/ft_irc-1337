@@ -111,6 +111,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		InviteClientFromChannel(currentCLient, tokens);
 	else if (tokens[0] == "TOPIC")
 		TopicClientFromChannel(currentCLient, tokens);
+	else if (tokens[0] == "MODE")
+		ModeClientFromChannel(currentCLient, tokens);
 	else
 	{
 		cerr << "lach msayft command khawi a wld l 9a7ba" << endl;
@@ -452,4 +454,53 @@ void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string re
 
 map<string, Channel> &Server::getChannels() {
 	return (this -> channels);
+}
+
+
+
+void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
+{
+	size_t tokens_len = tokens.size();
+	string &command = tokens[0];
+
+	if (tokens_len < 3)
+		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
+
+	string &channel = tokens[1];
+
+	if (channel[0] != '#') // NEED to check the return error 
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
+
+	map<string, Channel>::iterator chIt = getChannel(channel);
+
+	if (chIt == channels.end())
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
+
+	Channel &channelObj = chIt->second;
+
+	if (!channelObj.hasMember(client.getNick()))
+		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
+
+	if (!channelObj.isOperator(client.getNick()))
+		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
+
+	if (tokens_len == 2)
+	{
+		string &modeString = tokens[2];
+		Replies::RPL_CHANNELMODEIS(channel, client, modeString); // 324
+		// Replies::RPL_CREATIONTIME (channel, client, *this); // 329
+	}
+	// else
+	// {
+	// 	// string &modeString = tokens[2];
+
+	// 	// while(!modeString.empty())
+	// 		// HandleFlags(modeString, channel, client, tokens[3]);
+	// }
+
+
+	/*  
+		array
+		parseChannelCommand(array, tokens[2], "")
+	*/
 }

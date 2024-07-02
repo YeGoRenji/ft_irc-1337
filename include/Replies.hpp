@@ -23,6 +23,7 @@ public:
 	static void RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Client &client, Server &server);
 	static void RPL_NAMREPLY(Channel &channel, Client &client, Server &server);
 	static void RPL_ENDOFNAMES(Channel &channel, Client &client, Server &server);
+	static void RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString);
   
 	static void notifyInvite(Client &inviter, Client &invited, string &channelName);
 	static void notifyKick(Client &kicker, Client &kicked, string &channelName);
