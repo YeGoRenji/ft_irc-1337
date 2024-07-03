@@ -11,24 +11,41 @@ Channel::Channel(string _name, string _password): name(_name), password(_passwor
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
 
+void Channel::addMemberAndBroadcast(Client &client) {
+	addMember(client, true);
+}
 
-void Channel::addMember(Client &client)
+void Channel::addMemberSilently(Client &client) {
+	addMember(client, false);
+}
+
+void Channel::addMember(Client &client, bool isBroadcasted)
 {
 	// TODO : maybe try to make this a reference later?
 	// cerr << "Addr = " << &client << endl;
 	members[client.getNick()] = &client;
 	// cerr << client.getNick().size() << endl;
 	cout << client.getNick() << " (" << &client << ") was added to channel " << getChannelName() << endl;
-	broadcastAction(client, "", JOIN);
+	if (isBroadcasted)
+		broadcastAction(client, "", JOIN);
 }
 
-void Channel::removeMember(Client &client, string reason)
-{
+
+void Channel::removeMemberAndBroadcast(Client &client, string reason) {
+	removeMember(client, reason, true);
+}
+
+void Channel::removeMemberSilently(Client &client) {
+	removeMember(client, "69", false);
+}
+
+void Channel::removeMember(Client &client, string reason, bool isBroadcasted) {
 	string &nick = client.getNick();
 	if (!hasMember(nick))
 		return ;
 
-	broadcastAction(client, reason, PART);
+	if (isBroadcasted)
+		broadcastAction(client, reason, PART);
 	members.erase(nick);
 	chanOps.erase(nick);
 }
@@ -90,7 +107,6 @@ void Channel::broadcastAction(Client &client, string reason, BroadCastAction act
 
 void Channel::broadcastMessageToGroup(string message, map<string, Client*> &group, string senderName)
 {
-	cout << "Broadcasting <" << message << ">" << endl;
 	map<string, Client*>::iterator member_it = group.begin();
 	map<string, Client*>::iterator member_ite = group.end();
 

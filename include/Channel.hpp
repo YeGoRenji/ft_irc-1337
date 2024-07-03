@@ -33,9 +33,13 @@ public:
 	// setters
 	void setTopic(string topic);
 
-	// Methods
-	void addMember(Client &client);
-	void removeMember(Client &client, string reason);
+	//// Methods
+	// members methods
+	void removeMemberAndBroadcast(Client &client, string reason);
+	void removeMemberSilently(Client &client);
+	void addMemberAndBroadcast(Client &client);
+	void addMemberSilently(Client &client);
+	//
 	bool checkPassword(string userPassLine);
 	bool hasPassword() const;
 	bool hasMember(string &nick);
@@ -78,6 +82,9 @@ private:
 	// password
 	string					password;
 	vector<Message>			messages;
+
+	void removeMember(Client &client, string reason, bool isBroadcasted);
+	void addMember(Client &client, bool isBroadcasted);
 };
 
 #endif

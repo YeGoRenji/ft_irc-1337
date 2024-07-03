@@ -81,7 +81,7 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 // TODO : check the clients can change their nick!!!
 
 // format : NICKNAME nick
-void Client::setNick(Server &server, vector<string> tokens) {
+void Client::handleNICK(Server &server, vector<string> tokens) {
 
 	if (tokens.size() == 1)
 	{
@@ -110,7 +110,8 @@ void Client::setNick(Server &server, vector<string> tokens) {
 		//throw runtime_error("nickname already exists!");
 	}
 
-	this->nickname = tokens[1];
+	setNick(server, tokens[1]);
+
 	nickGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
 		this -> beWelcomed(server);
@@ -197,4 +198,26 @@ string &Client::getIp()
 string &Client::getUsername()
 {
 	return (this->username);
+}
+
+// setters (a7san wa7d)
+void Client::setNick(Server &server, string &nick)
+{
+	vector<Channel *> clientChannels = server.getChannelsWithMember(this->nickname);
+	vector<Channel *> channelsWhereWasOp;
+
+	for (size_t i = 0; i < clientChannels.size(); ++i)
+	{
+		if ((*clientChannels[i]).isOperator(this->nickname))
+			channelsWhereWasOp.push_back(clientChannels[i]);
+		(*clientChannels[i]).removeMemberSilently(*this);
+	}
+
+	this->nickname = nick;
+
+	for (size_t i = 0; i < clientChannels.size(); ++i)
+		(*clientChannels[i]).addMemberSilently(*this);
+
+	for (size_t i = 0; i < channelsWhereWasOp.size(); ++i)
+		(*channelsWhereWasOp[i]).addOperator(*this);
 }

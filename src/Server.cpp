@@ -7,6 +7,7 @@ string Server::serverName = "IRatherComeServer.mybasement";
 int chk(int status, const std::string msg) {
 	// TODO: use throw ?
 	if (status < 0) {
+		cerr << "WAAAAAAAAAAAAAAAAAAAAA" << endl;
 		std::cerr << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno) << endl;
 		exit(status);
 	}
@@ -15,6 +16,8 @@ int chk(int status, const std::string msg) {
 
 Server::Server(int port, string pass): password(pass)
 {
+	signal(SIGPIPE, SIG_IGN);
+
 	std::cout << "Server: Parameter constructor called" << endl;
 
 	serverSocket.setValue(chk(socket(AF_INET, SOCK_STREAM, 0), "Couldn't open socket"));
@@ -98,7 +101,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	if (tokens[0] == "PASS")
 		currentCLient.passHandler(*this, tokens);
 	else if (tokens[0] == "NICK")
-		currentCLient.setNick(*this, tokens);
+		currentCLient.handleNICK(*this, tokens);
 	else if (tokens[0] == "USER")
 		currentCLient.setUsernameAndRealName(*this, tokens);
 	else if (tokens[0] == "QUIT")
@@ -213,7 +216,7 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 		}
 		Channel &channelObj = channelIt->second;
 		// adduser to channel
-		channelObj.addMember(client);
+		channelObj.addMemberAndBroadcast(client);
 		if (!channelIt->second.getTopic().empty())
 			Replies::RPL_TOPIC(channelObj.getChannelName(), channelObj.getTopic(), client, *this);
 		//						channel, channelObj.getTopic(), client, *this
@@ -261,7 +264,7 @@ map<int, Client>::iterator Server::getClientFromNick(string &nick)
 		if (it -> second.getNick() == nick)
 			return (it);
 	}
-	return it;
+	return clients.end();
 }
 
 void Server::handlePART(Client &client, vector<string> &tokens)
@@ -335,7 +338,7 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 	if (tokens_len == 4)
 		reason = tokens.back();
 
-	// loop 3la number of clients 
+	// loop 3la number of clients
 	// 	ila kan dak l client kayn f list dyal l channel
 	// 		notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
 	// 		RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
@@ -353,8 +356,8 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 	RemoveMemberFromChannel(channelObj, kickedCLient, reason);
 }
 
-/* 
- 			TODO above 
+/*
+ 			TODO above
 void Channel::invite(Client* client) {
     _invited.push_back(client);
 }
@@ -397,9 +400,9 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	/*
 		// channelObj.addInvitedUser()
 		Add user to idk attribute about invitedusers or somthing !!
-		search for "TODO L: above" 		
+		search for "TODO L: above"
 	*/
-	
+
 }
 
 void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
@@ -444,13 +447,25 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 
 void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string reason)
 {
-	channel.removeMember(client, reason);
+	channel.removeMemberAndBroadcast(client, reason);
 	if (channel.getMemberCount() == 0)
 		channels.erase(channel.getChannelName());
 }
 
 map<string, Channel> &Server::getChannels() {
 	return (this -> channels);
+}
+
+vector<Channel *> Server::getChannelsWithMember(string nick) {
+	map<string, Channel>::iterator channelsIt = channels.begin();
+	map<string, Channel>::iterator channelsIte = channels.end();
+
+	vector<Channel *> result;
+
+	for (; channelsIt != channelsIte; ++channelsIt)
+		if (channelsIt->second.hasMember(nick))
+			result.push_back(&channelsIt->second);
+	return result;
 }
 
 void Server::handlePrivMsg(Client &sender, vector<string> &tokens)

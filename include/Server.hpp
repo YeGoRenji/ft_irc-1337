@@ -45,6 +45,7 @@ public:
 	string& getServerName();
 	map<int, Client>::iterator getClientFromNick(string &nick);
 	map<string, Channel> &getChannels();
+	vector<Channel *> getChannelsWithMember(string nick);
 	map<string, Channel>::iterator getChannel(string name);
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);

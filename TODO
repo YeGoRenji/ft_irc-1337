@@ -1,1 +1,3 @@
-:thumbsup_tone69:
+Bugs:
+- Magically fixed: When two users on the same channel, one changes nickname, that nickname isn't freed (nickname is already in use)
+- FIXED BY IGNORING SIGPIPE: CTRL+C while using nc (./clientJumia.sh) makes the server exit

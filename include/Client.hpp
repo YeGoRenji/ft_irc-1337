@@ -19,7 +19,7 @@ public:
 	void leaveAllChannels(Server &server, string reason);
 
 	//void login(Server &server);
-	void setNick(Server &server, vector<string> tokens);
+	void handleNICK(Server &server, vector<string> tokens);
 	void passHandler(Server &server, vector<string> tokens);
 	void setUsernameAndRealName(Server &server, vector<string> vectors);
 	void beWelcomed(Server &server);
@@ -32,6 +32,8 @@ public:
 	FD &getFdObject();
 	string &getIp();
 
+	// setters;
+	void setNick(Server &server, string &nick);
 
 	Client &operator<<(std::string);
 	void operator>>(std::string&);

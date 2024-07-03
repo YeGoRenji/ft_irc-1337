@@ -1,1 +1,2 @@
-(echo -en "PASS 123\r\n"; sleep 1; echo "NICK $1\r\n"; sleep 1; echo "USER $1 0 * $1\r\n" ; cat) | nc localhost 6969
+#!/bin/bash
+(echo -e -n "PASS 123\r\nNICK $1\r\nUSER $1 0 * $1\r\nJOIN #CH1\r\n" ; cat) | nc -c localhost 6969
