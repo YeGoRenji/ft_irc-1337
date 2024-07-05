@@ -6,11 +6,10 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password): name(_name), password(_password) // TODO: remove topic()
+Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode): name(_name), password(_password), mode(_mode) // TODO: remove topic()
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
-
 
 void Channel::addMember(Client &client)
 {
@@ -20,6 +19,28 @@ void Channel::addMember(Client &client)
 	// cerr << client.getNick().size() << endl;
 	cout << client.getNick() << " (" << &client << ") was added to channel " << getChannelName() << endl;
 	broadcastAction(client, "", JOIN);
+}
+
+CHANNEL_MODES::Modes operator|(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j)
+{
+	return static_cast<CHANNEL_MODES::Modes>(static_cast<int>(i) | static_cast<int>(j));
+}
+
+CHANNEL_MODES::Modes operator&(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j)
+{
+	return static_cast<CHANNEL_MODES::Modes>(static_cast<int>(i) & static_cast<int>(j));
+}
+
+bool	Channel::modeIsSet(CHANNEL_MODES::Modes _mode) {
+		return (this->mode & _mode);
+}
+
+void	Channel::setMode(CHANNEL_MODES::Modes _mode) {
+	this->mode = this->mode | _mode;
+}
+
+void	Channel::unsetMode(CHANNEL_MODES::Modes _mode) {
+	this->mode = static_cast<CHANNEL_MODES::Modes>(_mode & ~mode);
 }
 
 void Channel::removeMember(Client &client, string reason)
@@ -131,6 +152,8 @@ void	Channel::setTopic(string &newTopic, string &setter)
 	this->topic = newTopic;
 	this->topicSetter = setter;
 	this->topicSetTime = time(0);
+
+	cout <<  "this->topicSetTime	" << this->topicSetTime << endl;
 }
 
 void Channel::sendClientsList(Channel &channel, Client &client, Server &server)

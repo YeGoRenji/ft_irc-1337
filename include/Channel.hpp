@@ -7,6 +7,18 @@
 class Client;
 class Server;
 
+namespace CHANNEL_MODES {
+	enum Modes {
+		NO_MODE = 0,
+		SET_INVITE_ONLY = 2,
+		SET_TOPIC = 4,
+		SET_KEY = 8,
+		GIVE_PRIVILEGE = 16,
+		SET_LIMIT = 32,
+	};
+}
+
+
 enum BroadCastAction {
 	JOIN,
 	PART
@@ -20,7 +32,7 @@ struct Message {
 class Channel {
 public:
 	Channel();
-	Channel(string name, string password); // TODO : add operators
+	Channel(string name, string password, CHANNEL_MODES::Modes _mode); // TODO : add operators
 	// getters
 	string& getChannelName() ;
 	const string& getTopic() const;
@@ -65,20 +77,36 @@ public:
 	~Channel();
 
 
+	bool	modeIsSet(CHANNEL_MODES::Modes _mode);
+
+	void	setMode(CHANNEL_MODES::Modes _mode);
+
+	void	unsetMode(CHANNEL_MODES::Modes _mode);
+
+
 
 private:
 	string					name;
-	string					topic;
 	string					topicSetter;
-  time_t					topicSetTime;
 
-	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
-	
 	map<string, Client*>	members;
 	map<string, Client*> chanOps;
 	// password
 	string					password;
 	vector<Message>			messages;
+
+	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
+	string					topic;
+	CHANNEL_MODES::Modes		mode;
+	time_t					topicSetTime;
+	// uint16_t				limit;
+
 };
+
+CHANNEL_MODES::Modes operator|(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j);
+
+CHANNEL_MODES::Modes operator&(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j);
+
+
 
 #endif

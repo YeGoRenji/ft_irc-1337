@@ -241,7 +241,7 @@ void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens,
 
 map<string, Channel>::iterator Server::createChannel(string name, string password)
 {
-    pair<map<string, Channel>::iterator, bool> result = channels.insert(make_pair(name, Channel(name, password)));
+    pair<map<string, Channel>::iterator, bool> result = channels.insert(make_pair(name, Channel(name, password, CHANNEL_MODES::NO_MODE)));
     return result.first;
 }
 
@@ -456,6 +456,91 @@ map<string, Channel> &Server::getChannels() {
 	return (this -> channels);
 }
 
+void	error(bool state, char c, vector<string>& token, Channel& channel, Client* client, Server &server)
+{
+	(void)state;
+    (void)channel;
+    (void)client;
+    (void)c;
+	Errors::ERR_UNKNOWNMODE(token[1], *client, server);
+}
+
+// handleInvite
+void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server)
+{
+    (void)c;
+    (void)token;
+	(void)server;
+	
+	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
+	{
+		channel.unsetMode(CHANNEL_MODES::SET_INVITE_ONLY);
+		string message = ":";
+		message += client->getNick();
+		message += "!";
+		message += client->getUsername();
+		message += "@";
+		message += client->getIp();
+		message += " MODE ";
+		message += channel.getChannelName();
+		message += " -i\r\n";
+
+		Client &clien = server.getClientFromNick(client->getNick())->second;
+		clien << message;
+	}
+	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
+	{
+		channel.setMode(CHANNEL_MODES::SET_INVITE_ONLY);
+		string message = ":";
+		message += client->getNick();
+		message += "!";
+		message += client->getUsername();
+		message += "@";
+		message += client->getIp();
+		message += " MODE ";
+		message += channel.getChannelName();
+		message += " +i\r\n";
+
+		Client &clien = server.getClientFromNick(client->getNick())->second;
+		clien << message;
+		// client->getFdObject() << message;
+	}
+}
+
+
+// this fuction handles the flags in the mode command 
+void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client* client, Server &server)
+{
+	bool state = true;
+
+	if (modeString[0] == '+' || modeString[0] == '-')
+	{
+		state = (modeString[0] == '+');
+		modeString.erase(0, 1);
+	}
+	else
+		return Errors::ERR_UNKNOWNMODE(token[1], *client, server);
+		// return Errors::ERR_UNKNOWNMODE(channel, modeString[0], client, server);
+	
+	for (size_t i = 0; i < modeString.size() && !std::strchr("-+", modeString[i]); ++i)
+	{
+		void (*f[])(bool state, char c, std::vector<std::string>& tmp, Channel& channel, Client* client, Server &server) = {   
+			&error,
+			&handleInvite
+			// &handleKey,
+			// &handleLimit,
+			// &handleOperator,
+			// &handleTopic
+		};
+
+		// int index = (modeString[i] == 'k') * 1 + (modeString[i] == 'i') * 2 + (modeString[i] == 'o') * 3 + (modeString[i] == 't') * 4 + (modeString[i] == 'l') * 5;
+		int index = (modeString[i] == 'i') * 1;
+		f[index](state, modeString[i], token, channel, client, server);
+	}
+	modeString.erase(0, modeString.find_first_of("-+"));
+}
+
+
 
 
 void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
@@ -463,7 +548,7 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 	size_t tokens_len = tokens.size();
 	string &command = tokens[0];
 
-	if (tokens_len < 3)
+	if (tokens_len < 2)
 		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
 
 	string &channel = tokens[1];
@@ -486,21 +571,18 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 
 	if (tokens_len == 2)
 	{
-		string &modeString = tokens[2];
-		Replies::RPL_CHANNELMODEIS(channel, client, modeString); // 324
-		// Replies::RPL_CREATIONTIME (channel, client, *this); // 329
+		string modeString = "+lokit";
+		Replies::RPL_CHANNELMODEIS(channel, client, modeString, *this); // 324
+		Replies::RPL_CREATIONTIME (channel, time(0), client, *this); // 329
 	}
-	// else
-	// {
-	// 	// string &modeString = tokens[2];
-
-	// 	// while(!modeString.empty())
-	// 		// HandleFlags(modeString, channel, client, tokens[3]);
-	// }
-
-
-	/*  
-		array
-		parseChannelCommand(array, tokens[2], "")
-	*/
+	else
+	{
+		string modeString;
+		if (tokens[2][0] == '+' || tokens[2][0] == '-')
+			modeString = tokens[2];		
+		else
+			Errors::ERR_UNKNOWNMODE(tokens[2], client, *this);
+		while(!modeString.empty())
+			HandleFlags(modeString, tokens, channelObj, &client, *this);
+	}
 }

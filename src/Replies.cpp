@@ -202,21 +202,38 @@ void Replies::notifyKick(Client &kicker, Client &kicked, string &channelName)
 	kicked << reply;
 }
 
-void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString)
+void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString, Server &server)
 {
 	string reply = ":";
 
-	reply += client.getNick();
-	reply += "!";
-	reply += client.getUsername();
-	reply += "@";
-	reply += client.getIp();
+	reply += server.getServerName();
 	reply += " ";
-	reply += "KICK";
+	reply += "324";
+	reply += " ";
+	reply += client.getNick();
 	reply += " ";
 	reply += channel;
 	reply += " ";
 	reply += modeString;
+	reply += "\r\n";
+  
+	client << reply;
+
+}
+
+void	Replies::RPL_CREATIONTIME(string &channel, time_t time, Client &client, Server &server)
+{
+	string reply = ":";
+
+	reply += server.getServerName();
+	reply += " ";
+	reply += "329";
+	reply += " ";
+	reply += client.getNick();
+	reply += " ";
+	reply += channel;
+	reply += " ";
+	reply += std::to_string(time);
 	reply += "\r\n";
   
 	client << reply;
