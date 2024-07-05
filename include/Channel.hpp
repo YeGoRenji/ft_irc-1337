@@ -9,12 +9,12 @@ class Server;
 
 namespace CHANNEL_MODES {
 	enum Modes {
-		NO_MODE = 0,
-		SET_INVITE_ONLY = 2,
-		SET_TOPIC = 4,
-		SET_KEY = 8,
-		GIVE_PRIVILEGE = 16,
-		SET_LIMIT = 32,
+		NO_MODE = 0b0,
+		SET_INVITE_ONLY = 0b10,
+		SET_TOPIC = 0b100,
+		SET_KEY = 0b1000,
+		GIVE_PRIVILEGE = 0b10000,
+		SET_LIMIT = 0b100000,
 	};
 }
 

@@ -310,7 +310,7 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 	string &channel = tokens[1];
 
-	if (channel[0] != '#') // NEED to check the return error 
+	if (channel[0] != '#') // NEED to check the return error
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	map<string, Channel>::iterator chIt = getChannel(channel);
@@ -351,8 +351,8 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 
 }
 
-/* 
- 			todo above 
+/*
+ 			todo above
 void Channel::invite(Client* client) {
     _invited.push_back(client);
 }
@@ -387,8 +387,8 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	if (channelObj.hasMember(invitedNick))
 		return Errors::ERR_USERONCHANNEL(invitedNick, channel, client, *this);
 
-	
-	
+
+
 	Replies::RPL_INVITING(invitedNick, channel, client, *this);
 	Client &invited = getClientFromNick(invitedNick)->second;
 	Replies::notifyInvite(client, invited, channel);
@@ -397,9 +397,9 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	/*
 		// channelObj.addInvitedUser()
 		Add user to idk attribute about invitedusers or somthing !!
-		search for "todo above" 		
+		search for "todo above"
 	*/
-	
+
 }
 
 void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
@@ -418,14 +418,14 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	Channel &channelObj = chIt->second;
-	
+
 	if (!channelObj.hasMember(client.getNick()))
 		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
 
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
-	
-	
+
+
 
 	if (tokens_len == 2)
 	{
@@ -442,7 +442,7 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 		Replies::RPL_TOPIC(channel, newTopic, client, *this);
 		Replies::RPL_TOPICWHOTIME(channel, channelObj.getTopicSetter(), channelObj.getTopicSetTime(), client, *this);
 	}
-  
+
 }
 
 void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string reason)
@@ -471,7 +471,7 @@ void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, C
     (void)c;
     (void)token;
 	(void)server;
-	
+
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
 	{
 		channel.unsetMode(CHANNEL_MODES::SET_INVITE_ONLY);
@@ -508,7 +508,7 @@ void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, C
 }
 
 
-// this fuction handles the flags in the mode command 
+// this fuction handles the flags in the mode command
 void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client* client, Server &server)
 {
 	bool state = true;
@@ -521,17 +521,17 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 	else
 		return Errors::ERR_UNKNOWNMODE(token[1], *client, server);
 		// return Errors::ERR_UNKNOWNMODE(channel, modeString[0], client, server);
-	
+
+	void (*f[])(bool state, char c, std::vector<std::string>& tmp, Channel& channel, Client* client, Server &server) = {
+		&error,
+		&handleInvite
+		// &handleKey,
+		// &handleLimit,
+		// &handleOperator,
+		// &handleTopic
+	};
 	for (size_t i = 0; i < modeString.size() && !std::strchr("-+", modeString[i]); ++i)
 	{
-		void (*f[])(bool state, char c, std::vector<std::string>& tmp, Channel& channel, Client* client, Server &server) = {   
-			&error,
-			&handleInvite
-			// &handleKey,
-			// &handleLimit,
-			// &handleOperator,
-			// &handleTopic
-		};
 
 		// int index = (modeString[i] == 'k') * 1 + (modeString[i] == 'i') * 2 + (modeString[i] == 'o') * 3 + (modeString[i] == 't') * 4 + (modeString[i] == 'l') * 5;
 		int index = (modeString[i] == 'i') * 1;
@@ -553,7 +553,7 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 
 	string &channel = tokens[1];
 
-	if (channel[0] != '#') // NEED to check the return error 
+	if (channel[0] != '#') // NEED to check the return error
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	map<string, Channel>::iterator chIt = getChannel(channel);
@@ -579,7 +579,7 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 	{
 		string modeString;
 		if (tokens[2][0] == '+' || tokens[2][0] == '-')
-			modeString = tokens[2];		
+			modeString = tokens[2];
 		else
 			Errors::ERR_UNKNOWNMODE(tokens[2], client, *this);
 		while(!modeString.empty())
