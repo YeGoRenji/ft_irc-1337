@@ -81,6 +81,9 @@ public:
 
 	void	setMode(CHANNEL_MODES::Modes _mode);
 
+	void	setLimit(uint16_t _limit);
+	uint16_t	getLimit(void);
+
 	void	unsetMode(CHANNEL_MODES::Modes _mode);
 
 
@@ -99,7 +102,7 @@ private:
 	string					topic;
 	CHANNEL_MODES::Modes		mode;
 	time_t					topicSetTime;
-	// uint16_t				limit;
+	uint16_t				limit;
 
 };
 
