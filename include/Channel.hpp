@@ -72,7 +72,7 @@ public:
         return topicSetTime;
     }
 
-	// void invite(Client* client);
+	void invite(Client* client);
 
 	~Channel();
 
@@ -97,7 +97,7 @@ private:
 	string					password;
 	vector<Message>			messages;
 
-	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
+	std::vector<Client*>	invited; // TODO : zedtha gelt maybe nahtajohaa
 	string					topicSetter;
 	string					topic;
 	CHANNEL_MODES::Modes		mode;
