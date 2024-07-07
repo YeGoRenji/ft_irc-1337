@@ -375,7 +375,7 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	if (chIt == channels.end())
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
-	Channel &channelObj = chIt->second;
+	Channel &channelObj = chIt->second; 
 
 	if (!channelObj.hasMember(client.getNick()))
 		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
@@ -390,13 +390,14 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 
 
 
+
 	Replies::RPL_INVITING(invitedNick, channel, client, *this);
 	Client &invited = getClientFromNick(invitedNick)->second;
+	channelObj.invite(&invited);
 	Replies::notifyInvite(client, invited, channel);
 
 	// TODO: INVITE THE USER
 	/*
-		// channelObj.addInvitedUser()
 		Add user to idk attribute about invitedusers or somthing !!
 		search for "todo above"
 	*/

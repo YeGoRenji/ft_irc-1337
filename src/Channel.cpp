@@ -205,3 +205,11 @@ uint16_t	Channel::getLimit(void)
 {
 	return (this->limit);
 }
+
+
+
+
+void Channel::invite(Client* client) {
+    this->invited.push_back(client);
+	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
+}
