@@ -6,7 +6,7 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode): name(_name), password(_password), mode(_mode) // limit(3) // TODO: remove topic()
+Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode): name(_name), password(_password), mode(_mode), limit(3) // TODO: remove topic()
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
@@ -195,4 +195,13 @@ size_t Channel::getChanOpCount() const
 void Channel::setTopic(string topic)
 {
 	this -> topic = topic;
+}
+
+void Channel::setLimit(uint16_t _limit)
+{
+	this->limit = _limit;
+}
+uint16_t	Channel::getLimit(void)
+{
+	return (this->limit);
 }
