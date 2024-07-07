@@ -503,7 +503,91 @@ void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, C
 
 		Client &clien = server.getClientFromNick(client->getNick())->second;
 		clien << message;
-		// client->getFdObject() << message;
+	}
+}
+void	handleTopic(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server)
+{
+    (void)c;
+    (void)token;
+	(void)server;
+
+	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
+	{
+		channel.unsetMode(CHANNEL_MODES::SET_TOPIC);
+		string message = ":";
+		message += client->getNick();
+		message += "!";
+		message += client->getUsername();
+		message += "@";
+		message += client->getIp();
+		message += " MODE ";
+		message += channel.getChannelName();
+		message += " -t\r\n";
+
+		Client &clien = server.getClientFromNick(client->getNick())->second;
+		clien << message;
+	}
+	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
+	{
+		channel.setMode(CHANNEL_MODES::SET_TOPIC);
+		string message = ":";
+		message += client->getNick();
+		message += "!";
+		message += client->getUsername();
+		message += "@";
+		message += client->getIp();
+		message += " MODE ";
+		message += channel.getChannelName();
+		message += " +t\r\n";
+
+		Client &clien = server.getClientFromNick(client->getNick())->second;
+		clien << message;
+	}
+}
+void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server)
+{
+    (void)c;
+	(void)server;
+
+	if (state && token.size() < 4)
+		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
+
+
+
+	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_LIMIT))
+	{
+		// if (channel.getMemberCount() > (size_t)stoi(token[4]))
+		// 	return Errors::ERR_CHANNELISFULL(channel.getChannelName(), *client, server);
+		
+		channel.unsetMode(CHANNEL_MODES::SET_LIMIT);
+		string message = ":";
+		message += client->getNick();
+		message += "!";
+		message += client->getUsername();
+		message += "@";
+		message += client->getIp();
+		message += " MODE ";
+		message += channel.getChannelName();
+		message += " -l\r\n";
+
+		Client &clien = server.getClientFromNick(client->getNick())->second;
+		clien << message;
+	}
+	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_LIMIT))
+	{
+		channel.setMode(CHANNEL_MODES::SET_LIMIT);
+		string message = ":";
+		message += client->getNick();
+		message += "!";
+		message += client->getUsername();
+		message += "@";
+		message += client->getIp();
+		message += " MODE ";
+		message += channel.getChannelName();
+		message += " +l\r\n";
+
+		Client &clien = server.getClientFromNick(client->getNick())->second;
+		clien << message;
 	}
 }
 
@@ -524,17 +608,17 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 
 	void (*f[])(bool state, char c, std::vector<std::string>& tmp, Channel& channel, Client* client, Server &server) = {
 		&error,
-		&handleInvite
+		&handleInvite,
+		&handleTopic,
+		&handleLimit
 		// &handleKey,
-		// &handleLimit,
 		// &handleOperator,
-		// &handleTopic
 	};
 	for (size_t i = 0; i < modeString.size() && !std::strchr("-+", modeString[i]); ++i)
 	{
 
 		// int index = (modeString[i] == 'k') * 1 + (modeString[i] == 'i') * 2 + (modeString[i] == 'o') * 3 + (modeString[i] == 't') * 4 + (modeString[i] == 'l') * 5;
-		int index = (modeString[i] == 'i') * 1;
+		int index = (modeString[i] == 'i') * 1 + (modeString[i] == 't') * 2 + (modeString[i] == 'l') * 3;
 		f[index](state, modeString[i], token, channel, client, server);
 	}
 	modeString.erase(0, modeString.find_first_of("-+"));
@@ -569,11 +653,19 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 
-	if (tokens_len == 2)
+	if (tokens_len == 2) // mode #d 
 	{
-		string modeString = "+lokit";
+		string modeString = "+"; // TODO : get the deafult mode of the channel
+		// i need that if modes is sets, add the charecter to the modeString
+		if (channelObj.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
+			modeString += "i";
+		if (channelObj.modeIsSet(CHANNEL_MODES::SET_TOPIC))
+			modeString += "t";
+		if (channelObj.modeIsSet(CHANNEL_MODES::SET_LIMIT))
+			modeString += "l";
+		
 		Replies::RPL_CHANNELMODEIS(channel, client, modeString, *this); // 324
-		Replies::RPL_CREATIONTIME (channel, time(0), client, *this); // 329
+		Replies::RPL_CREATIONTIME (channel, channelObj.getTopicSetTime(), client, *this); // 329
 	}
 	else
 	{

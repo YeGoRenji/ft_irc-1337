@@ -21,6 +21,7 @@
 	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel) \
 	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel) \
 	X(472, UNKNOWNMODE, "is unknown mode char to me", channel) \
+	X(471, CHANNELISFULL, "Cannot join channel (+l)", channel) \
 
 #define TWO_ARG_ERRORS \
 	X(443, USERONCHANNEL, "is already on channel", nick, channel) \

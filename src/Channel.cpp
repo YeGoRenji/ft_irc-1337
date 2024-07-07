@@ -6,7 +6,7 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode): name(_name), password(_password), mode(_mode) // TODO: remove topic()
+Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode): name(_name), password(_password), mode(_mode) // limit(3) // TODO: remove topic()
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
@@ -40,7 +40,7 @@ void	Channel::setMode(CHANNEL_MODES::Modes _mode) {
 }
 
 void	Channel::unsetMode(CHANNEL_MODES::Modes _mode) {
-	this->mode = static_cast<CHANNEL_MODES::Modes>(_mode & ~mode);
+	this->mode = static_cast<CHANNEL_MODES::Modes>(~_mode & mode);
 }
 
 void Channel::removeMember(Client &client, string reason)

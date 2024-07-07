@@ -87,7 +87,6 @@ public:
 
 private:
 	string					name;
-	string					topicSetter;
 
 	map<string, Client*>	members;
 	map<string, Client*> chanOps;
@@ -96,6 +95,7 @@ private:
 	vector<Message>			messages;
 
 	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
+	string					topicSetter;
 	string					topic;
 	CHANNEL_MODES::Modes		mode;
 	time_t					topicSetTime;
