@@ -22,10 +22,14 @@
 	X(461, NEEDMOREPARAMS, "Not enough parameters", command) \
 	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel) \
 	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel) \
+	X(471, CHANNELISFULL, "Cannot join channel (+l)", channel)
+	// X(472, UNKNOWNMODE, "is unknown mode char to me", channel)
 
 #define TWO_ARG_ERRORS \
 	X(443, USERONCHANNEL, "is already on channel", nick, channel) \
-	X(441, USERNOTINCHANNEL, "They aren't on that channel", nick, channel) 
+	X(441, USERNOTINCHANNEL, "They aren't on that channel", nick, channel) \
+	X(472, UNKNOWNMODE, "is unknown mode char to me", c, channel)
+
 
 class Server;
 class Client;

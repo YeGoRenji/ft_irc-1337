@@ -3,11 +3,11 @@
 #include <Client.hpp>
 
 string Server::serverName = "IRatherComeServer.mybasement";
+void	replyModeNotify(Client &client, Channel &channel, string modeString, Server &server);
 
 int chk(int status, const std::string msg) {
 	// TODO: use throw ?
 	if (status < 0) {
-		cerr << "WAAAAAAAAAAAAAAAAAAAAA" << endl;
 		std::cerr << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno) << endl;
 		exit(status);
 	}
@@ -118,6 +118,8 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 		TopicClientFromChannel(currentCLient, tokens);
 	else if (tokens[0] == "PRIVMSG")
 		handlePrivMsg(currentCLient, tokens);
+	else if (tokens[0] == "MODE")
+		ModeClientFromChannel(currentCLient, tokens);
 	else
 		cerr << "ach had l command dzb???" << endl;
 }
@@ -225,6 +227,7 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 	}
 }
 
+// TODO: Change methode name
 void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)
 {
 	size_t i;
@@ -245,7 +248,7 @@ void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens,
 
 map<string, Channel>::iterator Server::createChannel(string name, string password)
 {
-    pair<map<string, Channel>::iterator, bool> result = channels.insert(make_pair(name, Channel(name, password)));
+    pair<map<string, Channel>::iterator, bool> result = channels.insert(make_pair(name, Channel(name, password, CHANNEL_MODES::NO_MODE)));
     return result.first;
 }
 
@@ -328,36 +331,34 @@ void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 
-	string &kickedNick = tokens[2];
+	vector<channelInfo> kickedUsers;
 
-	if (!channelObj.hasMember(kickedNick))
-		return Errors::ERR_USERNOTINCHANNEL(kickedNick, channel, client, *this);
+	parseChannelCommand(kickedUsers, tokens[2], "");
 
 	string reason = "Kicked by " + client.getNick();
 
 	if (tokens_len == 4)
 		reason = tokens.back();
 
-	// loop 3la number of clients
-	// 	ila kan dak l client kayn f list dyal l channel
-	// 		notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
-	// 		RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
-
-	for (size_t i = 0; i < channelObj.getMemberCount(); i++)
+	for (size_t i = 0; i < kickedUsers.size(); i++)
 	{
-		if (channelObj.hasMember(kickedNick))
+		if (!channelObj.hasMember(client.getNick()))
+			return Errors::ERR_NOTONCHANNEL(channel, client, *this);
+		if (!channelObj.hasMember(kickedUsers[i].name))
 		{
-			Replies::notifyKick(client, (*channelObj.getMembers()[kickedNick]), channel);
-			RemoveMemberFromChannel(channelObj, (*channelObj.getMembers()[kickedNick]), reason);
+			Errors::ERR_USERNOTINCHANNEL(kickedUsers[i].name, channel, client, *this);
+			continue;
 		}
+		Client &memberTokick = *channelObj.getMembers()[kickedUsers[i].name];
+
+		Replies::notifyKick(client, memberTokick, channel);
+		RemoveMemberFromChannel(channelObj, memberTokick, reason);
 	}
-	Client &kickedCLient = (*channelObj.getMembers()[kickedNick]);
-	Replies::notifyKick(client, kickedCLient,  channel);
-	RemoveMemberFromChannel(channelObj, kickedCLient, reason);
+
 }
 
 /*
- 			TODO above
+ 			todo above
 void Channel::invite(Client* client) {
     _invited.push_back(client);
 }
@@ -392,15 +393,18 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	if (channelObj.hasMember(invitedNick))
 		return Errors::ERR_USERONCHANNEL(invitedNick, channel, client, *this);
 
+
+
+
 	Replies::RPL_INVITING(invitedNick, channel, client, *this);
 	Client &invited = getClientFromNick(invitedNick)->second;
+	channelObj.invite(&invited);
 	Replies::notifyInvite(client, invited, channel);
-	// Replies::notifyInvite(Client &inviter, Client &invited, string &channelName);
+
 	// TODO: INVITE THE USER
 	/*
-		// channelObj.addInvitedUser()
 		Add user to idk attribute about invitedusers or somthing !!
-		search for "TODO L: above"
+		search for "todo above"
 	*/
 
 }
@@ -543,4 +547,185 @@ bool Server::hasMember(string &nick) {
 bool Server::hasChannel(string ChannelName)
 {
 	return (getChannel(ChannelName) != channels.end());
+}
+void	error(bool state, char c, vector<string>& token, Channel& channel, Client* client, Server &server)
+{
+	(void)state;
+    (void)channel;
+    (void)client;
+
+	Errors::ERR_UNKNOWNMODE(token[1], string(1, c), *client, server);
+}
+
+// handleInvite
+void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server)
+{
+    (void)c;
+    (void)token;
+	(void)server;
+
+	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
+	{
+		channel.unsetMode(CHANNEL_MODES::SET_INVITE_ONLY);
+		replyModeNotify(*client, channel, "-i", server);
+	}
+	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
+	{
+		channel.setMode(CHANNEL_MODES::SET_INVITE_ONLY);
+		replyModeNotify(*client, channel, "+i", server);
+	}
+}
+void	handleTopic(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server)
+{
+    (void)c;
+    (void)token;
+	(void)server;
+
+	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
+	{
+		channel.unsetMode(CHANNEL_MODES::SET_TOPIC);
+		replyModeNotify(*client, channel, "-t", server);
+	}
+	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
+	{
+		channel.setMode(CHANNEL_MODES::SET_TOPIC);
+		replyModeNotify(*client, channel, "+t", server);
+	}
+}
+
+
+void	replyModeNotify(Client &client, Channel &channel, string modeString, Server &server)
+{
+	string message = ":";
+	message += client.getNick();
+	message += "!";
+	message += client.getUsername();
+	message += "@";
+	message += client.getIp();
+	message += " MODE ";
+	message += channel.getChannelName();
+	message += " ";
+	message += modeString;
+	message += " ";
+
+	Client &clien = server.getClientFromNick(client.getNick())->second;
+	clien << message;
+}
+
+
+void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server)
+{
+    (void)c;
+	(void)server;
+
+	if (state && token.size() < 4)
+		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
+
+	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_LIMIT))
+	{
+		channel.unsetMode(CHANNEL_MODES::SET_LIMIT);
+		replyModeNotify(*client, channel, "-l", server);
+	}
+	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_LIMIT))
+	{
+		string str;
+		if (token[3][0] != ':')
+			str = token[3];
+		else
+			str = token[3].substr(1);
+
+		std::stringstream ss(str);
+        unsigned long     limit;
+        ss >> limit;
+		channel.setLimit(limit);
+		channel.setMode(CHANNEL_MODES::SET_LIMIT);
+
+		replyModeNotify(*client, channel, "+l", server);
+	}
+}
+
+
+void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client* client, Server &server)
+{
+	bool state = true;
+
+	if (modeString[0] == '+' || modeString[0] == '-')
+	{
+		state = (modeString[0] == '+');
+		modeString.erase(0, 1);
+	}
+	else
+		return Errors::ERR_UNKNOWNMODE(token[1], string(1, modeString[0]), *client, server);
+		// return Errors::ERR_UNKNOWNMODE(channel, modeString[0], client, server);
+
+	void (*f[])(bool state, char c, std::vector<std::string>& tmp, Channel& channel, Client* client, Server &server) = {
+		&error,
+		&handleInvite,
+		&handleTopic,
+		&handleLimit
+		// &handleKey,
+		// &handleOperator,
+	};
+	for (size_t i = 0; i < modeString.size() && !std::strchr("-+", modeString[i]); ++i)
+	{
+		int index = (modeString[i] == 'i') * 1 + (modeString[i] == 't') * 2 + (modeString[i] == 'l') * 3;
+		f[index](state, modeString[i], token, channel, client, server);
+	}
+	modeString.erase(0, modeString.find_first_of("-+"));
+}
+
+
+
+
+void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
+{
+	size_t tokens_len = tokens.size();
+	string &command = tokens[0];
+
+	if (tokens_len < 2)
+		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
+
+	string &channel = tokens[1];
+
+	if (channel[0] != '#') // NEED to check the return error
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
+
+	map<string, Channel>::iterator chIt = getChannel(channel);
+
+	if (chIt == channels.end())
+		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
+
+	Channel &channelObj = chIt->second;
+
+	if (!channelObj.hasMember(client.getNick()))
+		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
+
+	if (!channelObj.isOperator(client.getNick()))
+		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
+
+	if (tokens_len == 2) // mode #d
+	{
+		string modeString = "+"; // TODO : get the deafult mode of the channel
+		// i need that if modes is sets, add the charecter to the modeString
+		if (channelObj.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
+			modeString += "i";
+		if (channelObj.modeIsSet(CHANNEL_MODES::SET_TOPIC))
+			modeString += "t";
+		if (channelObj.modeIsSet(CHANNEL_MODES::SET_LIMIT))
+			modeString += "l";
+
+		Replies::RPL_CHANNELMODEIS(channel, client, modeString, *this); // 324
+		Replies::RPL_CREATIONTIME (channel, channelObj.getTopicSetTime(), client, *this); // 329
+	}
+	else
+	{
+		string modeString;
+		if (tokens[2][0] == '+' || tokens[2][0] == '-')
+			modeString = tokens[2];
+		else
+			return Errors::ERR_UNKNOWNMODE(tokens[2], string(1, modeString[0]), client, *this);
+
+		while(!modeString.empty())
+			HandleFlags(modeString, tokens, channelObj, &client, *this);
+	}
 }

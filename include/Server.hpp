@@ -59,6 +59,7 @@ private:
 	void TopicClientFromChannel(Client &client, vector<string> &tokens);
 	void InviteClientFromChannel(Client &client, vector<string> &tokens);
 	void handlePrivMsg(Client &sender, vector<string> &tokens);
+	void ModeClientFromChannel(Client &client, vector<string> &tokens);
 
 	Server();
 	map<int, Client> clients;

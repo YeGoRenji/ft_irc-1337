@@ -7,6 +7,17 @@
 class Client;
 class Server;
 
+namespace CHANNEL_MODES {
+	enum Modes {
+		NO_MODE = 0b0,
+		SET_INVITE_ONLY = 0b10,
+		SET_TOPIC = 0b100,
+		SET_KEY = 0b1000,
+		GIVE_PRIVILEGE = 0b10000,
+		SET_LIMIT = 0b100000,
+	};
+}
+
 enum BroadCastAction {
 	JOIN,
 	PART
@@ -21,7 +32,7 @@ struct Message {
 class Channel {
 public:
 	Channel();
-	Channel(string name, string password); // TODO : add operators
+	Channel(string name, string password, CHANNEL_MODES::Modes _mode); // TODO : add operators
 	// getters
 	string& getChannelName() ;
 	const string& getTopic() const;
@@ -66,16 +77,24 @@ public:
         return topicSetTime;
     }
 
-	// void invite(Client* client);
+	void invite(Client* client);
 
 	~Channel();
+
+
+	bool	modeIsSet(CHANNEL_MODES::Modes _mode);
+
+	void	setMode(CHANNEL_MODES::Modes _mode);
+
+	void	setLimit(uint16_t _limit);
+	uint16_t	getLimit(void);
+
+	void	unsetMode(CHANNEL_MODES::Modes _mode);
+
+
+
 private:
 	string					name;
-	string					topic;
-	string					topicSetter;
-  time_t					topicSetTime;
-
-	// std::vector<Client*>	_invited; // TODO : zedtha gelt maybe nahtajohaa
 
 	map<string, Client*>	members;
 	map<string, Client*> chanOps;
@@ -85,6 +104,19 @@ private:
 
 	void removeMember(Client &client, string reason, bool isBroadcasted);
 	void addMember(Client &client, bool isBroadcasted);
+	std::vector<Client*>	invited; // TODO : zedtha gelt maybe nahtajohaa
+	string					topicSetter;
+	string					topic;
+	CHANNEL_MODES::Modes		mode;
+	time_t					topicSetTime;
+	uint16_t				limit;
+
 };
+
+CHANNEL_MODES::Modes operator|(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j);
+
+CHANNEL_MODES::Modes operator&(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j);
+
+
 
 #endif

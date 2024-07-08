@@ -160,8 +160,6 @@ void Replies::RPL_PRIVMSG(Client &sender, Client &recevier, string &message)
 		reply += recevier.getNick();
 		reply += " :";
 		reply += message;
-		reply += "\r\n";
-
 		recevier << reply;
 }
 
@@ -203,4 +201,38 @@ void Replies::notifyKick(Client &kicker, Client &kicked, string &channelName)
 	reply += kicked.getNick();
 
 	kicked << reply;
+}
+
+void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString, Server &server)
+{
+	string reply = ":";
+
+	reply += server.getServerName();
+	reply += " ";
+	reply += "324";
+	reply += " ";
+	reply += client.getNick();
+	reply += " ";
+	reply += channel;
+	reply += " ";
+	reply += modeString;
+
+	client << reply;
+}
+
+void	Replies::RPL_CREATIONTIME(string &channel, time_t time, Client &client, Server &server)
+{
+	string reply = ":";
+
+	reply += server.getServerName();
+	reply += " ";
+	reply += "329";
+	reply += " ";
+	reply += client.getNick();
+	reply += " ";
+	reply += channel;
+	reply += " ";
+	reply += std::to_string(time);
+
+	client << reply;
 }

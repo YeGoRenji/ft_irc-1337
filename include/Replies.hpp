@@ -24,7 +24,10 @@ public:
 	static void RPL_NAMREPLY(Channel &channel, Client &client, Server &server);
 	static void RPL_ENDOFNAMES(Channel &channel, Client &client, Server &server);
 	static void RPL_PRIVMSG(Client &sender, Client &recevier, string &message);
-  
+
+	static void RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString, Server &server);
+	static void	RPL_CREATIONTIME(string &channel, time_t time, Client &client, Server &server);
+
 	static void notifyInvite(Client &inviter, Client &invited, string &channelName);
 	static void notifyKick(Client &kicker, Client &kicked, string &channelName);
 

@@ -6,7 +6,7 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password): name(_name), password(_password) // TODO: remove topic()
+Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode): name(_name), password(_password), mode(_mode), limit(3) // TODO: remove topic()
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
@@ -30,7 +30,6 @@ void Channel::addMember(Client &client, bool isBroadcasted)
 		broadcastAction(client, "", JOIN);
 }
 
-
 void Channel::removeMemberAndBroadcast(Client &client, string reason) {
 	removeMember(client, reason, true);
 }
@@ -39,7 +38,30 @@ void Channel::removeMemberSilently(Client &client) {
 	removeMember(client, "69", false);
 }
 
-void Channel::removeMember(Client &client, string reason, bool isBroadcasted) {
+CHANNEL_MODES::Modes operator|(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j)
+{
+	return static_cast<CHANNEL_MODES::Modes>(static_cast<int>(i) | static_cast<int>(j));
+}
+
+CHANNEL_MODES::Modes operator&(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j)
+{
+	return static_cast<CHANNEL_MODES::Modes>(static_cast<int>(i) & static_cast<int>(j));
+}
+
+bool	Channel::modeIsSet(CHANNEL_MODES::Modes _mode) {
+		return (this->mode & _mode);
+}
+
+void	Channel::setMode(CHANNEL_MODES::Modes _mode) {
+	this->mode = this->mode | _mode;
+}
+
+void	Channel::unsetMode(CHANNEL_MODES::Modes _mode) {
+	this->mode = static_cast<CHANNEL_MODES::Modes>(~_mode & mode);
+}
+
+void Channel::removeMember(Client &client, string reason, bool isBroadcasted)
+{
 	string &nick = client.getNick();
 	if (!hasMember(nick))
 		return ;
@@ -130,7 +152,7 @@ bool Channel::isValidName(string &name) {
 
 	if (name.empty())
 		return false;
-  
+
 	if (name[0] != '#')
 		return false;
 
@@ -154,6 +176,8 @@ void	Channel::setTopic(string &newTopic, string &setter)
 	this->topic = newTopic;
 	this->topicSetter = setter;
 	this->topicSetTime = time(0);
+
+	cout <<  "this->topicSetTime	" << this->topicSetTime << endl;
 }
 
 void Channel::sendClientsList(Channel &channel, Client &client, Server &server)
@@ -163,7 +187,7 @@ void Channel::sendClientsList(Channel &channel, Client &client, Server &server)
 }
 
 // getters
-string& Channel::getChannelName() 
+string& Channel::getChannelName()
 {
 	return (this -> name);
 }
@@ -195,4 +219,18 @@ size_t Channel::getChanOpCount() const
 void Channel::setTopic(string topic)
 {
 	this -> topic = topic;
+}
+
+void Channel::setLimit(uint16_t _limit)
+{
+	this->limit = _limit;
+}
+uint16_t	Channel::getLimit(void)
+{
+	return (this->limit);
+}
+
+void Channel::invite(Client* client) {
+    this->invited.push_back(client);
+	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
 }

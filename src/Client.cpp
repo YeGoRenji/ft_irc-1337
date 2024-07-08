@@ -159,12 +159,12 @@ void Client::operator>>(std::string& str) {
 	fdObject >> buffer;
 	command += buffer;
 
-	cerr << "\nGot <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
+	cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
 	if (!CONTAINS(command, "\r\n"))
 		return;
 
 	str = string(command.begin(), command.end() - 2);
-	cerr << "str : <" << str << ">" << endl;
+	cerr << "Full command : <" << str << ">" << endl;
 	command.clear();
 }
 
