@@ -234,3 +234,11 @@ void Channel::invite(Client* client) {
     this->invited.push_back(client);
 	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
 }
+
+const string	&Channel::getPassword() const {
+    return this->password;
+}
+
+void	Channel::setPassword(const string &_password) {
+    this->password = _password;
+}

@@ -91,6 +91,8 @@ public:
 
 	void	unsetMode(CHANNEL_MODES::Modes _mode);
 
+	void	setPassword(const string &_password);
+	const string	&getPassword() const;
 
 
 private:
