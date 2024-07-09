@@ -55,6 +55,7 @@ public:
 	bool hasPassword() const;
 	bool hasMember(string &nick);
 	void addOperator(Client &client);
+	void removeOperator(Client &client);
 	void broadcastMessageToGroup(string message, map<string, Client*> &group, string senderName);
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
