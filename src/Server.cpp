@@ -661,7 +661,7 @@ void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Clie
 
 	// MODE #D -k :password
 	// 0     1  2    3
-	if (state && token.size() < 4)
+	if ((state || !state) && token.size() < 4)
 		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
 
 	string pass;
@@ -688,6 +688,48 @@ void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Clie
 	}
 }
 
+void	handleOperator(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server)
+{
+    (void)c;
+
+	// MODE #D -o :nickname
+	// 0     1  2    3
+	if ((state || !state) && token.size() < 4)
+		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
+
+	string str;
+	if (token[3][0] != ':')
+		str = token[3];
+	else
+		str = token[3].substr(1);
+
+	map<string, Channel>::iterator chIt = server.getChannel(str);
+
+
+	if (channel.hasMember(str) && !(chIt == server.getChannels().end()))
+		return Errors::ERR_USERNOTINCHANNEL(str, channel.getChannelName(), *client, server);
+
+	if (!channel.hasMember(str))
+		return Errors::ERR_NOSUCHNICK(str, *client, server);
+
+	// Client	*clientToOp = &server.getClientFromNick(str)->second;
+	Client	*clientToOp = channel.getMembers()[str];
+
+	if (!state && channel.isOperator(clientToOp->getNick()))
+	{
+		channel.removeOperator(*clientToOp);
+
+		replyModeNotify(*client, channel, "-o", str, server);
+	}
+	else if (state && !channel.isOperator(clientToOp->getNick()))
+	{
+		channel.addOperator(*clientToOp);
+
+		replyModeNotify(*client, channel, "+o", str, server);
+	}
+
+}
+
 
 void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client* client, Server &server)
 {
@@ -707,12 +749,12 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 		&handleInvite,
 		&handleTopic,
 		&handleLimit,
-		&handleKey
-		// &handleOperator,
+		&handleKey,
+		&handleOperator
 	};
 	for (size_t i = 0; i < modeString.size() && !std::strchr("-+", modeString[i]); ++i)
 	{
-		int index = (modeString[i] == 'i') * 1 + (modeString[i] == 't') * 2 + (modeString[i] == 'l') * 3 + (modeString[i] == 'k') * 4;
+		int index = (modeString[i] == 'i') * 1 + (modeString[i] == 't') * 2 + (modeString[i] == 'l') * 3 + (modeString[i] == 'k') * 4 + (modeString[i] == 'o') * 5;
 		f[index](state, modeString[i], token, channel, client, server);
 	}
 	modeString.erase(0, modeString.find_first_of("-+"));
@@ -759,6 +801,8 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 			modeString += "l";
 		if (channelObj.modeIsSet(CHANNEL_MODES::SET_KEY))
 			modeString += "k";
+		if (channelObj.getChanOpCount()) // W7AAALT HNA HAHAHAH DIMA KATB9A +o 
+			modeString += "o";
 
 		Replies::RPL_CHANNELMODEIS(channel, client, modeString, *this); // 324
 		Replies::RPL_CREATIONTIME (channel, channelObj.getTopicSetTime(), client, *this); // 329
