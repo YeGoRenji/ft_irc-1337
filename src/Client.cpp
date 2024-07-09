@@ -11,6 +11,23 @@ Client::Client(int _fd):
 fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("localhost")
 {
 	cout << "Client: Parameter constructor called" << endl;
+
+	sockaddr_in client_info;
+	bzero(&client_info, sizeof(client_info));
+	socklen_t info_size = sizeof(client_info);
+
+	if (!getpeername(_fd, (sockaddr *)&client_info, &info_size)) {
+
+		char ip_cstr[INET_ADDRSTRLEN] = "unknown";
+		// TODO: can inet_ntop fail ??? what if ipv6 ? should I care ?
+		inet_ntop(AF_INET, &client_info.sin_addr, ip_cstr, sizeof(ip_cstr));
+
+		// cout << "Got ip = " << ip_cstr << endl;
+		//
+		ip = ip_cstr;
+	}
+
+	// TODO: should I do something if getpeername fails ?
 }
 
 Client::~Client()

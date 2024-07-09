@@ -6,9 +6,6 @@
 # include <Hacks.hpp>
 # include <Errors.hpp>
 # include <unistd.h>
-# include <sys/socket.h>
-# include <sys/poll.h>
-# include <netinet/in.h>
 
 // max users in listen(2) queue
 # ifndef MAX_LISTEN

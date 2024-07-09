@@ -7,6 +7,10 @@
 # include <vector>
 # include <algorithm>
 # include <fcntl.h>
+# include <sys/socket.h>
+# include <sys/poll.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
 
 # define NAME(token) #token
 

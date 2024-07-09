@@ -62,6 +62,7 @@ void Server::start() {
 		chk(poll(fds.data(), fds.size(), WAIT_ANY), "poll failed");
 
 		if (fds[0].revents & POLLIN) {
+			// TODO: maybe we shouldn't call check when accept fails (We should just ignore client ?)
 			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
 			int newClientFd = newClient.getFd();
 			// clients.push_back(newClient);

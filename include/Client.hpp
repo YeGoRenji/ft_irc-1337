@@ -6,7 +6,7 @@
 # include <Server.hpp>
 # include <Utility.hpp>
 # include <Replies.hpp>
-#include <Errors.hpp>
+# include <Errors.hpp>
 
 class Server;
 
