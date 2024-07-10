@@ -661,7 +661,7 @@ void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Clie
 
 	// MODE #D -k :password
 	// 0     1  2    3
-	if ((state || !state) && token.size() < 4)
+	if (token.size() < 4)
 		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
 
 	string pass;
@@ -694,38 +694,35 @@ void	handleOperator(bool state, char c, vector<string> &token, Channel &channel,
 
 	// MODE #D -o :nickname
 	// 0     1  2    3
-	if ((state || !state) && token.size() < 4)
+	if (token.size() < 4)
 		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
 
-	string str;
+	string nickToOp;
 	if (token[3][0] != ':')
-		str = token[3];
+		nickToOp = token[3];
 	else
-		str = token[3].substr(1);
+		nickToOp = token[3].substr(1);
 
-	map<string, Channel>::iterator chIt = server.getChannel(str);
+	if (!server.hasMember(nickToOp))
+		return Errors::ERR_NOSUCHNICK(nickToOp, *client, server);
 
-
-	if (channel.hasMember(str) && !(chIt == server.getChannels().end()))
-		return Errors::ERR_USERNOTINCHANNEL(str, channel.getChannelName(), *client, server);
-
-	if (!channel.hasMember(str))
-		return Errors::ERR_NOSUCHNICK(str, *client, server);
+	if (!channel.hasMember(nickToOp))
+		return Errors::ERR_USERNOTINCHANNEL(nickToOp, channel.getChannelName(), *client, server);
 
 	// Client	*clientToOp = &server.getClientFromNick(str)->second;
-	Client	*clientToOp = channel.getMembers()[str];
+	Client	*clientToOp = channel.getMembers()[nickToOp];
 
 	if (!state && channel.isOperator(clientToOp->getNick()))
 	{
 		channel.removeOperator(*clientToOp);
 
-		replyModeNotify(*client, channel, "-o", str, server);
+		replyModeNotify(*client, channel, "-o", nickToOp, server);
 	}
 	else if (state && !channel.isOperator(clientToOp->getNick()))
 	{
 		channel.addOperator(*clientToOp);
 
-		replyModeNotify(*client, channel, "+o", str, server);
+		replyModeNotify(*client, channel, "+o", nickToOp, server);
 	}
 
 }
@@ -801,8 +798,6 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 			modeString += "l";
 		if (channelObj.modeIsSet(CHANNEL_MODES::SET_KEY))
 			modeString += "k";
-		if (channelObj.getChanOpCount()) // W7AAALT HNA HAHAHAH DIMA KATB9A +o 
-			modeString += "o";
 
 		Replies::RPL_CHANNELMODEIS(channel, client, modeString, *this); // 324
 		Replies::RPL_CREATIONTIME (channel, channelObj.getTopicSetTime(), client, *this); // 329
