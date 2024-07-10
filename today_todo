@@ -1,6 +1,1 @@
-- if we don't send a "\r\n" at the end of the command (e.g using nc) server kaybda yt9a7bn
-- send all channel messages on client join (We wont do this I guess ?)
 
-- check if TOPIC responses are flipped ? (TOPIC #ch :topic && TOPIC #ch)
-
-- limiting message length ?
