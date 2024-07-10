@@ -102,7 +102,7 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 
 	if (tokens.size() == 1)
 	{
-		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
+		Errors::ERR_NONICKNAMEGIVEN(*this, server);
 		return;
 	}
 
@@ -128,6 +128,8 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 	}
 
 	setNick(server, tokens[1]);
+
+
 
 	nickGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
