@@ -66,8 +66,8 @@ void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 	reply += " = ";
 	reply += channel.getChannelName();
 	reply += " :";
-	reply += Utility::constructMemberList(channel.getMembers(), "");
-	reply += Utility::constructMemberList(channel.getChanOps(), "@");
+	reply += channel.getNonOpsStrList();
+	reply += channel.getChanOpsStrList();
 
 	client << reply;
 }

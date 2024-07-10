@@ -40,6 +40,8 @@ public:
 	map<string, Client*> &getChanOps();
 	size_t getMemberCount() const;
 	size_t getChanOpCount() const;
+	string getChanOpsStrList();
+	string getNonOpsStrList();
 
 	// setters
 	void setTopic(string topic);

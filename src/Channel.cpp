@@ -216,6 +216,28 @@ size_t Channel::getChanOpCount() const
 	return (chanOps.size());
 }
 
+string Channel::getNonOpsStrList()
+{
+	string str;
+	map<string, Client*>::iterator it = members.begin();
+	map<string, Client*>::iterator ite = members.end();
+
+	for (; it != ite; ++it)
+	{
+		if (!isOperator(it->second->getNick())) {
+			str += it->second->getNick();
+			str += " ";
+		}
+	}
+
+	return str;
+}
+
+string Channel::getChanOpsStrList()
+{
+	return Utility::constructMemberList(getChanOps(), "@");
+}
+
 // setters
 void Channel::setTopic(string topic)
 {
