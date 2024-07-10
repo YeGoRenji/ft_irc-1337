@@ -127,16 +127,17 @@ void Channel::broadcastAction(Client &client, string reason, BroadCastAction act
 	broadcastMessageToGroup(reply, getMembers(), "");
 }
 
-void Channel::broadcastMessageToGroup(string message, map<string, Client*> &group, string senderName)
+void Channel::broadcastMessageToGroup(string message, map<string, Client*> &group, string senderNick)
 {
 	map<string, Client*>::iterator member_it = group.begin();
 	map<string, Client*>::iterator member_ite = group.end();
 
 	for (; member_it != member_ite; member_it++)
 	{
-		if (member_it -> second -> getNick() == senderName)
+		Client *member = member_it->second;
+		if (member -> getNick() == senderNick)
 			continue;
-		*(member_it -> second) << message;
+		*member << message;
 	}
 }
 

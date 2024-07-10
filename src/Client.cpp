@@ -95,9 +95,8 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 
 // The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 // TODO : maybe do this ? uwu? maybe not?
-// TODO : check the clients can change their nick!!!
 
-// format : NICKNAME nick
+// format : NICK nick
 void Client::handleNICK(Server &server, vector<string> tokens) {
 
 	if (tokens.size() == 1)
@@ -128,8 +127,6 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 	}
 
 	setNick(server, tokens[1]);
-
-
 
 	nickGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
@@ -208,6 +205,22 @@ void Client::leaveAllChannels(Server &server, string reason)
 		server.RemoveMemberFromChannel(*joinedChannels[i], *this, reason);
 }
 
+string Client::craftSourceMessage(string command, string message)
+{
+	string reply = ":";
+	reply += getNick();
+	reply += "!";
+	reply += getUsername();
+	reply += "@";
+	reply += getIp();
+	reply += " ";
+	reply += command;
+	reply += " ";
+	reply += message;
+
+	return (reply);
+}
+
 // getters
 string &Client::getIp()
 {
@@ -225,11 +238,15 @@ void Client::setNick(Server &server, string &nick)
 	vector<Channel *> clientChannels = server.getChannelsWithMember(this->nickname);
 	vector<Channel *> channelsWhereWasOp;
 
+	string reply = craftSourceMessage("NICK", nick);
+
 	for (size_t i = 0; i < clientChannels.size(); ++i)
 	{
-		if ((*clientChannels[i]).isOperator(this->nickname))
+		Channel &channel = (*clientChannels[i]);
+		channel.broadcastMessageToGroup(reply, channel.getMembers(), "");
+		if (channel.isOperator(this->nickname))
 			channelsWhereWasOp.push_back(clientChannels[i]);
-		(*clientChannels[i]).removeMemberSilently(*this);
+		channel.removeMemberSilently(*this);
 	}
 
 	this->nickname = nick;

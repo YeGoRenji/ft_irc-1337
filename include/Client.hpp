@@ -17,12 +17,14 @@ public:
 	~Client();
 	void disconnect();
 	void leaveAllChannels(Server &server, string reason);
+	string craftSourceMessage(string command, string message);
 
 	//void login(Server &server);
 	void handleNICK(Server &server, vector<string> tokens);
 	void passHandler(Server &server, vector<string> tokens);
 	void setUsernameAndRealName(Server &server, vector<string> vectors);
 	void beWelcomed(Server &server);
+
 	// getters;
 	bool isPassGiven();
 	bool wasWelcomed;
