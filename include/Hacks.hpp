@@ -3,6 +3,9 @@
 
 # include <iostream>
 # include <sstream>
+# include <cstring>
+# include <cerrno>
+# include <csignal>
 # include <map>
 # include <vector>
 # include <algorithm>

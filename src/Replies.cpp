@@ -135,6 +135,8 @@ void	Replies::RPL_TOPIC(string &channel, string &topic, Client &client, Server &
 void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Client &client, Server &server)
 {
 	FD fd = client.getFdObject();
+	stringstream ss;
+	ss << time;
 
 	string reply = ":";
 	reply += server.getServerName();
@@ -145,8 +147,7 @@ void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Cli
 	reply += " ";
 	reply += setter;
 	reply += " ";
-	reply += std::to_string(time); // TODO : ila kant forbidden nbedlooha
-								   // TODO : yep, this is c++11 and should be changed!!
+	reply += ss.str();
 
 	fd << reply;
 }
@@ -223,6 +224,8 @@ void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeStr
 void	Replies::RPL_CREATIONTIME(string &channel, time_t time, Client &client, Server &server)
 {
 	string reply = ":";
+	stringstream ss;
+	ss << time;
 
 	reply += server.getServerName();
 	reply += " ";
@@ -232,7 +235,7 @@ void	Replies::RPL_CREATIONTIME(string &channel, time_t time, Client &client, Ser
 	reply += " ";
 	reply += channel;
 	reply += " ";
-	reply += std::to_string(time);
+	reply += ss.str();
 
 	client << reply;
 }
