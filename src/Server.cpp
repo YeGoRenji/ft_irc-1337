@@ -97,7 +97,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	if (!currentCLient.isPassGiven() && tokens[0] != "PASS")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
 
-	cerr << "token size : " << tokens[0].size() << endl;
+//	cerr << "token size : " << tokens[0].size() << endl;
 
 	if (tokens[0] == "PASS")
 		currentCLient.passHandler(*this, tokens);

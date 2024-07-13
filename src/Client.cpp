@@ -44,6 +44,7 @@ FD &Client::getFdObject() {
 	return fdObject;
 }
 
+// TODO: unused function ?
 void Client::getLineStream(stringstream &ss) {
 	string passLine;
 	fdObject >> passLine;
@@ -75,7 +76,6 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 
 	passGiven = true;
 	isAuthed = passGiven & nickGiven & userGiven;
-	cout << isPassGiven() << endl;
 }
 
 string &Client::getNick()
@@ -175,12 +175,12 @@ void Client::operator>>(std::string& str) {
 	fdObject >> buffer;
 	command += buffer;
 
-	cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
+	// cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
 	if (!CONTAINS(command, "\r\n"))
 		return;
 
 	str = string(command.begin(), command.end() - 2);
-	cerr << "Full command : <" << str << ">" << endl;
+	cerr << "\nGot command : <" << str << ">" << endl;
 	command.clear();
 }
 
