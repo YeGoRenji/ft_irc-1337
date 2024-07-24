@@ -99,6 +99,16 @@ void Channel::addOperator(Client &client)
 	chanOps[client.getNick()] = &client;
 }
 
+void Channel::removeOperator(Client &client)
+{
+    // Check if the client is already in the map
+    if (chanOps.find(client.getNick()) != chanOps.end())
+    {
+        // Remove the client from the map
+        chanOps.erase(client.getNick());
+    }
+}
+
 void Channel::broadcastAction(Client &client, string reason, BroadCastAction action)
 {
 	string reply = ":";
@@ -256,4 +266,12 @@ uint16_t	Channel::getLimit(void)
 void Channel::invite(Client* client) {
     this->invited.push_back(client);
 	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
+}
+
+const string	&Channel::getPassword() const {
+    return this->password;
+}
+
+void	Channel::setPassword(const string &_password) {
+    this->password = _password;
 }

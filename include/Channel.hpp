@@ -58,6 +58,7 @@ public:
 	bool hasMember(string &nick);
 	void addOperator(Client &client);
 	void broadcastMessageToGroup(string message, map<string, Client*> &group, string senderNick);
+	void removeOperator(Client &client);
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
 	void sendClientsList(Channel &channel, Client &client, Server &server);
@@ -93,6 +94,8 @@ public:
 
 	void	unsetMode(CHANNEL_MODES::Modes _mode);
 
+	void	setPassword(const string &_password);
+	const string	&getPassword() const;
 
 
 private:
