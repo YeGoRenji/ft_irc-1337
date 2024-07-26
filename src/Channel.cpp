@@ -159,6 +159,38 @@ bool Channel::isOperator(string &nick) {
 	return (chanOps.find(nick) != chanOps.end());
 }
 
+bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server) {
+
+	// channel is invite only and Client not invited
+	if (modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY) && !isNickInvited(client.getNick()))
+	{
+		Errors::ERR_INVITEONLYCHAN(name, client, server);
+		return false;
+	}
+
+	// channel has limit and full
+	if (modeIsSet(CHANNEL_MODES::SET_LIMIT) && getMemberCount() >= limit)
+	{
+		Errors::ERR_CHANNELISFULL(name, client, server);
+		return false;
+	}
+
+	// channel has pass but user didn't supply it
+	if (hasPassword() && suppliedPass.empty())
+	{
+		Errors::ERR_BADCHANNELKEY(name, client, server);
+		return false;
+	}
+	// user supplied a wrong password
+	if (!checkPassword(suppliedPass))
+	{
+		Errors::ERR_BADCHANNELKEY(name, client, server);
+		return false;
+	}
+
+	return true;
+}
+
 bool Channel::isValidName(string &name) {
 
 	if (name.empty())
@@ -191,10 +223,10 @@ void	Channel::setTopic(string &newTopic, string &setter)
 	cout <<  "this->topicSetTime	" << this->topicSetTime << endl;
 }
 
-void Channel::sendClientsList(Channel &channel, Client &client, Server &server)
+void Channel::sendClientsList(Client &client, Server &server)
 {
-	Replies::RPL_NAMREPLY(channel, client, server);
-	Replies::RPL_ENDOFNAMES(channel, client, server);
+	Replies::RPL_NAMREPLY(*this, client, server);
+	Replies::RPL_ENDOFNAMES(*this, client, server);
 }
 
 // getters
@@ -264,8 +296,12 @@ uint16_t	Channel::getLimit(void)
 }
 
 void Channel::invite(Client* client) {
-    this->invited.push_back(client);
+    this->invited[client->getNick()] = client;
 	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
+}
+
+bool Channel::isNickInvited(string nick) {
+	return (invited.find(nick) != invited.end());
 }
 
 const string	&Channel::getPassword() const {

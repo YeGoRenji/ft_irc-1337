@@ -6,9 +6,8 @@ fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fal
 	cout << "Client: Default constructor called" << endl;
 }
 
-// TODO: ip should be dynamic not always "localhost"
 Client::Client(int _fd):
-fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("localhost")
+fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("unknown")
 {
 	cout << "Client: Parameter constructor called" << endl;
 

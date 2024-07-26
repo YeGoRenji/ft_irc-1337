@@ -1,6 +1,4 @@
-#include <Replies.hpp>
 #include <Server.hpp>
-#include <Client.hpp>
 
 string Server::serverName = "IRatherComeServer.mybasement";
 void	replyModeNotify(Client &client, Channel &channel, string modeString, string param, Server &server);
@@ -210,28 +208,19 @@ void Server::AddClientoChannel(Client &client, vector<string> &tokens)
 		else
 		{
 //			cerr << "channel " << it -> name << " exists!" << endl;
-			// channel has pass but user didn't supply it
-			if (channelIt -> second.hasPassword() && (it -> password).empty())
-			{
-				Errors::ERR_BADCHANNELKEY(it -> name, client, *this);
+
+			if (!channelIt->second.canBeJoinedBy(client, it->password, *this))
 				return;
-			}
-			// user supplied a wrong password
-			if (!channelIt -> second.checkPassword(it -> password))
-			{
-				Errors::ERR_BADCHANNELKEY(it -> name, client, *this);
-				return;
-			}
+
 			// do nothing, currChannel already points to the right channel
 			// now just add the user to the channel and broadcast
 		}
 		Channel &channelObj = channelIt->second;
 		// adduser to channel
 		channelObj.addMemberAndBroadcast(client);
-		if (!channelIt->second.getTopic().empty())
+		if (!channelObj.getTopic().empty())
 			Replies::RPL_TOPIC(channelObj.getChannelName(), channelObj.getTopic(), client, *this);
-		//						channel, channelObj.getTopic(), client, *this
-		channelObj.sendClientsList(channelIt->second, client, *this);
+		channelObj.sendClientsList(client, *this);
 		// channelIt -> second.broadcastAction(client, JOIN);
 	}
 }
@@ -730,7 +719,6 @@ void	handleOperator(bool state, char c, vector<string> &token, Channel &channel,
 
 }
 
-
 void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client* client, Server &server)
 {
 	bool state = true;
@@ -760,9 +748,6 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 	modeString.erase(0, modeString.find_first_of("-+"));
 }
 
-
-
-
 void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
@@ -786,9 +771,6 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 	if (!channelObj.hasMember(client.getNick()))
 		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
 
-	if (!channelObj.isOperator(client.getNick()))
-		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
-
 	if (tokens_len == 2) // mode #d
 	{
 		string modeString = "+"; // TODO : get the deafult mode of the channel
@@ -807,6 +789,10 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 	}
 	else
 	{
+
+		if (!channelObj.isOperator(client.getNick()))
+			return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
+
 		string modeString;
 		if (tokens[2][0] == '+' || tokens[2][0] == '-')
 			modeString = tokens[2];

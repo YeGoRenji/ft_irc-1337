@@ -61,9 +61,11 @@ public:
 	void removeOperator(Client &client);
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
-	void sendClientsList(Channel &channel, Client &client, Server &server);
+	void sendClientsList(Client &client, Server &server);
 	void addMessage(string sender, string message);
 	static bool isValidName(string &name);
+
+	bool canBeJoinedBy(Client &client, string suppliedPass, Server &server);
 
 	void	setTopic(string& newTopic, string& setter);
 
@@ -81,6 +83,8 @@ public:
     }
 
 	void invite(Client* client);
+
+	bool isNickInvited(string nick);
 
 	~Channel();
 
@@ -109,12 +113,12 @@ private:
 
 	void removeMember(Client &client, string reason, bool isBroadcasted);
 	void addMember(Client &client, bool isBroadcasted);
-	std::vector<Client*>	invited; // TODO : zedtha gelt maybe nahtajohaa
+	map<string, Client*>	invited; // TODO : zedtha gelt maybe nahtajohaa
 	string					topicSetter;
 	string					topic;
 	CHANNEL_MODES::Modes		mode;
 	time_t					topicSetTime;
-	uint16_t				limit;
+	uint16_t				limit; // TODO: check if uint16_t is enough ?
 
 };
 

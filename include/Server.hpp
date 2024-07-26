@@ -6,6 +6,7 @@
 # include <Hacks.hpp>
 # include <Errors.hpp>
 # include <unistd.h>
+# include <Replies.hpp>
 
 // max users in listen(2) queue
 # ifndef MAX_LISTEN
