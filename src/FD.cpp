@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:54:34 by afatimi           #+#    #+#             */
-/*   Updated: 2024/06/28 15:14:40 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/07/28 15:13:58 by ylyoussf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ FD &FD::operator=(const FD &obj)
 	if (this != &obj)
 	{
 		this->fd = obj.fd;
+		fcntl(fd, F_SETFL, O_NONBLOCK);
 	}
 	return (*this);
 }
@@ -51,7 +52,7 @@ FD &FD::operator<<(std::string str) {
 	return *this;
 }
 
-void FD::operator>>(std::string& buffer) {
+bool FD::operator>>(std::string& buffer) {
 	// char buffer[1024] = { 0 };
 	char byte;
 
@@ -62,16 +63,19 @@ void FD::operator>>(std::string& buffer) {
 	{
 		int byteRead = read(fd, &byte, 1);
 		// cerr << "READ <" << byte << ">" << endl;
+		cerr << "byteRead = " << byteRead << endl;
+		if (byteRead == 0)
+			return true;
 		if (byteRead == -1)
 		{
-			cerr << "Read Got -1" << endl;
 			break;
 		}
-		if (byteRead)
-			buffer += byte;
-		l = buffer.size();
+		buffer += byte;
+		// l = buffer.size();
+		l += byteRead;
 	}
 
+	return false;
 //	buffer.erase(buffer.find("\r\n"));
 }
 

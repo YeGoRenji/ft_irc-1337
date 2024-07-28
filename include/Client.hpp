@@ -38,7 +38,7 @@ public:
 	void setNick(Server &server, string &nick);
 
 	Client &operator<<(std::string);
-	void operator>>(std::string&);
+	bool operator>>(std::string&);
 
 private:
 	FD fdObject;

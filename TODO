@@ -1,9 +1,4 @@
-Bugs:
-- Magically fixed: When two users on the same channel, one changes nickname, that nickname isn't freed (nickname is already in use)
-- FIXED BY IGNORING SIGPIPE: CTRL+C while using nc (./clientJumia.sh) makes the server exit
-
 TODOs:
-- if we don't send a "\r\n" at the end of the command (e.g using nc) server kaybda yt9a7bn
-- send all channel messages on client join (We wont do this I guess ?)
-- check if TOPIC responses are flipped ? (TOPIC #ch :topic && TOPIC #ch)
+- check if TOPIC responses are flipped ? (TOPIC #ch :topic && TOPIC #ch) (SKRKL's  TODO)
 - limiting message length ?
+- What happens when you JOIN a channel you are already in ?

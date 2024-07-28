@@ -88,7 +88,13 @@ void Server::start() {
 				Client &currentCLient = clients[fds[i].fd];
 				string data;
 
-				currentCLient >> data;
+				bool clientSentCTRL_C = currentCLient >> data;
+
+				if (clientSentCTRL_C)
+				{
+					quitUser(currentCLient, fds, "Client *spanked* CTRL-C");
+					continue;
+				}
 				vector<string> tokens = Utility::getCommandTokens(data);
 				fds[i].revents = 0;
 				if (tokens.size())
@@ -114,17 +120,17 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	else if (tokens[0] == "QUIT")
 		quitUser(currentCLient, fds, tokens.size() == 2 ? tokens[1] : "Leaving...");
 	else if (tokens[0] == "JOIN") // TODO : DEFINITALLY STILL NOT FINISHED
-		AddClientoChannel(currentCLient, tokens);
+		handleJOIN(currentCLient, tokens);
 	else if (tokens[0] == "PART")
 		handlePART(currentCLient, tokens); // TODO : STILL NOT FINISHED
 	else if (tokens[0] == "KICK")
-		KickClientFromChannel(currentCLient, tokens);
+		handleKICK(currentCLient, tokens);
 	else if (tokens[0] == "INVITE")
 		InviteClientFromChannel(currentCLient, tokens);
 	else if (tokens[0] == "TOPIC")
 		TopicClientFromChannel(currentCLient, tokens);
 	else if (tokens[0] == "PRIVMSG")
-		handlePrivMsg(currentCLient, tokens);
+		handlePRIVMSG(currentCLient, tokens);
 	else if (tokens[0] == "MODE")
 		ModeClientFromChannel(currentCLient, tokens);
 	else
@@ -156,7 +162,7 @@ bool Server::checkUserExistence(string nickName)
 	return (getClientFromNick(nickName) != clients.end());
 }
 
-void Server::AddClientoChannel(Client &client, vector<string> &tokens)
+void Server::handleJOIN(Client &client, vector<string> &tokens)
 {
 	// TODO: Refactor this method so it looks like RemoveClientFromChannel
 	string channelsTokens;
@@ -303,7 +309,7 @@ void Server::handlePART(Client &client, vector<string> &tokens)
 	}
 }
 
-void Server::KickClientFromChannel(Client &client, vector<string> &tokens)
+void Server::handleKICK(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
 	string &command = tokens[0];
@@ -472,7 +478,7 @@ vector<Channel *> Server::getChannelsWithMember(string nick) {
 	return result;
 }
 
-void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
+void Server::handlePRIVMSG(Client &sender, vector<string> &tokens)
 {
 	if (tokens.size() == 1)
 		return Errors::ERR_NORECIPIENT(tokens[0], sender, *this);
@@ -503,14 +509,15 @@ void Server::handlePrivMsg(Client &sender, vector<string> &tokens)
 		if (this -> hasChannel(targetName))
 		{
 			Channel &ch = getChannel(targetName) -> second;
+
+			if (!ch.hasMember(sender.getNick()))
+				return Errors::ERR_CANNOTSENDTOCHAN(ch.getChannelName(), sender, *this);
+
 			map<string, Client*> *targetMembersGroup;
 			if (chanOpsOnly)
 				targetMembersGroup = &(ch.getChanOps());
 			else
 				targetMembersGroup = &(ch.getMembers());
-
-			// TODO : check the channels modes and send ERR_CANNOTSENDTOCHAN if needed
-
 
 			// TODO : refractor this garbage
 			string reply = ":";
@@ -773,6 +780,7 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 
 	if (tokens_len == 2) // mode #d
 	{
+		// TODO: refractor to a seperate func
 		string modeString = "+"; // TODO : get the deafult mode of the channel
 		// i need that if modes is sets, add the charecter to the modeString
 		if (channelObj.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
@@ -785,11 +793,11 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 			modeString += "k";
 
 		Replies::RPL_CHANNELMODEIS(channel, client, modeString, *this); // 324
-		Replies::RPL_CREATIONTIME (channel, channelObj.getTopicSetTime(), client, *this); // 329
+		Replies::RPL_CREATIONTIME (channel, channelObj.getCreationTime(), client, *this); // 329
 	}
-	else
+	else // mode #d +lik
 	{
-
+		// TODO: refractor to a seperate func
 		if (!channelObj.isOperator(client.getNick()))
 			return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 

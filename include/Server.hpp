@@ -48,15 +48,15 @@ public:
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &currClient, vector<pollfd> &fds, string reason);
-	void AddClientoChannel(Client &client, vector<string> &tokens);
+	void handleJOIN(Client &client, vector<string> &tokens);
 
 	map<string, Channel>::iterator createChannel(string name, string password);
 
 	void handlePART(Client &client, vector<string> &tokens);
-	void KickClientFromChannel(Client &client, vector<string> &tokens);
+	void handleKICK(Client &client, vector<string> &tokens);
 	void TopicClientFromChannel(Client &client, vector<string> &tokens);
 	void InviteClientFromChannel(Client &client, vector<string> &tokens);
-	void handlePrivMsg(Client &sender, vector<string> &tokens);
+	void handlePRIVMSG(Client &sender, vector<string> &tokens);
 	void ModeClientFromChannel(Client &client, vector<string> &tokens);
 
 	Server();

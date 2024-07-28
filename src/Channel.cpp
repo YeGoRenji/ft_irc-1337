@@ -6,7 +6,8 @@ Channel::Channel(): name("default") // op("default")
 }
 
 // TODO : add operators
-Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode): name(_name), password(_password), mode(_mode), limit(3) // TODO: remove topic()
+Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode):
+name(_name), creationTime(time(0)), password(_password), mode(_mode), limit(69)
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }
@@ -79,8 +80,6 @@ bool Channel::hasPassword() const
 
 bool Channel::checkPassword(string userPassLine)
 {
-	if (password.empty())
-		return (true);
 	return (userPassLine == this -> password);
 }
 
@@ -168,23 +167,24 @@ bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server)
 		return false;
 	}
 
+	// You can invite people to a non-invite only channel
+	// What priv it gives is :
+	//  - it bypasses Limit
+	//  - it bypasses Password
+	if (isNickInvited(client.getNick()))
+		return outvite(&client);
+
+	// user supplied a wrong password
+	if (modeIsSet(CHANNEL_MODES::SET_KEY) && !checkPassword(suppliedPass))
+	{
+		Errors::ERR_BADCHANNELKEY(name, client, server);
+		return false;
+	}
+
 	// channel has limit and full
 	if (modeIsSet(CHANNEL_MODES::SET_LIMIT) && getMemberCount() >= limit)
 	{
 		Errors::ERR_CHANNELISFULL(name, client, server);
-		return false;
-	}
-
-	// channel has pass but user didn't supply it
-	if (hasPassword() && suppliedPass.empty())
-	{
-		Errors::ERR_BADCHANNELKEY(name, client, server);
-		return false;
-	}
-	// user supplied a wrong password
-	if (!checkPassword(suppliedPass))
-	{
-		Errors::ERR_BADCHANNELKEY(name, client, server);
 		return false;
 	}
 
@@ -281,10 +281,6 @@ string Channel::getChanOpsStrList()
 }
 
 // setters
-void Channel::setTopic(string topic)
-{
-	this -> topic = topic;
-}
 
 void Channel::setLimit(uint16_t _limit)
 {
@@ -300,6 +296,12 @@ void Channel::invite(Client* client) {
 	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
 }
 
+bool Channel::outvite(Client* client) {
+	this->invited.erase(client->getNick());
+	cout << "[ " << client->getNick() << " got outvited from " << this->name << " ]" << endl;
+	return true;
+}
+
 bool Channel::isNickInvited(string nick) {
 	return (invited.find(nick) != invited.end());
 }
@@ -310,4 +312,9 @@ const string	&Channel::getPassword() const {
 
 void	Channel::setPassword(const string &_password) {
     this->password = _password;
+}
+
+time_t	Channel::getCreationTime() const
+{
+	return creationTime;
 }

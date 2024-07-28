@@ -43,9 +43,6 @@ public:
 	string getChanOpsStrList();
 	string getNonOpsStrList();
 
-	// setters
-	void setTopic(string topic);
-
 	//// Methods
 	// members methods
 	void removeMemberAndBroadcast(Client &client, string reason);
@@ -83,6 +80,7 @@ public:
     }
 
 	void invite(Client* client);
+	bool outvite(Client* client);
 
 	bool isNickInvited(string nick);
 
@@ -101,10 +99,13 @@ public:
 	void	setPassword(const string &_password);
 	const string	&getPassword() const;
 
+	time_t	getCreationTime() const; 
+
 
 private:
 	string					name;
 
+	time_t					creationTime;
 	map<string, Client*>	members;
 	map<string, Client*> chanOps;
 	// password
