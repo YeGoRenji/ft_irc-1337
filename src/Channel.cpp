@@ -250,5 +250,7 @@ const string	&Channel::getPassword() const {
 }
 
 void	Channel::setPassword(const string &_password) {
+	cout << "\n\n\nSetting keyy to " << _password << endl;
+	cout << "Current keyy is " << this->password << "\n\n\n\n";
     this->password = _password;
 }

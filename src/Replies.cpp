@@ -203,10 +203,11 @@ void Replies::notifyKick(Client &kicker, Client &kicked, string &channelName)
 	kicked << reply;
 }
 
-void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString, Server &server)
+void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString, Server &server, Channel &channelObj)
 {
 	string reply = ":";
 
+	cout << "MODE STRING : " << modeString << endl;
 	reply += server.getServerName();
 	reply += " ";
 	reply += "324";
@@ -216,6 +217,22 @@ void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeStr
 	reply += channel;
 	reply += " ";
 	reply += modeString;
+
+	// (void)channelObj;
+	if (modeString.find("l") != string::npos)
+	{
+		reply += " ";
+		cout << "LIMIT : " << channelObj.getLimit() << endl;
+		reply += std::to_string(channelObj.getLimit());
+	}
+	if (modeString.find("k") != string::npos)
+	{
+		reply += " ";
+		cout << "PASSWORD : " << channelObj.getPassword() << endl;
+		reply += channelObj.getPassword();
+	}
+
+	cout << "REPLY : " << reply << endl;
 
 	client << reply;
 }
