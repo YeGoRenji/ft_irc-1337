@@ -576,12 +576,12 @@ void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, C
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
 	{
 		channel.unsetMode(CHANNEL_MODES::SET_INVITE_ONLY);
-		replyModeNotify(*client, channel, "-i", "here", server);
+		replyModeNotify(*client, channel, "-i", "", server);
 	}
 	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
 	{
 		channel.setMode(CHANNEL_MODES::SET_INVITE_ONLY);
-		replyModeNotify(*client, channel, "+i", "here", server);
+		replyModeNotify(*client, channel, "+i", "", server);
 	}
 }
 void	handleTopic(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server, std::vector<std::string> *Args)
@@ -593,12 +593,12 @@ void	handleTopic(bool state, char c, vector<string> &token, Channel &channel, Cl
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
 	{
 		channel.unsetMode(CHANNEL_MODES::SET_TOPIC);
-		replyModeNotify(*client, channel, "-t", "here", server);
+		replyModeNotify(*client, channel, "-t", "", server);
 	}
 	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
 	{
 		channel.setMode(CHANNEL_MODES::SET_TOPIC);
-		replyModeNotify(*client, channel, "+t", "here", server);
+		replyModeNotify(*client, channel, "+t", "", server);
 	}
 }
 
@@ -647,7 +647,7 @@ void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Cl
 			Args->erase(Args->begin());
 		}
 
-		if (str.find_first_not_of("0123456789") != string::npos)
+		if (str.find_first_not_of("0123456789") != string::npos || (str[0] == '0' && str.size() > 1))
 			return ;
 		std::stringstream ss(str);
 		unsigned long     limit;
@@ -682,7 +682,7 @@ void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Clie
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_KEY))
 	{
 		if (pass != channel.getPassword())
-			return Errors::ERR_KEYALREADYSET(client->getNick(), channel.getChannelName(), *client, server); // 467 client #channel :Channel key already set
+			return Errors::ERR_KEYALREADYSET(client->getNick(), channel.getChannelName(), *client, server); // 467 client #channel :Channel key already set from adrift.sg.quakenet.org
 		channel.unsetMode(CHANNEL_MODES::SET_KEY);
 		replyModeNotify(*client, channel, "-k", pass, server);
 	}

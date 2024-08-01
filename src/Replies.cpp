@@ -207,7 +207,7 @@ void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeStr
 {
 	string reply = ":";
 
-	cout << "MODE STRING : " << modeString << endl;
+	// cout << "MODE STRING : " << modeString << endl;
 	reply += server.getServerName();
 	reply += " ";
 	reply += "324";
@@ -222,13 +222,13 @@ void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeStr
 	if (modeString.find("l") != string::npos)
 	{
 		reply += " ";
-		cout << "LIMIT : " << channelObj.getLimit() << endl;
+		// cout << "LIMIT : " << channelObj.getLimit() << endl;
 		reply += std::to_string(channelObj.getLimit());
 	}
 	if (modeString.find("k") != string::npos)
 	{
 		reply += " ";
-		cout << "PASSWORD : " << channelObj.getPassword() << endl;
+		// cout << "PASSWORD : " << channelObj.getPassword() << endl;
 		reply += channelObj.getPassword();
 	}
 
