@@ -497,7 +497,7 @@ void Server::handlePRIVMSG(Client &sender, vector<string> &tokens)
 	for(; targetNamesIt != targetNamesIte; targetNamesIt++)
 	{
 		string targetName = *targetNamesIt;
-		bool chanOpsOnly;
+		bool chanOpsOnly = false;
 		// check for a first special charater and erase it if exists
 		while (targetName[0] == '%' || targetName[0] == '@')
 		{
