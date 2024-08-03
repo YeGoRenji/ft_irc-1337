@@ -39,11 +39,11 @@ Server::Server(int port, string pass): password(pass)
 
 	address.sin_family = AF_INET;
 	address.sin_port   = htons(port);
-	address.sin_addr.s_addr = 0;
+	address.sin_addr.s_addr = INADDR_ANY;
 
 	chk(bind(serverSocket.getValue(), (sockaddr *)&address, sizeof(address)), "Couldn't bind socket to address");
 
-	chk(listen(serverSocket.getValue(), 10), "Couldn't Listen to socket");
+	chk(listen(serverSocket.getValue(), SOMAXCONN), "Couldn't Listen to socket");
 }
 
 Server::~Server()
@@ -812,7 +812,7 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 		if (channelObj.modeIsSet(CHANNEL_MODES::SET_KEY))
 			modeString += "k";
 
-		Replies::RPL_CHANNELMODEIS(channel, client, modeString, *this); // 324
+		Replies::RPL_CHANNELMODEIS(channelObj, client, modeString, *this); // 324
 		Replies::RPL_CREATIONTIME (channel, channelObj.getCreationTime(), client, *this); // 329
 	}
 	else // mode #d +lik

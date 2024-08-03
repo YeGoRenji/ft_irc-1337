@@ -204,7 +204,7 @@ void Replies::notifyKick(Client &kicker, Client &kicked, string &channelName)
 	kicked << reply;
 }
 
-void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString, Server &server, Channel &channelObj)
+void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &modeString, Server &server)
 {
 	string reply = ":";
 
@@ -215,7 +215,7 @@ void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeStr
 	reply += " ";
 	reply += client.getNick();
 	reply += " ";
-	reply += channel;
+	reply += channelObj.getChannelName();
 	reply += " ";
 	reply += modeString;
 
