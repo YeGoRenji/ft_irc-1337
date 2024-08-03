@@ -16,8 +16,10 @@
 # include <arpa/inet.h>
 
 # define NAME(token) #token
+# define DEBUG(printable) (cerr << NAME(printable) <<  ": " << printable << endl)
 
-# define CONTAINS(buffer, str) (buffer.find(str) != string::npos)
+# define CONTAINS(buffer, str) (buffer.find((str)) != string::npos)
+# define INCLUDES(cont, elt) (cont.find((elt)) != cont.end())
 
 using std::cout;
 using std::stringstream;

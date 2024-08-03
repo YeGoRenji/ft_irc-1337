@@ -29,7 +29,7 @@ struct channelInfo {
 class Server {
 public:
 	static string serverName;
-	Server(int port, string pass);
+	Server(uint16_t port, string pass);
 	~Server();
 	void start();
 	bool checkPassword(string passLine);

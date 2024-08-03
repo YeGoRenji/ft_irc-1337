@@ -54,7 +54,6 @@ private:
 	string username;
 	string ip;
 
-	void getLineStream(stringstream &ss);
 	bool nickNameAlreadyExists(Server &server, string nickname);
 };
 

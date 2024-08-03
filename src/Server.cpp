@@ -11,9 +11,8 @@ string	toStr(long nbr) {
     return ret;
 }
 
-int chk(int status, const std::string msg) {
-	// TODO: use throw ?
-	if (status < 0) {
+int chk(int status, const std::string msg, bool throwOnErr = true) {
+	if (throwOnErr && status < 0) {
 		stringstream ss;
 		ss << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno);
 		throw std::runtime_error(ss.str());
@@ -21,7 +20,7 @@ int chk(int status, const std::string msg) {
 	return status;
 }
 
-Server::Server(int port, string pass): password(pass)
+Server::Server(uint16_t port, string pass): password(pass)
 {
 	signal(SIGPIPE, SIG_IGN);
 
@@ -40,6 +39,7 @@ Server::Server(int port, string pass): password(pass)
 
 	address.sin_family = AF_INET;
 	address.sin_port   = htons(port);
+	cerr << address.sin_port << endl;
 	address.sin_addr.s_addr = INADDR_ANY;
 
 	chk(bind(serverSocket.getValue(), (sockaddr *)&address, sizeof(address)), "Couldn't bind socket to address");
@@ -69,23 +69,26 @@ void Server::start() {
 		chk(poll(fds.data(), fds.size(), WAIT_ANY), "poll failed");
 
 		if (fds[0].revents & POLLIN) {
-			// TODO: maybe we shouldn't call check when accept fails (We should just ignore client ?)
-			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection");
-			int newClientFd = newClient.getFd();
-			// clients.push_back(newClient);
-			clients[newClientFd] = newClient;
-			// clients.insert(make_pair(, newClient));
 			fds[0].revents = 0;
+			Client newClient = chk(accept(serverSocket.getValue(), NULL, NULL), "Couldn't accept connection", false);
+			int newClientFd = newClient.getFd();
+
+			// if accept failed just ignore TODO: check if this is how to handle it
+			if (newClientFd < 0)
+				continue;
+			clients[newClientFd] = newClient;
 			fds.push_back((pollfd){ newClientFd, POLLIN, 0 });
 		}
 
 
 		for (size_t i = fds.size() - 1; i > 0; --i) {
 			if (fds[i].revents & POLLHUP) {
+				fds[i].revents = 0;
 				Client &currentCLient = clients[fds[i].fd];
 				quitUser(currentCLient, fds, "Leaving...");
 			}
 			else if (fds[i].revents & POLLIN) {
+				fds[i].revents = 0;
 				Client &currentCLient = clients[fds[i].fd];
 				string data;
 
@@ -97,7 +100,6 @@ void Server::start() {
 					continue;
 				}
 				vector<string> tokens = Utility::getCommandTokens(data);
-				fds[i].revents = 0;
 				if (tokens.size())
 					commandsLoop(currentCLient, tokens, fds);
 			}
@@ -434,8 +436,6 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 	if (!channelObj.hasMember(client.getNick()))
 		return Errors::ERR_NOTONCHANNEL(channel, client, *this);
 
-	if (!channelObj.isOperator(client.getNick()))
-		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 
 	if (tokens_len == 2)
 	{
@@ -448,6 +448,9 @@ void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
 	}
 	else
 	{
+		if (channelObj.modeIsSet(CHANNEL_MODES::SET_TOPIC) && !channelObj.isOperator(client.getNick()))
+			return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
+
 		string &newTopic = tokens[2];
 
 		channelObj.setTopic(newTopic, client.getNick());

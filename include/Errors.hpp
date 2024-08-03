@@ -21,11 +21,10 @@
 	X(433, NICKNAMEINUSE, "Nickname is already in use", nick) \
 	X(442, NOTONCHANNEL, "You're not on that channel", channel) \
 	X(461, NEEDMOREPARAMS, "Not enough parameters", command) \
-	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel) \
+	X(475, BADCHANNELKEY, "Cannot join channel, you need channel password (+k)", channel) \
 	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel) \
-	X(471, CHANNELISFULL, "Cannot join channel (+l)", channel) \
-	X(473, INVITEONLYCHAN, "Cannot join channel (+i)", channel)
-	// X(472, UNKNOWNMODE, "is unknown mode char to me", channel)
+	X(471, CHANNELISFULL, "Cannot join channel, channel is full (+l)", channel) \
+	X(473, INVITEONLYCHAN, "Cannot join channel, you must be invited (+i)", channel)
 
 #define TWO_ARG_ERRORS \
 	X(443, USERONCHANNEL, "is already on channel", nick, channel) \

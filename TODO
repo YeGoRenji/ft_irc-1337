@@ -1,4 +1,4 @@
 TODOs:
-- check if TOPIC responses are flipped ? (TOPIC #ch :topic && TOPIC #ch) (SKRKL's  TODO)
 - limiting message length ?
 - What happens when you JOIN a channel you are already in ?
+- for limechat somehow channel names are case insentitive ? (channel #h is the same as #H)

@@ -22,7 +22,6 @@ fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fa
 		inet_ntop(AF_INET, &client_info.sin_addr, ip_cstr, sizeof(ip_cstr));
 
 		// cout << "Got ip = " << ip_cstr << endl;
-		//
 		ip = ip_cstr;
 	}
 
@@ -40,16 +39,6 @@ int Client::getFd() {
 
 FD &Client::getFdObject() {
 	return fdObject;
-}
-
-// TODO: unused function ?
-void Client::getLineStream(stringstream &ss) {
-	string passLine;
-	fdObject >> passLine;
-
-	//cout << "Got : " << passLine << endl;
-
-	ss.str(passLine);
 }
 
 // format : PASS pass
