@@ -14,8 +14,9 @@ string	toStr(long nbr) {
 int chk(int status, const std::string msg) {
 	// TODO: use throw ?
 	if (status < 0) {
-		std::cerr << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno) << endl;
-		exit(status);
+		stringstream ss;
+		ss << "Error[" << status << "]\t" << msg << ", Reason: " << strerror(errno);
+		throw std::runtime_error(ss.str());
 	}
 	return status;
 }
@@ -520,17 +521,7 @@ void Server::handlePRIVMSG(Client &sender, vector<string> &tokens)
 			else
 				targetMembersGroup = &(ch.getMembers());
 
-			// TODO : refractor this garbage
-			string reply = ":";
-			reply += sender.getNick();
-			reply += "!";
-			reply += sender.getUsername();
-			reply += "@";
-			reply += sender.getIp();
-			reply += " PRIVMSG ";
-			reply += ch.getChannelName();
-			reply += " :";
-			reply += message;
+			string reply = sender.craftSourceMessage("PRIVMSG", ch.getChannelName() + " :" + message);
 
 			ch.broadcastMessageToGroup(reply, *targetMembersGroup, sender.getNick());
 			ch.addMessage(sender.getNick(), message);
