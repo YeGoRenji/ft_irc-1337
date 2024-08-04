@@ -3,14 +3,6 @@
 string Server::serverName = "IRatherComeServer.mybasement";
 void	replyModeNotify(Client &client, Channel &channel, string modeString, string param, Server &server);
 
-string	toStr(long nbr) {
-    std::string        ret;
-    std::ostringstream convert;
-    convert << nbr;
-    ret = convert.str();
-    return ret;
-}
-
 int chk(int status, const std::string msg, bool throwOnErr = true) {
 	if (throwOnErr && status < 0) {
 		stringstream ss;
@@ -39,7 +31,6 @@ Server::Server(uint16_t port, string pass): password(pass)
 
 	address.sin_family = AF_INET;
 	address.sin_port   = htons(port);
-	cerr << address.sin_port << endl;
 	address.sin_addr.s_addr = INADDR_ANY;
 
 	chk(bind(serverSocket.getValue(), (sockaddr *)&address, sizeof(address)), "Couldn't bind socket to address");
@@ -109,35 +100,36 @@ void Server::start() {
 
 void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds)
 {
-	if (!currentCLient.isPassGiven() && tokens[0] != "PASS")
+	string command = Utility::toUpper(tokens[0]);
+
+	if (!currentCLient.isPassGiven() && command != "PASS")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
 
-//	cerr << "token size : " << tokens[0].size() << endl;
-
-	if (tokens[0] == "PASS")
+//	cerr << "token size : " << command.size() << endl;
+	if (command == "PASS")
 		currentCLient.passHandler(*this, tokens);
-	else if (tokens[0] == "NICK")
+	else if (command == "NICK")
 		currentCLient.handleNICK(*this, tokens);
-	else if (tokens[0] == "USER")
+	else if (command == "USER")
 		currentCLient.setUsernameAndRealName(*this, tokens);
-	else if (tokens[0] == "QUIT")
+	else if (command == "QUIT")
 		quitUser(currentCLient, fds, tokens.size() == 2 ? tokens[1] : "Leaving...");
-	else if (tokens[0] == "JOIN") // TODO : DEFINITALLY STILL NOT FINISHED
+	else if (command == "JOIN") // TODO : DEFINITALLY STILL NOT FINISHED
 		handleJOIN(currentCLient, tokens);
-	else if (tokens[0] == "PART")
+	else if (command == "PART")
 		handlePART(currentCLient, tokens); // TODO : STILL NOT FINISHED
-	else if (tokens[0] == "KICK")
+	else if (command == "KICK")
 		handleKICK(currentCLient, tokens);
-	else if (tokens[0] == "INVITE")
+	else if (command == "INVITE")
 		InviteClientFromChannel(currentCLient, tokens);
-	else if (tokens[0] == "TOPIC")
+	else if (command == "TOPIC")
 		TopicClientFromChannel(currentCLient, tokens);
-	else if (tokens[0] == "PRIVMSG")
+	else if (command == "PRIVMSG")
 		handlePRIVMSG(currentCLient, tokens);
-	else if (tokens[0] == "MODE")
+	else if (command == "MODE")
 		ModeClientFromChannel(currentCLient, tokens);
 	else
-		cerr << "ach had l command dzb???" << endl;
+		Errors::ERR_UNKNOWNCOMMAND(command, currentCLient, *this);
 }
 
 bool Server::checkPassword(string input) {
@@ -286,9 +278,8 @@ void Server::handlePART(Client &client, vector<string> &tokens)
 
 	string reason = "Client gone to edge";
 
-	if (tokens_len == 3) {
-		reason = tokens.back();
-	}
+	if (tokens_len >= 3)
+		reason = tokens[2];
 
 	vector<channelInfo> ch;
 	parseChannelCommand(ch, tokens[1], "");
@@ -407,13 +398,6 @@ void Server::InviteClientFromChannel(Client &client, vector<string> &tokens)
 	Client &invited = getClientFromNick(invitedNick)->second;
 	channelObj.invite(&invited);
 	Replies::notifyInvite(client, invited, channel);
-
-	// TODO: INVITE THE USER
-	/*
-		Add user to idk attribute about invitedusers or somthing !!
-		search for "todo above"
-	*/
-
 }
 
 void Server::TopicClientFromChannel(Client &client, vector<string> &tokens)
@@ -629,7 +613,7 @@ void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Cl
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_LIMIT))
 	{
 		channel.unsetMode(CHANNEL_MODES::SET_LIMIT);
-		replyModeNotify(*client, channel, "-l", toStr(channel.getLimit()), server);
+		replyModeNotify(*client, channel, "-l", Utility::toStr(channel.getLimit()), server);
 	}
 	else if (state && (!channel.modeIsSet(CHANNEL_MODES::SET_LIMIT) || channel.modeIsSet(CHANNEL_MODES::SET_LIMIT)))
 	{
@@ -649,7 +633,7 @@ void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Cl
 		channel.setLimit(limit);
 		channel.setMode(CHANNEL_MODES::SET_LIMIT);
 
-		replyModeNotify(*client, channel, "+l", toStr(limit), server);
+		replyModeNotify(*client, channel, "+l", Utility::toStr(limit), server);
 	}
 }
 

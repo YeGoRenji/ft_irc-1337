@@ -14,6 +14,8 @@ public:
 	static vector<string> splitTokensByChar(string tokens, char c);
 	static vector<string> getCommandTokens(string);
 	static string constructMemberList(map<string, Client *> &members, const string prefix);
+	static string toStr(long nbr);
+	static string toUpper(string str);
 
 private:
 	Utility();

@@ -58,3 +58,21 @@ string Utility::constructMemberList(map<string, Client *> &members, const string
 	}
 	return str;
 }
+
+string	Utility::toStr(long nbr) {
+    std::string        ret;
+    std::ostringstream convert;
+    convert << nbr;
+    ret = convert.str();
+    return ret;
+}
+
+string Utility::toUpper(string str) {
+	string res = str;
+
+	std::transform(str.begin(), str.end(), res.begin(), ::toupper);
+
+	return res;
+}
+
+

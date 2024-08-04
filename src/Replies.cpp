@@ -135,8 +135,6 @@ void	Replies::RPL_TOPIC(string &channel, string &topic, Client &client, Server &
 void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Client &client, Server &server)
 {
 	FD fd = client.getFdObject();
-	stringstream ss;
-	ss << time;
 
 	string reply = ":";
 	reply += server.getServerName();
@@ -147,21 +145,21 @@ void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Cli
 	reply += " ";
 	reply += setter;
 	reply += " ";
-	reply += ss.str();
+	reply += Utility::toStr(time);
 
 	fd << reply;
 }
 
 void Replies::RPL_PRIVMSG(Client &sender, Client &recevier, string &message)
 {
-		string reply = ":";
+	string reply = ":";
 
-		reply += sender.getNick();
-		reply += " PRIVMSG ";
-		reply += recevier.getNick();
-		reply += " :";
-		reply += message;
-		recevier << reply;
+	reply += sender.getNick();
+	reply += " PRIVMSG ";
+	reply += recevier.getNick();
+	reply += " :";
+	reply += message;
+	recevier << reply;
 }
 
 // NOTIFICATIONS
@@ -222,10 +220,9 @@ void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &mod
 	// (void)channelObj;
 	if (modeString.find("l") != string::npos)
 	{
-		reply += " ";
 		// cout << "LIMIT : " << channelObj.getLimit() << endl;
-		stringstream ss; ss << channelObj.getLimit();
-		reply += ss.str();
+		reply += " ";
+		reply += Utility::toStr(channelObj.getLimit());
 	}
 	if (modeString.find("k") != string::npos)
 	{
@@ -242,8 +239,6 @@ void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &mod
 void	Replies::RPL_CREATIONTIME(string &channel, time_t time, Client &client, Server &server)
 {
 	string reply = ":";
-	stringstream ss;
-	ss << time;
 
 	reply += server.getServerName();
 	reply += " ";
@@ -253,7 +248,7 @@ void	Replies::RPL_CREATIONTIME(string &channel, time_t time, Client &client, Ser
 	reply += " ";
 	reply += channel;
 	reply += " ";
-	reply += ss.str();
+	reply += Utility::toStr(time);
 
 	client << reply;
 }
