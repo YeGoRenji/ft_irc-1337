@@ -224,7 +224,8 @@ void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &mod
 	{
 		reply += " ";
 		// cout << "LIMIT : " << channelObj.getLimit() << endl;
-		reply += std::to_string(channelObj.getLimit());
+		stringstream ss; ss << channelObj.getLimit();
+		reply += ss.str();
 	}
 	if (modeString.find("k") != string::npos)
 	{

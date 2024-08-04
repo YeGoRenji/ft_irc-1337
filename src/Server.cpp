@@ -217,7 +217,7 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 		else
 		{
 //			cerr << "channel " << it -> name << " exists!" << endl;
-
+		
 			if (!channelIt->second.canBeJoinedBy(client, it->password, *this))
 				return;
 

@@ -160,6 +160,10 @@ bool Channel::isOperator(string &nick) {
 
 bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server) {
 
+	// Already in channel
+	if (hasMember(client.getNick()))
+		return false;
+
 	// channel is invite only and Client not invited
 	if (modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY) && !isNickInvited(client.getNick()))
 	{
