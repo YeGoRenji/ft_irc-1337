@@ -1,3 +1,4 @@
 TODOs:
 - limiting message length ?
 - for limechat somehow channel names are case insentitive ? (channel #h is the same as #H)
+- When name already in use you shouldn't be able to join until u send good nick (Bug happened when using ./clientJumia.sh already_used)
