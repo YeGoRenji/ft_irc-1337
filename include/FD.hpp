@@ -13,7 +13,7 @@ public:
 	FD &operator=(const FD &);
 	~FD();
 	FD &operator<<(std::string);
-	void operator>>(std::string&);
+	bool operator>>(std::string& buffer);
 	int getValue();
 	void setValue(int fd);
 	

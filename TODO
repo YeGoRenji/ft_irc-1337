@@ -1,3 +1,5 @@
-Bugs:
-- Magically fixed: When two users on the same channel, one changes nickname, that nickname isn't freed (nickname is already in use)
-- FIXED BY IGNORING SIGPIPE: CTRL+C while using nc (./clientJumia.sh) makes the server exit
+TODOs:
+- limiting message length ?
+- for limechat somehow channel names are case insentitive ? (channel #h is the same as #H)
+- When name already in use you shouldn't be able to join until u send good nick (Bug happened when using ./clientJumia.sh already_used)
+- We should send all the welcome messages required by the RFC <https://modern.ircdocs.horse/#connection-registration>

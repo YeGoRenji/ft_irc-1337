@@ -66,8 +66,8 @@ void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 	reply += " = ";
 	reply += channel.getChannelName();
 	reply += " :";
-	reply += Utility::constructMemberList(channel.getMembers(), "");
-	reply += Utility::constructMemberList(channel.getChanOps(), "@");
+	reply += channel.getNonOpsStrList();
+	reply += channel.getChanOpsStrList();
 
 	client << reply;
 }
@@ -145,22 +145,21 @@ void	Replies::RPL_TOPICWHOTIME(string &channel, string &setter, time_t time, Cli
 	reply += " ";
 	reply += setter;
 	reply += " ";
-	reply += std::to_string(time); // TODO : ila kant forbidden nbedlooha
-								   // TODO : yep, this is c++11 and should be changed!!
+	reply += Utility::toStr(time);
 
 	fd << reply;
 }
 
 void Replies::RPL_PRIVMSG(Client &sender, Client &recevier, string &message)
 {
-		string reply = ":";
+	string reply = ":";
 
-		reply += sender.getNick();
-		reply += " PRIVMSG ";
-		reply += recevier.getNick();
-		reply += " :";
-		reply += message;
-		recevier << reply;
+	reply += sender.getNick();
+	reply += " PRIVMSG ";
+	reply += recevier.getNick();
+	reply += " :";
+	reply += message;
+	recevier << reply;
 }
 
 // NOTIFICATIONS
@@ -203,7 +202,7 @@ void Replies::notifyKick(Client &kicker, Client &kicked, string &channelName)
 	kicked << reply;
 }
 
-void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeString, Server &server, Channel &channelObj)
+void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &modeString, Server &server)
 {
 	string reply = ":";
 
@@ -214,16 +213,16 @@ void	Replies::RPL_CHANNELMODEIS(string &channel, Client &client, string &modeStr
 	reply += " ";
 	reply += client.getNick();
 	reply += " ";
-	reply += channel;
+	reply += channelObj.getChannelName();
 	reply += " ";
 	reply += modeString;
 
 	// (void)channelObj;
 	if (modeString.find("l") != string::npos)
 	{
-		reply += " ";
 		// cout << "LIMIT : " << channelObj.getLimit() << endl;
-		reply += std::to_string(channelObj.getLimit());
+		reply += " ";
+		reply += Utility::toStr(channelObj.getLimit());
 	}
 	if (modeString.find("k") != string::npos)
 	{
@@ -249,7 +248,7 @@ void	Replies::RPL_CREATIONTIME(string &channel, time_t time, Client &client, Ser
 	reply += " ";
 	reply += channel;
 	reply += " ";
-	reply += std::to_string(time);
+	reply += Utility::toStr(time);
 
 	client << reply;
 }

@@ -6,9 +6,7 @@
 # include <Hacks.hpp>
 # include <Errors.hpp>
 # include <unistd.h>
-# include <sys/socket.h>
-# include <sys/poll.h>
-# include <netinet/in.h>
+# include <Replies.hpp>
 
 // max users in listen(2) queue
 # ifndef MAX_LISTEN
@@ -31,7 +29,7 @@ struct channelInfo {
 class Server {
 public:
 	static string serverName;
-	Server(int port, string pass);
+	Server(uint16_t port, string pass);
 	~Server();
 	void start();
 	bool checkPassword(string passLine);
@@ -50,15 +48,15 @@ public:
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &currClient, vector<pollfd> &fds, string reason);
-	void AddClientoChannel(Client &client, vector<string> &tokens);
+	void handleJOIN(Client &client, vector<string> &tokens);
 
 	map<string, Channel>::iterator createChannel(string name, string password);
 
 	void handlePART(Client &client, vector<string> &tokens);
-	void KickClientFromChannel(Client &client, vector<string> &tokens);
+	void handleKICK(Client &client, vector<string> &tokens);
 	void TopicClientFromChannel(Client &client, vector<string> &tokens);
 	void InviteClientFromChannel(Client &client, vector<string> &tokens);
-	void handlePrivMsg(Client &sender, vector<string> &tokens);
+	void handlePRIVMSG(Client &sender, vector<string> &tokens);
 	void ModeClientFromChannel(Client &client, vector<string> &tokens);
 
 	Server();

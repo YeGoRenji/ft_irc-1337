@@ -6,16 +6,30 @@ fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fal
 	cout << "Client: Default constructor called" << endl;
 }
 
-// TODO: ip should be dynamic not always "localhost"
 Client::Client(int _fd):
-fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("localhost")
+fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("unknown")
 {
 	cout << "Client: Parameter constructor called" << endl;
+
+	sockaddr_in client_info;
+	bzero(&client_info, sizeof(client_info));
+	socklen_t info_size = sizeof(client_info);
+
+	if (!getpeername(_fd, (sockaddr *)&client_info, &info_size)) {
+
+		char ip_cstr[INET_ADDRSTRLEN] = "unknown";
+		// TODO: can inet_ntop fail ??? what if ipv6 ? should I care ?
+		inet_ntop(AF_INET, &client_info.sin_addr, ip_cstr, sizeof(ip_cstr));
+
+		// cout << "Got ip = " << ip_cstr << endl;
+		ip = ip_cstr;
+	}
+
+	// TODO: should I do something if getpeername fails ?
 }
 
 Client::~Client()
 {
-	// TODO: Remove this line it was added to fix Wextra
 	cout << "Client: Destructor called" << endl;
 }
 
@@ -25,15 +39,6 @@ int Client::getFd() {
 
 FD &Client::getFdObject() {
 	return fdObject;
-}
-
-void Client::getLineStream(stringstream &ss) {
-	string passLine;
-	fdObject >> passLine;
-
-	//cout << "Got : " << passLine << endl;
-
-	ss.str(passLine);
 }
 
 // format : PASS pass
@@ -58,7 +63,6 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 
 	passGiven = true;
 	isAuthed = passGiven & nickGiven & userGiven;
-	cout << isPassGiven() << endl;
 }
 
 string &Client::getNick()
@@ -78,14 +82,13 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 
 // The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 // TODO : maybe do this ? uwu? maybe not?
-// TODO : check the clients can change their nick!!!
 
-// format : NICKNAME nick
+// format : NICK nick
 void Client::handleNICK(Server &server, vector<string> tokens) {
 
 	if (tokens.size() == 1)
 	{
-		Errors::ERR_NEEDMOREPARAMS(tokens[0], *this, server);
+		Errors::ERR_NONICKNAMEGIVEN(*this, server);
 		return;
 	}
 
@@ -154,18 +157,19 @@ Client &Client::operator<<(std::string str) {
 	return (*this);
 }
 
-void Client::operator>>(std::string& str) {
+bool Client::operator>>(std::string& str) {
 	string buffer;
-	fdObject >> buffer;
+	bool shouldClientQuit = fdObject >> buffer;
 	command += buffer;
 
-	cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
+	// cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
 	if (!CONTAINS(command, "\r\n"))
-		return;
+		return shouldClientQuit;
 
 	str = string(command.begin(), command.end() - 2);
-	cerr << "Full command : <" << str << ">" << endl;
+	cerr << "\nGot command : <" << str << ">" << endl;
 	command.clear();
+	return shouldClientQuit;
 }
 
 void Client::disconnect() {
@@ -189,6 +193,22 @@ void Client::leaveAllChannels(Server &server, string reason)
 		server.RemoveMemberFromChannel(*joinedChannels[i], *this, reason);
 }
 
+string Client::craftSourceMessage(string command, string message)
+{
+	string reply = ":";
+	reply += getNick();
+	reply += "!";
+	reply += getUsername();
+	reply += "@";
+	reply += getIp();
+	reply += " ";
+	reply += command;
+	reply += " ";
+	reply += message;
+
+	return (reply);
+}
+
 // getters
 string &Client::getIp()
 {
@@ -206,11 +226,15 @@ void Client::setNick(Server &server, string &nick)
 	vector<Channel *> clientChannels = server.getChannelsWithMember(this->nickname);
 	vector<Channel *> channelsWhereWasOp;
 
+	string reply = craftSourceMessage("NICK", nick);
+
 	for (size_t i = 0; i < clientChannels.size(); ++i)
 	{
-		if ((*clientChannels[i]).isOperator(this->nickname))
+		Channel &channel = (*clientChannels[i]);
+		channel.broadcastMessageToGroup(reply, channel.getMembers(), "");
+		if (channel.isOperator(this->nickname))
 			channelsWhereWasOp.push_back(clientChannels[i]);
-		(*clientChannels[i]).removeMemberSilently(*this);
+		channel.removeMemberSilently(*this);
 	}
 
 	this->nickname = nick;

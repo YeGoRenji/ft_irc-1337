@@ -6,7 +6,7 @@
 # include <Server.hpp>
 # include <Utility.hpp>
 # include <Replies.hpp>
-#include <Errors.hpp>
+# include <Errors.hpp>
 
 class Server;
 
@@ -17,12 +17,14 @@ public:
 	~Client();
 	void disconnect();
 	void leaveAllChannels(Server &server, string reason);
+	string craftSourceMessage(string command, string message);
 
 	//void login(Server &server);
 	void handleNICK(Server &server, vector<string> tokens);
 	void passHandler(Server &server, vector<string> tokens);
 	void setUsernameAndRealName(Server &server, vector<string> vectors);
 	void beWelcomed(Server &server);
+
 	// getters;
 	bool isPassGiven();
 	bool wasWelcomed;
@@ -36,7 +38,7 @@ public:
 	void setNick(Server &server, string &nick);
 
 	Client &operator<<(std::string);
-	void operator>>(std::string&);
+	bool operator>>(std::string&);
 
 private:
 	FD fdObject;
@@ -52,7 +54,6 @@ private:
 	string username;
 	string ip;
 
-	void getLineStream(stringstream &ss);
 	bool nickNameAlreadyExists(Server &server, string nickname);
 };
 

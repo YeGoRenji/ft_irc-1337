@@ -16,20 +16,22 @@
 #define ONE_ARG_ERRORS \
 	X(401, NOSUCHNICK, "No such nick/channel", recevier) \
 	X(403, NOSUCHCHANNEL, "No such channel", channel) \
+	X(404, CANNOTSENDTOCHAN, "Cannot send to channel", channel) \
+	X(421, UNKNOWNCOMMAND, "ach had l command dzb ???", command) \
 	X(432, ERRONEUSNICKNAME, "Erroneus nickname", nick) \
 	X(433, NICKNAMEINUSE, "Nickname is already in use", nick) \
 	X(442, NOTONCHANNEL, "You're not on that channel", channel) \
 	X(461, NEEDMOREPARAMS, "Not enough parameters", command) \
-	X(475, BADCHANNELKEY, "Cannot join channel (+k)", channel) \
-	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel) \
-	X(471, CHANNELISFULL, "Cannot join channel (+l)", channel)
-	// X(472, UNKNOWNMODE, "is unknown mode char to me", channel)
+	X(475, BADCHANNELKEY, "Cannot join channel, you need channel password (+k)", channel) \
+	X(471, CHANNELISFULL, "Cannot join channel, channel is full (+l)", channel) \
+	X(473, INVITEONLYCHAN, "Cannot join channel, you must be invited (+i)", channel) \
+	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel)
 
 #define TWO_ARG_ERRORS \
-	X(443, USERONCHANNEL, "is already on channel", nick, channel) \
 	X(441, USERNOTINCHANNEL, "They aren't on that channel", nick, channel) \
-	X(472, UNKNOWNMODE, "is unknown mode char to me", c, channel) \
-	X(467, KEYALREADYSET, "Channel key already set", nick, channel) 
+	X(443, USERONCHANNEL, "is already on channel", nick, channel) \
+	X(467, KEYALREADYSET, "Channel key already set", nick, channel) \
+	X(472, UNKNOWNMODE, "is unknown mode char to me", c, channel)
 
 
 class Server;
