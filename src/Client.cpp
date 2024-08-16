@@ -210,6 +210,12 @@ string Client::craftSourceMessage(string command, string message)
 }
 
 // getters
+
+bool Client::isAuthenticated()
+{
+	return isAuthed;
+}
+
 string &Client::getIp()
 {
 	return (this->ip);

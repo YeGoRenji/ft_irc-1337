@@ -27,6 +27,7 @@ public:
 
 	// getters;
 	bool isPassGiven();
+	bool isAuthenticated();
 	bool wasWelcomed;
 	int getFd();
 	string &getNick();

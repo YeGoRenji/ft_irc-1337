@@ -102,7 +102,7 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 {
 	string command = Utility::toUpper(tokens[0]);
 
-	if (!currentCLient.isPassGiven() && command != "PASS")
+	if (!currentCLient.isAuthenticated() && command != "PASS" && command != "NICK" && command != "USER" && command != "QUIT")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
 
 //	cerr << "token size : " << command.size() << endl;
@@ -209,7 +209,7 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 		else
 		{
 //			cerr << "channel " << it -> name << " exists!" << endl;
-		
+
 			if (!channelIt->second.canBeJoinedBy(client, it->password, *this))
 				return;
 
@@ -665,7 +665,7 @@ void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Clie
 	}
 	else if (state && (!channel.modeIsSet(CHANNEL_MODES::SET_KEY) || channel.modeIsSet(CHANNEL_MODES::SET_KEY)))
 	{
-	
+
 		channel.setPassword(pass);
 
 		channel.setMode(CHANNEL_MODES::SET_KEY);
@@ -688,7 +688,7 @@ void	handleOperator(bool state, char c, vector<string> &token, Channel &channel,
 	{
 		nickToOp = Args[0][0];
 		Args->erase(Args->begin());
-	}	
+	}
 
 	if (!server.hasMember(nickToOp))
 		return Errors::ERR_NOSUCHNICK(nickToOp, *client, server);
@@ -719,7 +719,7 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 {
 	bool state = true;
 
-	
+
 	if (modeString[0] == '+' || modeString[0] == '-')
 	{
 		state = (modeString[0] == '+');
@@ -742,7 +742,7 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 		int index = (modeString[i] == 'i') * 1 + (modeString[i] == 't') * 2 + (modeString[i] == 'l') * 3 + (modeString[i] == 'k') * 4 + (modeString[i] == 'o') * 5;
 		f[index](state, modeString[i], token, channel, client, server, Args);
 	}
-	
+
 	// for (size_t i = 0; i < Args->size(); i++)
 	// 	cout  << "Args : " << *Args[i] << endl;
 
@@ -806,7 +806,7 @@ void Server::ModeClientFromChannel(Client &client, vector<string> &tokens)
 			return Errors::ERR_UNKNOWNMODE(tokens[2], string(1, modeString[0]), client, *this);
 
 		// MODE #D +ikl-o
-		std::vector<std::string> Args(tokens.begin() + 3, tokens.end()); 
+		std::vector<std::string> Args(tokens.begin() + 3, tokens.end());
 		while(!modeString.empty())
 			HandleFlags(modeString, tokens, channelObj, &client, *this, &Args);
 	}
