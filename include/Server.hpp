@@ -34,7 +34,7 @@ public:
 	void start();
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string nickName);
-	void parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
+	void parseChannelsToken(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
 	void RemoveMemberFromChannel(Channel &channel, Client &client, string reason);
 	bool hasMember(string &nick);
 	bool hasChannel(string ChannelName);

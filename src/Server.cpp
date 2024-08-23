@@ -166,7 +166,7 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 
 	if (tokens.size() == 1)
 	{
-		// the next lines only for debugging purposes
+		// INFO: the next lines only for debugging purposes
 		map<string, Channel>::iterator it = channels.begin();
 			cerr << "channel name : ";
 		for(; it != channels.end(); it++)
@@ -180,7 +180,7 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 	if (tokens.size() == 3)
 		passwordsTokens = tokens[2];
 
-	parseChannelCommand(ch, channelsTokens, passwordsTokens);
+	parseChannelsToken(ch, channelsTokens, passwordsTokens);
 
 	vector<channelInfo>::iterator it = ch.begin();
 	vector<channelInfo>::iterator ite = ch.end();
@@ -226,7 +226,7 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 }
 
 // TODO: Change methode name
-void Server::parseChannelCommand(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)
+void Server::parseChannelsToken(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)
 {
 	size_t i;
 	vector<string> channelNames = Utility::splitTokensByChar(channelsTokens, ',');
@@ -280,7 +280,7 @@ void Server::handlePART(Client &client, vector<string> &tokens)
 		reason = tokens[2];
 
 	vector<channelInfo> ch;
-	parseChannelCommand(ch, tokens[1], "");
+	parseChannelsToken(ch, tokens[1], "");
 
 	string channelName;
 	for(size_t i = 0; i < ch.size(); i++)
@@ -308,7 +308,7 @@ void Server::handleKICK(Client &client, vector<string> &tokens)
 
 	string &channel = tokens[1];
 
-	if (channel[0] != '#') // NEED to check the return error
+	if (channel[0] != '#') // TODO: NEED to check the return error
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	map<string, Channel>::iterator chIt = getChannel(channel);
@@ -324,25 +324,23 @@ void Server::handleKICK(Client &client, vector<string> &tokens)
 	if (!channelObj.isOperator(client.getNick()))
 		return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 
-	vector<channelInfo> kickedUsers;
-
-	parseChannelCommand(kickedUsers, tokens[2], "");
+	vector<string> kickedNicks = Utility::splitTokensByChar(tokens[2], ',');
 
 	string reason = "Kicked by " + client.getNick();
 
 	if (tokens_len == 4)
 		reason = tokens.back();
 
-	for (size_t i = 0; i < kickedUsers.size(); i++)
+	for (size_t i = 0; i < kickedNicks.size(); i++)
 	{
 		if (!channelObj.hasMember(client.getNick()))
 			return Errors::ERR_NOTONCHANNEL(channel, client, *this);
-		if (!channelObj.hasMember(kickedUsers[i].name))
+		if (!channelObj.hasMember(kickedNicks[i]))
 		{
-			Errors::ERR_USERNOTINCHANNEL(kickedUsers[i].name, channel, client, *this);
+			Errors::ERR_USERNOTINCHANNEL(kickedNicks[i], channel, client, *this);
 			continue;
 		}
-		Client &memberTokick = *channelObj.getMembers()[kickedUsers[i].name];
+		Client &memberTokick = *channelObj.getMembers()[kickedNicks[i]];
 
 		Replies::notifyKick(client, memberTokick, channel);
 		RemoveMemberFromChannel(channelObj, memberTokick, reason);
