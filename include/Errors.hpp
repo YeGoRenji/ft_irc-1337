@@ -25,13 +25,13 @@
 	X(475, BADCHANNELKEY, "Cannot join channel, you need channel password (+k)", channel) \
 	X(471, CHANNELISFULL, "Cannot join channel, channel is full (+l)", channel) \
 	X(473, INVITEONLYCHAN, "Cannot join channel, you must be invited (+i)", channel) \
-	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel)
+	X(482, CHANOPRIVSNEEDED, "You're not channel operator", channel) \
+	X(472, UNKNOWNMODE, "is unknown mode char to me", modechar)
 
 #define TWO_ARG_ERRORS \
 	X(441, USERNOTINCHANNEL, "They aren't on that channel", nick, channel) \
 	X(443, USERONCHANNEL, "is already on channel", nick, channel) \
-	X(467, KEYALREADYSET, "Channel key already set", nick, channel) \
-	X(472, UNKNOWNMODE, "is unknown mode char to me", c, channel)
+	X(467, KEYALREADYSET, "Channel key already set", nick, channel)
 
 
 class Server;

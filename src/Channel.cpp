@@ -5,7 +5,6 @@ Channel::Channel(): name("default") // op("default")
 	//std::cout << "Channel: Default constructor called" << endl;
 }
 
-// TODO : add operators
 Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode):
 name(_name), creationTime(time(0)), password(_password), mode(_mode), limit(69)
 {
@@ -22,7 +21,6 @@ void Channel::addMemberSilently(Client &client) {
 
 void Channel::addMember(Client &client, bool isBroadcasted)
 {
-	// TODO : maybe try to make this a reference later?
 	// cerr << "Addr = " << &client << endl;
 	members[client.getNick()] = &client;
 	// cerr << client.getNick().size() << endl;
@@ -93,7 +91,7 @@ void Channel::addOperator(Client &client)
 {
 	if (chanOps.find(client.getNick()) != chanOps.end())
 	{
-		return; // TODO : do we need to send an error or something here (e.g trying re-make an op)
+		return;
 	}
 	chanOps[client.getNick()] = &client;
 }
@@ -234,6 +232,22 @@ void Channel::sendClientsList(Client &client, Server &server)
 }
 
 // getters
+
+string	&Channel::getTopic()
+{
+        return topic;
+}
+
+string	&Channel::getTopicSetter()
+{
+	return topicSetter;
+}
+
+time_t			Channel::getTopicSetTime()
+{
+	return topicSetTime;
+}
+
 string& Channel::getChannelName()
 {
 	return (this -> name);

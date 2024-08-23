@@ -18,10 +18,7 @@ fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fa
 	if (!getpeername(_fd, (sockaddr *)&client_info, &info_size)) {
 
 		char ip_cstr[INET_ADDRSTRLEN] = "unknown";
-		// TODO: can inet_ntop fail ??? what if ipv6 ? should I care ?
 		inet_ntop(AF_INET, &client_info.sin_addr, ip_cstr, sizeof(ip_cstr));
-
-		// cout << "Got ip = " << ip_cstr << endl;
 		ip = ip_cstr;
 	}
 
@@ -80,9 +77,6 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 	return server.checkUserExistence(nickname);
 }
 
-// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
-// TODO : maybe do this ? uwu? maybe not?
-
 // format : NICK nick
 void Client::handleNICK(Server &server, vector<string> tokens) {
 
@@ -96,21 +90,18 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 	{
 		Errors::ERR_ERRONEUSNICKNAME(tokens[0], *this, server);
 		return;
-		//throw runtime_error("no nickname was given");
 	}
 
 	if (tokens[1][0] == '#' || tokens[1][0] == ':' || tokens[1][0] == ' ')
 	{
 		Errors::ERR_ERRONEUSNICKNAME(tokens[1], *this, server);
 		return;
-		//throw runtime_error("nickname starts with nigger listed characters");
 	}
 
 	if (nickNameAlreadyExists(server, tokens[1]))
 	{
 		Errors::ERR_NICKNAMEINUSE(tokens[1], *this, server);
 		return ;
-		//throw runtime_error("nickname already exists!");
 	}
 
 	setNick(server, tokens[1]);
@@ -127,7 +118,6 @@ void Client::beWelcomed(Server &server)
 	Replies::RPL_YOURHOST(*this, server);
 }
 
-// TODO : what the fuck is an ident server in the rfc??
 // format : USER <username> 0 * [:]<realname>
 void Client::setUsernameAndRealName(Server &server, vector<string> tokens)
 {

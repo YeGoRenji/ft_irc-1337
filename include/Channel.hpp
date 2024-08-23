@@ -26,13 +26,13 @@ enum BroadCastAction {
 struct Message {
 	string sender;
 	string body;
-	// TODO : might wanna add the time here
+
 };
 
 class Channel {
 public:
 	Channel();
-	Channel(string name, string password, CHANNEL_MODES::Modes _mode); // TODO : add operators
+	Channel(string name, string password, CHANNEL_MODES::Modes _mode);
 	// getters
 	string& getChannelName() ;
 	const string& getTopic() const;
@@ -66,18 +66,9 @@ public:
 
 	void	setTopic(string& newTopic, string& setter);
 
-	// TODO : move l body dial had l 9lawi to the cpp file
-	string	&getTopic() {
-        return topic;
-    }
-
-    string	&getTopicSetter() {
-        return topicSetter;
-    }
-
-    time_t			getTopicSetTime() {
-        return topicSetTime;
-    }
+	string	&getTopic();
+    string	&getTopicSetter();
+    time_t	getTopicSetTime();
 
 	void invite(Client* client);
 	bool outvite(Client* client);
@@ -114,7 +105,7 @@ private:
 
 	void removeMember(Client &client, string reason, bool isBroadcasted);
 	void addMember(Client &client, bool isBroadcasted);
-	map<string, Client*>	invited; // TODO : zedtha gelt maybe nahtajohaa
+	map<string, Client*>	invited; // TODO : check l error diyal changing nickname !
 	string					topicSetter;
 	string					topic;
 	CHANNEL_MODES::Modes		mode;

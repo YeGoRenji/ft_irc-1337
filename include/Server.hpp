@@ -45,6 +45,10 @@ public:
 	map<string, Channel> &getChannels();
 	vector<Channel *> getChannelsWithMember(string nick);
 	map<string, Channel>::iterator getChannel(string name);
+
+	void	sendChannelModeToClient(Channel &channelObj, Client &client);
+	void	applyModeToChannel(Channel &channelObj, Client &client, vector<string> &tokens);
+
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &currClient, vector<pollfd> &fds, string reason);
@@ -53,11 +57,11 @@ private:
 	map<string, Channel>::iterator createChannel(string name, string password);
 
 	void handlePART(Client &client, vector<string> &tokens);
+	void handleMODE(Client &client, vector<string> &tokens);
 	void handleKICK(Client &client, vector<string> &tokens);
-	void TopicClientFromChannel(Client &client, vector<string> &tokens);
-	void InviteClientFromChannel(Client &client, vector<string> &tokens);
+	void handleTOPIC(Client &client, vector<string> &tokens);
+	void handleINVITE(Client &client, vector<string> &tokens);
 	void handlePRIVMSG(Client &sender, vector<string> &tokens);
-	void ModeClientFromChannel(Client &client, vector<string> &tokens);
 
 	Server();
 	map<int, Client> clients;
