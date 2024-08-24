@@ -16,6 +16,7 @@ public:
 	static string constructMemberList(map<string, Client *> &members, const string prefix);
 	static string toStr(long nbr);
 	static string toUpper(string str);
+	static string toLower(string str);
 
 private:
 	Utility();

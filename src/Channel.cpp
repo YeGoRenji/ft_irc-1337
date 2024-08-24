@@ -6,7 +6,7 @@ Channel::Channel(): name("default") // op("default")
 }
 
 Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode):
-name(_name), creationTime(time(0)), password(_password), mode(_mode), limit(69)
+name(Utility::toLower(_name)), creationTime(time(0)), password(_password), mode(_mode), limit(69)
 {
 	//std::cout << "Channel: Parameter constructor called" << endl;
 }

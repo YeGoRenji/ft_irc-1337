@@ -75,4 +75,10 @@ string Utility::toUpper(string str) {
 	return res;
 }
 
+string Utility::toLower(string str) {
+	string res = str;
 
+	std::transform(str.begin(), str.end(), res.begin(), ::tolower);
+
+	return res;
+}

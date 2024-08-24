@@ -197,6 +197,9 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 			Errors::ERR_NOSUCHCHANNEL(it->name, client, *this);
 			continue;
 		}
+
+		it->name = Utility::toLower(it->name);
+
 		// check if channel exists if not create it
 		map<string, Channel>::iterator channelIt = getChannel(it -> name);
 		if (channelIt == channels.end())
@@ -252,7 +255,7 @@ map<string, Channel>::iterator Server::createChannel(string name, string passwor
 
 map<string, Channel>::iterator Server::getChannel(string name)
 {
-	return channels.find(name);
+	return channels.find(Utility::toLower(name));
 }
 
 map<int, Client>::iterator Server::getClientFromNick(string &nick)
