@@ -153,6 +153,13 @@ bool Client::operator>>(std::string& str) {
 	command += buffer;
 
 	// cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
+	if (command.size() > 512) {
+		str = command.substr(0, 513);
+		command.clear();
+		return false;
+		// Errors::ERR_
+	}
+
 	if (!CONTAINS(command, "\r\n"))
 		return shouldClientQuit;
 

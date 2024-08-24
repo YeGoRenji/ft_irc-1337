@@ -1,5 +1,4 @@
 TODOs:
-- limiting message length ?
 - When name already in use you shouldn't be able to join until u send good nick (Bug happened when using ./clientJumia.sh already_used)
 - We should send all the welcome messages required by the RFC <https://modern.ircdocs.horse/#connection-registration>
 

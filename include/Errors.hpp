@@ -9,6 +9,7 @@
 #define SIMPLE_ERRORS \
 	X(69, CUSTOM_NOT_AUTHED, "Client is not authenticated") \
 	X(412, NOTEXTTOSEND, "No text to send") \
+	X(417, INPUTTOOLONG, "Input line was too long") \
 	X(431, NONICKNAMEGIVEN, "No nickname given") \
 	X(462, ALREADYREGISTERED, "You may not reregister") \
 	X(464, PASSWDMISMATCH, "Password incorrect")

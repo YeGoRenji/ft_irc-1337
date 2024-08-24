@@ -84,6 +84,11 @@ void Server::start() {
 
 				bool clientSentCTRL_C = currentCLient >> data;
 
+				if (data.size() > 512) {
+					Errors::ERR_INPUTTOOLONG(currentCLient, *this);
+					continue;
+				}
+
 				if (clientSentCTRL_C)
 				{
 					quitUser(currentCLient, fds, "Client *spanked* CTRL-C");
