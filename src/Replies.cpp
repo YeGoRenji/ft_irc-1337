@@ -228,7 +228,10 @@ void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &mod
 	{
 		reply += " ";
 		// cout << "PASSWORD : " << channelObj.getPassword() << endl;
-		reply += channelObj.getPassword();
+		if (channelObj.isOperator(client.getNick()))
+			reply += channelObj.getPassword();
+		else
+			reply += "*";
 	}
 
 	cout << "REPLY : " << reply << endl;
