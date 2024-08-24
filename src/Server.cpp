@@ -12,7 +12,7 @@ int chk(int status, const std::string msg, bool throwOnErr = true) {
 	return status;
 }
 
-Server::Server(uint16_t port, string pass): password(pass)
+Server::Server(uint16_t port, string pass): password(pass), creationTime(time(NULL))
 {
 	signal(SIGPIPE, SIG_IGN);
 
@@ -798,4 +798,9 @@ void Server::handleMODE(Client &client, vector<string> &tokens)
 		sendChannelModeToClient(channelObj, client);
 	else
 		applyModeToChannel(channelObj, client, tokens);
+}
+
+time_t Server::getCreationTime()
+{
+	return this -> creationTime;
 }

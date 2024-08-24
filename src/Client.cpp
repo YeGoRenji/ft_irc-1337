@@ -116,6 +116,9 @@ void Client::beWelcomed(Server &server)
 {
 	Replies::RPL_WELCOME(*this, server);
 	Replies::RPL_YOURHOST(*this, server);
+	Replies::RPL_CREATED(*this, server);
+	Replies::RPL_MYINFO(*this, server);
+	Replies::RPL_ISUPPORT(*this, server);
 }
 
 // format : USER <username> 0 * [:]<realname>

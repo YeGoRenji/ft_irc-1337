@@ -82,3 +82,12 @@ string Utility::toLower(string str) {
 
 	return res;
 }
+
+string Utility::getTimeFromEpoch(time_t timestamp)
+{
+	char buffer[80] = { 0 };
+	std::tm* localTime = std::localtime(&timestamp);
+	std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
+
+	return string(buffer);
+}

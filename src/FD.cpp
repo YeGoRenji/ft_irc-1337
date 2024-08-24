@@ -6,7 +6,7 @@
 /*   By: afatimi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:54:34 by afatimi           #+#    #+#             */
-/*   Updated: 2024/08/24 21:54:18 by ylyoussf         ###   ########.fr       */
+/*   Updated: 2024/08/24 22:53:01 by afatimi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ bool FD::operator>>(std::string& buffer) {
 	while (buffSize < 2 || !(buffer[buffSize - 2] == '\r' && buffer[buffSize - 1] == '\n') )
 	{
 		int byteRead = read(fd, &byte, 1);
-		cerr << "READ <" << byte << ">" << endl;
-		cerr << "byteRead = " << byteRead << endl;
+		//cerr << "READ <" << byte << ">" << endl;
+		//cerr << "byteRead = " << byteRead << endl;
 		if (byteRead == 0)
 			return true;
 		if (byteRead == -1)

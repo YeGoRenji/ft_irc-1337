@@ -1,5 +1,5 @@
 TODOs:
-- We should send all the welcome messages required by the RFC <https://modern.ircdocs.horse/#connection-registration>
+- implement MAXNICKLEN & MAXTOPICLEN & CHANLEN & MAXCHANNELS and send it in RPL_ISUPPORT, and a LOCATION=YOURMOM
 
 - Nicknames Validation: 
 	Nicknames are non-empty strings with the following restrictions:

@@ -14,6 +14,57 @@ void Replies::RPL_WELCOME(Client &client, Server &server)
 	client << reply;
 }
 
+void Replies::RPL_CREATED(Client &client, Server &server)
+{
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 003 ";
+	reply += Utility::getClientName(client, server);
+	reply += " :This server was created ";
+	reply += Utility::getTimeFromEpoch(server.getCreationTime());
+
+	client << reply;
+}
+
+void Replies::RPL_MYINFO(Client &client, Server &server)
+{
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 004 ";
+	reply += Utility::getClientName(client, server);
+	reply += " ";
+	reply += server.getServerName();
+	reply += " ";
+	reply += "6.9";
+	reply += " ";
+	reply += "iklot";
+
+	client << reply;
+}
+
+void Replies::RPL_ISUPPORT(Client &client, Server &server)
+{
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 005 ";
+	reply += Utility::getClientName(client, server);
+	reply += " ";
+	reply += "USERIP";
+	reply += " ";
+	reply += "CHANTYPES=#";
+	reply += " ";
+	reply += "CASEMAPPING=ascii";
+	reply += " ";
+	reply += "PREFIX=(o)@";
+	reply += " ";
+	reply += "LOCATION=YOURMOM";
+	reply += " ";
+	reply += ":are supported by this server";
+	// TODO : add MAXNICKLEN & MAXTOPICLEN & CHANLEN & MAXCHANNELS
+
+	client << reply;
+}
+
 // void Replies::RPL_CUSTOM_CLIENT_JOINED(string channel, Client &joiner, Client &client)
 // {
 // 	string reply = ":";
@@ -56,6 +107,7 @@ void Replies::RPL_YOURHOST(Client &client, Server &server)
 
 // 	client << reply;
 // }
+
 
 void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 {

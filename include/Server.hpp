@@ -45,6 +45,7 @@ public:
 	map<string, Channel> &getChannels();
 	vector<Channel *> getChannelsWithMember(string nick);
 	map<string, Channel>::iterator getChannel(string name);
+	time_t getCreationTime();
 
 	void	sendChannelModeToClient(Channel &channelObj, Client &client);
 	void	applyModeToChannel(Channel &channelObj, Client &client, vector<string> &tokens);
@@ -52,10 +53,10 @@ public:
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);
 	void quitUser(Client &currClient, vector<pollfd> &fds, string reason);
-	void handleJOIN(Client &client, vector<string> &tokens);
 
 	map<string, Channel>::iterator createChannel(string name, string password);
 
+	void handleJOIN(Client &client, vector<string> &tokens);
 	void handlePART(Client &client, vector<string> &tokens);
 	void handleMODE(Client &client, vector<string> &tokens);
 	void handleKICK(Client &client, vector<string> &tokens);
@@ -68,5 +69,6 @@ private:
 	map<string, Channel> channels;
 	FD serverSocket;
 	string password;
+	time_t creationTime;
 };
 #endif

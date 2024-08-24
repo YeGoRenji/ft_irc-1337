@@ -17,6 +17,7 @@ public:
 	static string toStr(long nbr);
 	static string toUpper(string str);
 	static string toLower(string str);
+	static string getTimeFromEpoch(time_t timestamp);
 
 private:
 	Utility();
