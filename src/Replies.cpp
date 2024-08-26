@@ -61,6 +61,9 @@ void Replies::RPL_ISUPPORT(Client &client, Server &server)
 	reply += "NICKLEN=";
 	reply += Utility::toStr(Server::NICKLEN);
 	reply += " ";
+	reply += "TOPICLEN=";
+	reply += Utility::toStr(Server::TOPICLEN);
+	reply += " ";
 	reply += "LOCATION=YOURMOM";
 	reply += " ";
 	reply += ":are supported by this server";

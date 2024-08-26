@@ -1,5 +1,5 @@
 TODOs:
-- implement MAXTOPICLEN & CHANLEN & MAXCHANNELS and send it in RPL_ISUPPORT, and a LOCATION=YOURMOM
+- implement CHANLEN & MAXCHANNELS and send it in RPL_ISUPPORT, and a LOCATION=YOURMOM
 
 - Nicknames Validation: 
 	Nicknames are non-empty strings with the following restrictions:
