@@ -59,7 +59,7 @@ void Replies::RPL_ISUPPORT(Client &client, Server &server)
 	reply += "PREFIX=(o)@";
 	reply += " ";
 	reply += "NICKLEN=";
-	reply += Utility::toStr(Server::MAXNICKLEN);
+	reply += Utility::toStr(Server::NICKLEN);
 	reply += " ";
 	reply += "LOCATION=YOURMOM";
 	reply += " ";

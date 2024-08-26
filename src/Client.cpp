@@ -86,7 +86,7 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 		return;
 	}
 
-	string nick = tokens[1].substr(0, Server::MAXNICKLEN);
+	string nick = tokens[1].substr(0, Server::NICKLEN);
 
 	if (nick.empty()) {
 		Errors::ERR_ERRONEUSNICKNAME(tokens[0], *this, server);
@@ -159,7 +159,7 @@ bool Client::operator>>(std::string& str) {
 
 	// cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
 	if (command.size() > 512) {
-		str = command.substr(0, 513);
+		str = command.substr(0, 512);
 		command.clear();
 		return false;
 		// Errors::ERR_

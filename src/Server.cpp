@@ -2,7 +2,8 @@
 
 string Server::serverName = "IRatherComeServer.mybasement";
 
-int Server::MAXNICKLEN = 30;
+int Server::NICKLEN = 30;
+int Server::TOPICLEN = 369;
 
 void	replyModeNotify(Client &client, Channel &channel, string modeString, string param, Server &server);
 
@@ -195,7 +196,6 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 	vector<channelInfo>::iterator ite = ch.end();
 	for(; it != ite; it++)
 	{
-		cerr << "handling channel : " << it -> name << endl;
 		if (it->name == "0")
 		{
 			client.leaveAllChannels(*this, "Left all channels...");
@@ -230,8 +230,10 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 		Channel &channelObj = channelIt->second;
 		// adduser to channel
 		channelObj.addMemberAndBroadcast(client);
-		if (!channelObj.getTopic().empty())
+		if (!channelObj.getTopic().empty()) {
 			Replies::RPL_TOPIC(channelObj.getChannelName(), channelObj.getTopic(), client, *this);
+			Replies::RPL_TOPICWHOTIME(channelObj.getChannelName(), channelObj.getTopicSetter(), channelObj.getTopicSetTime(), client, *this);
+		}
 		channelObj.sendClientsList(client, *this);
 		// channelIt -> second.broadcastAction(client, JOIN);
 	}
@@ -243,9 +245,6 @@ void Server::parseChannelsToken(vector<channelInfo> &ch, string channelsTokens, 
 	size_t i;
 	vector<string> channelNames = Utility::splitTokensByChar(channelsTokens, ',');
 	vector<string> passwords = Utility::splitTokensByChar(passwordsTokens, ',');
-
-	cerr << "channels size = " << channelNames.size() << endl;
-	cerr << "passwords size = " << passwords.size() << endl;
 
 	for (i = 0; i < channelNames.size(); i++)
 		ch.push_back((channelInfo){.name=channelNames[i], .password=""});
@@ -432,7 +431,7 @@ void Server::handleTOPIC(Client &client, vector<string> &tokens)
 		if (channelObj.modeIsSet(CHANNEL_MODES::SET_TOPIC) && !channelObj.isOperator(client.getNick()))
 			return Errors::ERR_CHANOPRIVSNEEDED(channel, client, *this);
 
-		string &newTopic = tokens[2];
+		string newTopic = tokens[2].substr(0, Server::TOPICLEN);
 
 		channelObj.setTopic(newTopic, client.getNick());
 		Replies::RPL_TOPIC(channel, newTopic, client, *this);
@@ -713,7 +712,6 @@ void	handleOperator(bool state, char c, vector<string> &token, Channel &channel,
 	}
 
 }
-
 
 void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client* client, Server &server, std::vector<std::string> *Args)
 {
