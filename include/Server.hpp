@@ -29,6 +29,7 @@ struct channelInfo {
 class Server {
 public:
 	static string serverName;
+	static int MAXNICKLEN;
 	Server(uint16_t port, string pass);
 	~Server();
 	void start();

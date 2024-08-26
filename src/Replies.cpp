@@ -45,6 +45,7 @@ void Replies::RPL_MYINFO(Client &client, Server &server)
 void Replies::RPL_ISUPPORT(Client &client, Server &server)
 {
 	string reply = ":";
+
 	reply += server.getServerName();
 	reply += " 005 ";
 	reply += Utility::getClientName(client, server);
@@ -57,10 +58,13 @@ void Replies::RPL_ISUPPORT(Client &client, Server &server)
 	reply += " ";
 	reply += "PREFIX=(o)@";
 	reply += " ";
+	reply += "NICKLEN=";
+	reply += Utility::toStr(Server::MAXNICKLEN);
+	reply += " ";
 	reply += "LOCATION=YOURMOM";
 	reply += " ";
 	reply += ":are supported by this server";
-	// TODO : add MAXNICKLEN & MAXTOPICLEN & CHANLEN & MAXCHANNELS
+	// TODO : add MAXTOPICLEN & CHANLEN & MAXCHANNELS
 
 	client << reply;
 }

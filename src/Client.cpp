@@ -7,7 +7,7 @@ fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fal
 }
 
 Client::Client(int _fd):
-fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("unknown")
+fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("YOURMOM")
 {
 	cout << "Client: Parameter constructor called" << endl;
 
@@ -86,25 +86,27 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 		return;
 	}
 
-	if (tokens[1].empty())
-	{
+	string nick = tokens[1].substr(0, Server::MAXNICKLEN);
+
+	if (nick.empty()) {
 		Errors::ERR_ERRONEUSNICKNAME(tokens[0], *this, server);
 		return;
 	}
 
-	if (tokens[1][0] == '#' || tokens[1][0] == ':' || tokens[1][0] == ' ')
+	// TODO: More Validation check ../TODO
+	if (nick[0] == '#' || nick[0] == ':' || nick[0] == ' ')
 	{
-		Errors::ERR_ERRONEUSNICKNAME(tokens[1], *this, server);
+		Errors::ERR_ERRONEUSNICKNAME(nick, *this, server);
 		return;
 	}
 
-	if (nickNameAlreadyExists(server, tokens[1]))
+	if (nickNameAlreadyExists(server, nick))
 	{
-		Errors::ERR_NICKNAMEINUSE(tokens[1], *this, server);
+		Errors::ERR_NICKNAMEINUSE(nick, *this, server);
 		return ;
 	}
 
-	setNick(server, tokens[1]);
+	setNick(server, nick);
 
 	nickGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))

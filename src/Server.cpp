@@ -1,7 +1,11 @@
 #include <Server.hpp>
 
 string Server::serverName = "IRatherComeServer.mybasement";
+
+int Server::MAXNICKLEN = 30;
+
 void	replyModeNotify(Client &client, Channel &channel, string modeString, string param, Server &server);
+
 
 int chk(int status, const std::string msg, bool throwOnErr = true) {
 	if (throwOnErr && status < 0) {
