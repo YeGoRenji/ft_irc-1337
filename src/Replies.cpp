@@ -64,6 +64,15 @@ void Replies::RPL_ISUPPORT(Client &client, Server &server)
 	reply += "TOPICLEN=";
 	reply += Utility::toStr(Server::TOPICLEN);
 	reply += " ";
+	reply += "CHANNELLEN=";
+	reply += Utility::toStr(Server::CHANNELLEN);
+	reply += " ";
+	reply += "MAXCHANNELS=";
+	reply += Utility::toStr(Server::MAXCHANNELS);
+	reply += " ";
+	reply += "MAXCLIENTS=";
+	reply += Utility::toStr(Server::MAXCLIENTS);
+	reply += " ";
 	reply += "LOCATION=YOURMOM";
 	reply += " ";
 	reply += ":are supported by this server";

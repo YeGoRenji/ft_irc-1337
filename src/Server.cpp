@@ -6,7 +6,7 @@ int Server::NICKLEN = 30;
 int Server::TOPICLEN = 369;
 int Server::CHANNELLEN = 64;
 int Server::MAXCHANNELS = 69;
-int Server::MAXCLIENTS = 2; // 73
+int Server::MAXCLIENTS = 73; // from mbousouf <3
 
 void	replyModeNotify(Client &client, Channel &channel, string modeString, string param, Server &server);
 
