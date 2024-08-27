@@ -88,13 +88,7 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 
 	string nick = tokens[1].substr(0, Server::NICKLEN);
 
-	if (nick.empty()) {
-		Errors::ERR_ERRONEUSNICKNAME(tokens[0], *this, server);
-		return;
-	}
-
-	// TODO: More Validation check ../TODO
-	if (nick[0] == '#' || nick[0] == ':' || nick[0] == ' ')
+	if (!Client::isValidNick(nick))
 	{
 		Errors::ERR_ERRONEUSNICKNAME(nick, *this, server);
 		return;
@@ -252,4 +246,34 @@ void Client::setNick(Server &server, string &nick)
 
 	for (size_t i = 0; i < channelsWhereWasOp.size(); ++i)
 		(*channelsWhereWasOp[i]).addOperator(*this);
+}
+
+
+
+bool Client::isValidNick(string nick) {
+
+	if (nick.empty())
+		return false;
+
+	// They MUST NOT contain any of the following characters: space (' ', 0x20), comma (',', 0x2C), asterisk ('*', 0x2A), question mark ('?', 0x3F), exclamation mark ('!', 0x21), at sign ('@', 0x40).
+	// 	They SHOULD NOT contain any dot character ('.', 0x2E).
+	if (nick.find_first_of(" ,*?!@.") != string::npos)
+		return false;
+
+	char firstChar = nick[0];
+
+	// 	They MUST NOT start with any of the following characters: dollar ('$', 0x24), colon (':', 0x3A).
+	if (firstChar == '$' || firstChar == ':')
+		return false;
+
+
+	// 	They MUST NOT start with a character listed as a channel type, or prefix listed in the IRCv3 multi-prefix Extension.
+	if (firstChar == '#' || firstChar == '&')
+		return false;
+
+	// 	They MUST NOT start with a channel membership prefix
+	if (firstChar == '~' || firstChar == '&' || firstChar == '@' || firstChar == '%' || firstChar == '+')
+		return false;
+
+	return true;
 }

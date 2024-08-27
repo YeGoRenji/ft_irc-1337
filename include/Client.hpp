@@ -37,9 +37,11 @@ public:
 
 	// setters;
 	void setNick(Server &server, string &nick);
-
 	Client &operator<<(std::string);
 	bool operator>>(std::string&);
+
+	// statics;
+	bool isValidNick(string nick);
 
 private:
 	FD fdObject;
