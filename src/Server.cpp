@@ -547,18 +547,18 @@ bool Server::hasChannel(string ChannelName)
 {
 	return (getChannel(ChannelName) != channels.end());
 }
-void	error(bool state, char c, vector<string>& token, Channel& channel, Client* client, Server &server, std::vector<std::string> *Args)
+void	error(bool state, char c, vector<string> &token, Channel &channel, Client &client, Server &server, std::vector<std::string> &Args)
 {
 	(void)state;
     (void)channel;
 	(void)Args;
 	(void)token;
 
-	Errors::ERR_UNKNOWNMODE(string(1, c), *client, server);
+	Errors::ERR_UNKNOWNMODE(string(1, c), client, server);
 }
 
 // handleInvite
-void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server, std::vector<std::string> *Args)
+void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, Client &client, Server &server, std::vector<std::string> &Args)
 {
     (void)c;
     (void)token;
@@ -567,15 +567,15 @@ void	handleInvite(bool state, char c, vector<string> &token, Channel &channel, C
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
 	{
 		channel.unsetMode(CHANNEL_MODES::SET_INVITE_ONLY);
-		replyModeNotify(*client, channel, "-i", "", server);
+		replyModeNotify(client, channel, "-i", "", server);
 	}
 	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY))
 	{
 		channel.setMode(CHANNEL_MODES::SET_INVITE_ONLY);
-		replyModeNotify(*client, channel, "+i", "", server);
+		replyModeNotify(client, channel, "+i", "", server);
 	}
 }
-void	handleTopic(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server, std::vector<std::string> *Args)
+void	handleTopic(bool state, char c, vector<string> &token, Channel &channel, Client &client, Server &server, std::vector<std::string> &Args)
 {
     (void)c;
     (void)token;
@@ -584,12 +584,12 @@ void	handleTopic(bool state, char c, vector<string> &token, Channel &channel, Cl
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
 	{
 		channel.unsetMode(CHANNEL_MODES::SET_TOPIC);
-		replyModeNotify(*client, channel, "-t", "", server);
+		replyModeNotify(client, channel, "-t", "", server);
 	}
 	else if (state && !channel.modeIsSet(CHANNEL_MODES::SET_TOPIC))
 	{
 		channel.setMode(CHANNEL_MODES::SET_TOPIC);
-		replyModeNotify(*client, channel, "+t", "", server);
+		replyModeNotify(client, channel, "+t", "", server);
 	}
 }
 
@@ -616,30 +616,30 @@ void	replyModeNotify(Client &client, Channel &channel, string modeString, string
 }
 
 
-void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server, std::vector<std::string> *Args)
+void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Client &client, Server &server, std::vector<std::string> &Args)
 {
     (void)c;
 
 
 	if (state && token.size() < 4)
-		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
+		return Errors::ERR_NEEDMOREPARAMS(token[0], client, server);
 
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_LIMIT))
 	{
 		channel.unsetMode(CHANNEL_MODES::SET_LIMIT);
-		replyModeNotify(*client, channel, "-l", Utility::toStr(channel.getLimit()), server);
+		replyModeNotify(client, channel, "-l", Utility::toStr(channel.getLimit()), server);
 	}
 	else if (state && (!channel.modeIsSet(CHANNEL_MODES::SET_LIMIT) || channel.modeIsSet(CHANNEL_MODES::SET_LIMIT)))
 	{
 		string str;
-		if (Args[0][0][0] != ':')
+		if (Args[0][0] != ':')
 		{
-			str = Args[0][0];
-			Args->erase(Args->begin());
+			str = Args[0];
+			Args.erase(Args.begin());
 		}
 
 		if (str.find_first_not_of("0123456789") != string::npos || (str[0] == '0' && str.size() > 1))
-			return Errors::CUSTOM_INVALID_LIMIT(*client);
+			return Errors::CUSTOM_INVALID_LIMIT(client);
 
 		// TODO: handle overflow ?
 		std::stringstream ss(str);
@@ -649,11 +649,11 @@ void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Cl
 		channel.setLimit(limit);
 		channel.setMode(CHANNEL_MODES::SET_LIMIT);
 
-		replyModeNotify(*client, channel, "+l", Utility::toStr(limit), server);
+		replyModeNotify(client, channel, "+l", Utility::toStr(limit), server);
 	}
 }
 
-void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server, std::vector<std::string> *Args)
+void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Client &client, Server &server, std::vector<std::string> &Args)
 {
     (void)c;
 
@@ -661,23 +661,23 @@ void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Clie
 	// MODE #D -k :password
 	// 0     1  2    3
 	if (token.size() < 4)
-		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
+		return Errors::ERR_NEEDMOREPARAMS(token[0], client, server);
 
 
 
 	string pass;
-	if (Args[0][0][0] != ':')
+	if (Args[0][0] != ':')
 	{
-		pass = Args[0][0];
-		Args->erase(Args->begin());
+		pass = Args[0];
+		Args.erase(Args.begin());
 	}
 
 	if (!state && channel.modeIsSet(CHANNEL_MODES::SET_KEY))
 	{
 		if (pass != channel.getPassword())
-			return Errors::ERR_KEYALREADYSET(client->getNick(), channel.getChannelName(), *client, server); // 467 client #channel :Channel key already set from adrift.sg.quakenet.org
+			return Errors::ERR_KEYALREADYSET(client.getNick(), channel.getChannelName(), client, server); // 467 client #channel :Channel key already set from adrift.sg.quakenet.org
 		channel.unsetMode(CHANNEL_MODES::SET_KEY);
-		replyModeNotify(*client, channel, "-k", pass, server);
+		replyModeNotify(client, channel, "-k", pass, server);
 	}
 	else if (state && (!channel.modeIsSet(CHANNEL_MODES::SET_KEY) || channel.modeIsSet(CHANNEL_MODES::SET_KEY)))
 	{
@@ -686,29 +686,29 @@ void	handleKey(bool state, char c, vector<string> &token, Channel &channel, Clie
 
 		channel.setMode(CHANNEL_MODES::SET_KEY);
 
-		replyModeNotify(*client, channel, "+k", pass, server);
+		replyModeNotify(client, channel, "+k", pass, server);
 	}
 }
 
-void	handleOperator(bool state, char c, vector<string> &token, Channel &channel, Client *client, Server &server, std::vector<std::string> *Args)
+void	handleOperator(bool state, char c, vector<string> &token, Channel &channel, Client &client, Server &server, std::vector<std::string> &Args)
 {
     (void)c;
 
 	if (token.size() < 4)
-		return Errors::ERR_NEEDMOREPARAMS(token[0], *client, server);
+		return Errors::ERR_NEEDMOREPARAMS(token[0], client, server);
 
 	string nickToOp;
-	if (Args[0][0][0] != ':')
+	if (Args[0][0] != ':')
 	{
-		nickToOp = Args[0][0];
-		Args->erase(Args->begin());
+		nickToOp = Args[0];
+		Args.erase(Args.begin());
 	}
 
 	if (!server.hasMember(nickToOp))
-		return Errors::ERR_NOSUCHNICK(nickToOp, *client, server);
+		return Errors::ERR_NOSUCHNICK(nickToOp, client, server);
 
 	if (!channel.hasMember(nickToOp))
-		return Errors::ERR_USERNOTINCHANNEL(nickToOp, channel.getChannelName(), *client, server);
+		return Errors::ERR_USERNOTINCHANNEL(nickToOp, channel.getChannelName(), client, server);
 
 	Client	*clientToOp = channel.getMembers()[nickToOp];
 
@@ -716,18 +716,18 @@ void	handleOperator(bool state, char c, vector<string> &token, Channel &channel,
 	{
 		channel.removeOperator(*clientToOp);
 
-		replyModeNotify(*client, channel, "-o", nickToOp, server);
+		replyModeNotify(client, channel, "-o", nickToOp, server);
 	}
 	else if (state && !channel.isOperator(clientToOp->getNick()))
 	{
 		channel.addOperator(*clientToOp);
 
-		replyModeNotify(*client, channel, "+o", nickToOp, server);
+		replyModeNotify(client, channel, "+o", nickToOp, server);
 	}
 
 }
 
-void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client* client, Server &server, std::vector<std::string> *Args)
+void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Channel& channel, Client &client, Server &server, std::vector<std::string> &Args)
 {
 	bool state = true;
 
@@ -738,9 +738,9 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 		modeString.erase(0, 1);
 	}
 	else
-		return Errors::ERR_UNKNOWNMODE(string(1, modeString[0]), *client, server);
+		return Errors::ERR_UNKNOWNMODE(string(1, modeString[0]), client, server);
 
-	void (*f[])(bool state, char c, std::vector<std::string>& tmp, Channel& channel, Client* client, Server &server, std::vector<std::string> *Args) = {
+	void (*f[])(bool state, char c, std::vector<std::string>& tmp, Channel& channel, Client &client, Server &server, std::vector<std::string> &Args) = {
 		&error,
 		&handleInvite,
 		&handleTopic,
@@ -786,7 +786,7 @@ void	Server::applyModeToChannel(Channel &channelObj, Client &client, vector<stri
 	std::vector<std::string> Args(tokens.begin() + 3, tokens.end());
 	// TODO : lach mdayr client as pointer a l9lawi, use a reference instead!!
 	while(!modeString.empty())
-		HandleFlags(modeString, tokens, channelObj, &client, *this, &Args);
+		HandleFlags(modeString, tokens, channelObj, client, *this, Args);
 }
 
 

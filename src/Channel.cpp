@@ -299,11 +299,11 @@ string Channel::getChanOpsStrList()
 
 // setters
 
-void Channel::setLimit(uint16_t _limit)
+void Channel::setLimit(unsigned long _limit)
 {
 	this->limit = _limit;
 }
-uint16_t	Channel::getLimit(void)
+unsigned long	Channel::getLimit(void)
 {
 	return (this->limit);
 }

@@ -82,7 +82,7 @@ public:
 
 	void	setMode(CHANNEL_MODES::Modes _mode);
 
-	void	setLimit(uint16_t _limit);
+	void	setLimit(unsigned long _limit);
 	unsigned long	getLimit(void);
 
 	void	unsetMode(CHANNEL_MODES::Modes _mode);
