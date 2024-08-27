@@ -4,6 +4,9 @@ string Server::serverName = "IRatherComeServer.mybasement";
 
 int Server::NICKLEN = 30;
 int Server::TOPICLEN = 369;
+int Server::CHANNELLEN = 64;
+int Server::MAXCHANNELS = 69;
+int Server::MAXCLIENTS = 2; // 73
 
 void	replyModeNotify(Client &client, Channel &channel, string modeString, string param, Server &server);
 
@@ -17,7 +20,7 @@ int chk(int status, const std::string msg, bool throwOnErr = true) {
 	return status;
 }
 
-Server::Server(uint16_t port, string pass): password(pass), creationTime(time(NULL))
+Server::Server(uint16_t port, string pass): password(pass), creationTime(time(NULL)), channelsCount(0), clientsCount(0)
 {
 	signal(SIGPIPE, SIG_IGN);
 
@@ -71,10 +74,18 @@ void Server::start() {
 
 			if (newClientFd < 0)
 				continue;
+
+			cerr << "Clients count = " << clientsCount << endl;
+			if (clientsCount >= Server::MAXCLIENTS) {
+				Errors::CUSTOM_SERVER_FULL(newClient);
+				newClient.disconnect();
+				continue ;
+			}
+
 			clients[newClientFd] = newClient;
 			fds.push_back((pollfd){ newClientFd, POLLIN, 0 });
+			clientsCount++;
 		}
-
 
 		for (size_t i = fds.size() - 1; i > 0; --i) {
 			if (fds[i].revents & POLLHUP) {
@@ -87,16 +98,10 @@ void Server::start() {
 				Client &currentCLient = clients[fds[i].fd];
 				string data;
 
-				bool clientSentCTRL_C = currentCLient >> data;
+				currentCLient >> data;
 
 				if (data.size() > 512) {
 					Errors::ERR_INPUTTOOLONG(currentCLient, *this);
-					continue;
-				}
-
-				if (clientSentCTRL_C)
-				{
-					quitUser(currentCLient, fds, "Client *spanked* CTRL-C");
 					continue;
 				}
 				vector<string> tokens = Utility::getCommandTokens(data);
@@ -158,6 +163,7 @@ void Server::quitUser(Client &currClient, vector<pollfd> &fds, string reason)
 	currClient.disconnect();
 
 	clients.erase(currClient.getFd());
+	clientsCount--;
 	fds.erase(it);
 }
 
@@ -201,6 +207,7 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 			client.leaveAllChannels(*this, "Left all channels...");
 			continue ;
 		}
+
 		if (!Channel::isValidName(it->name))
 		{
 			Errors::ERR_NOSUCHCHANNEL(it->name, client, *this);
@@ -213,8 +220,13 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 		map<string, Channel>::iterator channelIt = getChannel(it -> name);
 		if (channelIt == channels.end())
 		{
+			if (Server::channelsCount >= Server::MAXCHANNELS){
+				// TODO : send some kinda custom error?
+				continue;
+			}
 //			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
 			channelIt = createChannel(it -> name, it -> password);
+			Server::channelsCount++;
 			channelIt -> second.addOperator(client);
 		}
 		else
@@ -239,7 +251,6 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 	}
 }
 
-// TODO: Change methode name
 void Server::parseChannelsToken(vector<channelInfo> &ch, string channelsTokens, string passwordsTokens)
 {
 	size_t i;
@@ -247,7 +258,7 @@ void Server::parseChannelsToken(vector<channelInfo> &ch, string channelsTokens, 
 	vector<string> passwords = Utility::splitTokensByChar(passwordsTokens, ',');
 
 	for (i = 0; i < channelNames.size(); i++)
-		ch.push_back((channelInfo){.name=channelNames[i], .password=""});
+		ch.push_back((channelInfo){.name=channelNames[i].substr(0, Server::CHANNELLEN), .password=""});
 
 	size_t min_iter = min(channelNames.size(), passwords.size());
 	for (i = 0; i < min_iter; i++)
@@ -444,7 +455,13 @@ void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string re
 {
 	channel.removeMemberAndBroadcast(client, reason);
 	if (channel.getMemberCount() == 0)
+	{
 		channels.erase(channel.getChannelName());
+		Server::channelsCount--;
+		// TODO : remove this shice before correctin day
+		if (Server::channelsCount < 0)
+			cerr << "there is some bug with the channelNumber" << std::endl;
+	}
 }
 
 map<string, Channel> &Server::getChannels() {

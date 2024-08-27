@@ -64,6 +64,12 @@ void Errors::CUSTOM_CLIENT_GONE_TO_EDGE(Client &client)
 	client << error; \
 }
 
+void Errors::CUSTOM_SERVER_FULL(Client &client)
+{
+	string error = "ERROR :Server is Full lilassaf :'(";
+	client << error; \
+}
+
 void Errors::ERR_NORECIPIENT(string command, Client &client, Server &server)
 {
 	string error = ":"; \

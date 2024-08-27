@@ -31,6 +31,11 @@ public:
 	static string serverName;
 	static int NICKLEN;
 	static int TOPICLEN;
+	static int CHANNELLEN;
+	static int MAXCHANNELS;
+	static int MAXCLIENTS;
+
+
 	Server(uint16_t port, string pass);
 	~Server();
 	void start();
@@ -72,5 +77,7 @@ private:
 	FD serverSocket;
 	string password;
 	time_t creationTime;
+	int channelsCount;
+	int clientsCount;
 };
 #endif

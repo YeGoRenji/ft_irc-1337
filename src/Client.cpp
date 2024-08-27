@@ -146,26 +146,25 @@ Client &Client::operator<<(std::string str) {
 	return (*this);
 }
 
-bool Client::operator>>(std::string& str) {
+void Client::operator>>(std::string& str) {
 	string buffer;
-	bool shouldClientQuit = fdObject >> buffer;
+	fdObject >> buffer;
 	command += buffer;
 
 	// cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
 	if (command.size() > 512) {
 		str = command.substr(0, 512);
 		command.clear();
-		return false;
+		return;
 		// Errors::ERR_
 	}
 
 	if (!CONTAINS(command, "\r\n"))
-		return shouldClientQuit;
+		return;
 
 	str = string(command.begin(), command.end() - 2);
 	cerr << "\nGot command : <" << str << ">" << endl;
 	command.clear();
-	return shouldClientQuit;
 }
 
 void Client::disconnect() {

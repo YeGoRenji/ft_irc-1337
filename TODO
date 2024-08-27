@@ -1,2 +1,2 @@
 TODOs:
-- implement CHANLEN & MAXCHANNELS and send it in RPL_ISUPPORT, and a LOCATION=YOURMOM
+- implement MAXCHANNELS and send it in RPL_ISUPPORT, and a LOCATION=YOURMOM
