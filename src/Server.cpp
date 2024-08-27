@@ -221,7 +221,7 @@ void Server::handleJOIN(Client &client, vector<string> &tokens)
 		if (channelIt == channels.end())
 		{
 			if (Server::channelsCount >= Server::MAXCHANNELS){
-				// TODO : send some kinda custom error?
+				Errors::CUSTOM_TOO_MANY_CHANNELS(client);
 				continue;
 			}
 //			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
@@ -330,7 +330,7 @@ void Server::handleKICK(Client &client, vector<string> &tokens)
 
 	string &channel = tokens[1];
 
-	if (channel[0] != '#') // TODO: NEED to check the return error
+	if (channel[0] != '#')
 		return Errors::ERR_NOSUCHCHANNEL(channel, client, *this);
 
 	map<string, Channel>::iterator chIt = getChannel(channel);
@@ -639,12 +639,8 @@ void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Cl
 		}
 
 		if (str.find_first_not_of("0123456789") != string::npos || (str[0] == '0' && str.size() > 1))
-		{
+			return Errors::CUSTOM_INVALID_LIMIT(*client);
 
-			// TODO : ask ysf if we should display an error message here
-			cerr << "EYOOO : khasna digit a wld l 9a7ba";
-			return ;
-		}
 		std::stringstream ss(str);
 		unsigned long     limit;
 		ss >> limit;
@@ -787,6 +783,7 @@ void	Server::applyModeToChannel(Channel &channelObj, Client &client, vector<stri
 	modeString = tokens[2];
 
 	std::vector<std::string> Args(tokens.begin() + 3, tokens.end());
+	// TODO : lach mdayr client as pointer a l9lawi, use a reference instead!!
 	while(!modeString.empty())
 		HandleFlags(modeString, tokens, channelObj, &client, *this, &Args);
 }

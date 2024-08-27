@@ -76,26 +76,9 @@ void Replies::RPL_ISUPPORT(Client &client, Server &server)
 	reply += "LOCATION=YOURMOM";
 	reply += " ";
 	reply += ":are supported by this server";
-	// TODO : add MAXTOPICLEN & CHANLEN & MAXCHANNELS
 
 	client << reply;
 }
-
-// void Replies::RPL_CUSTOM_CLIENT_JOINED(string channel, Client &joiner, Client &client)
-// {
-// 	string reply = ":";
-// 	reply += joiner.getNick();
-// 	reply += "!";
-// 	reply += joiner.getUsername();
-// 	reply += "@";
-// 	reply += joiner.getIp();
-// 	reply += " ";
-// 	reply += "JOIN";
-// 	reply += " ";
-// 	reply += channel;
-
-// 	client << reply;
-// }
 
 void Replies::RPL_YOURHOST(Client &client, Server &server)
 {
@@ -109,21 +92,6 @@ void Replies::RPL_YOURHOST(Client &client, Server &server)
 
 	client << reply;
 }
-
-// void Replies::RPL_TOPIC(Channel &channel, Client &client, Server &server)
-// {
-// 	string reply = ":";
-// 	reply += server.getServerName();
-// 	reply += " 332 ";
-// 	reply += Utility::getClientName(client, server);
-// 	reply += " ";
-// 	reply += channel.getChannelName();
-// 	reply += " :";
-// 	reply += channel.getTopic();
-
-// 	client << reply;
-// }
-
 
 void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 {

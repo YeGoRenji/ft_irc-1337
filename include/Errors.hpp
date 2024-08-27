@@ -57,6 +57,8 @@ public:
 
 	static void	CUSTOM_CLIENT_GONE_TO_EDGE(Client &client);
 	static void CUSTOM_SERVER_FULL(Client &client);
+	static void CUSTOM_TOO_MANY_CHANNELS(Client &client);
+	static void CUSTOM_INVALID_LIMIT(Client &client);
 	static void	ERR_NORECIPIENT(string command, Client &client, Server &server);
 
 private:

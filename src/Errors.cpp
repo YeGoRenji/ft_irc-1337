@@ -70,6 +70,18 @@ void Errors::CUSTOM_SERVER_FULL(Client &client)
 	client << error; \
 }
 
+void Errors::CUSTOM_TOO_MANY_CHANNELS(Client &client)
+{
+	string error = "ERROR :Too many channels in server lilassaf :'(";
+	client << error; \
+}
+
+void Errors::CUSTOM_INVALID_LIMIT(Client &client)
+{
+	string error = "ERROR :Limit should be digits only";
+	client << error; \
+}
+
 void Errors::ERR_NORECIPIENT(string command, Client &client, Server &server)
 {
 	string error = ":"; \
