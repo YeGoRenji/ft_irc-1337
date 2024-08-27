@@ -83,7 +83,6 @@ bool Channel::checkPassword(string userPassLine)
 
 Channel::~Channel()
 {
-	// TODO : Problem : this gets called a lot, figure out a better way
 	//std::cout << "Channel: Destructor called" << endl;
 }
 

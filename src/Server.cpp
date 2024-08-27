@@ -641,6 +641,7 @@ void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Cl
 		if (str.find_first_not_of("0123456789") != string::npos || (str[0] == '0' && str.size() > 1))
 			return Errors::CUSTOM_INVALID_LIMIT(*client);
 
+		// TODO: handle overflow ?
 		std::stringstream ss(str);
 		unsigned long     limit;
 		ss >> limit;

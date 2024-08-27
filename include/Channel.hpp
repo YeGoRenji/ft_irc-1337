@@ -83,7 +83,7 @@ public:
 	void	setMode(CHANNEL_MODES::Modes _mode);
 
 	void	setLimit(uint16_t _limit);
-	uint16_t	getLimit(void);
+	unsigned long	getLimit(void);
 
 	void	unsetMode(CHANNEL_MODES::Modes _mode);
 
@@ -105,12 +105,12 @@ private:
 
 	void removeMember(Client &client, string reason, bool isBroadcasted);
 	void addMember(Client &client, bool isBroadcasted);
-	map<string, Client*>	invited; // TODO : check l error diyal changing nickname !
+	map<string, Client*>	invited;
 	string					topicSetter;
 	string					topic;
-	CHANNEL_MODES::Modes		mode;
+	CHANNEL_MODES::Modes	mode;
 	time_t					topicSetTime;
-	uint16_t				limit; // TODO: check if uint16_t is enough ?
+	unsigned long			limit;
 
 };
 
