@@ -34,5 +34,6 @@ using std::replace;
 using std::min;
 using std::pair;
 using std::make_pair;
+using std::exception;
 
 #endif

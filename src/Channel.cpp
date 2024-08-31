@@ -230,6 +230,14 @@ void Channel::sendClientsList(Client &client, Server &server)
 	Replies::RPL_ENDOFNAMES(*this, client, server);
 }
 
+void Channel::sendTopic(Client &client, Server &server)
+{
+	if (!topic.empty()) {
+		Replies::RPL_TOPIC(name, topic, client, server);
+		Replies::RPL_TOPICWHOTIME(name, topicSetter, topicSetTime, client, server);
+	}
+}
+
 // getters
 
 string	&Channel::getTopic()

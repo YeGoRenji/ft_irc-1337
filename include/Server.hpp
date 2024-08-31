@@ -38,24 +38,36 @@ public:
 
 	Server(uint16_t port, string pass);
 	~Server();
+
 	void start();
 	bool checkPassword(string passLine);
 	bool checkUserExistence(string nickName);
 	void parseChannelsToken(vector<channelInfo> &ch, string channelsTokens, string passswordsTokens);
 	void RemoveMemberFromChannel(Channel &channel, Client &client, string reason);
-	bool hasMember(string &nick);
-	bool hasChannel(string ChannelName);
 
 	// getter
+	bool hasMember(string &nick);
+	bool hasChannel(string ChannelName);
 	string& getServerName();
 	map<int, Client>::iterator getClientFromNick(string &nick);
 	map<string, Channel> &getChannels();
 	vector<Channel *> getChannelsWithMember(string nick);
 	map<string, Channel>::iterator getChannel(string name);
+	Channel &getChannelOrCreate(Client &client, channelInfo &chInfo);
 	time_t getCreationTime();
 
 	void	sendChannelModeToClient(Channel &channelObj, Client &client);
 	void	applyModeToChannel(Channel &channelObj, Client &client, vector<string> &tokens);
+
+	class TooManyChannels : public exception {
+	public:
+		const char *what() const throw();
+	};
+
+	class CannotJoin : public exception {
+	public:
+		const char *what() const throw();
+	};
 
 private:
 	void commandsLoop(Client &currentCLient, vector<string> &tokens, vector<pollfd> &fds);

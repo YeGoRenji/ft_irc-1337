@@ -50,7 +50,7 @@ private:
 	bool isAuthed;
 	bool passGiven;
 	bool nickGiven;
-	bool userGiven; // TODO : revise this function
+	bool userGiven;
 	// user data
 	string nickname;
 	string realname;

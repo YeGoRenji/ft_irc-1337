@@ -172,82 +172,70 @@ bool Server::checkUserExistence(string nickName)
 	return (getClientFromNick(nickName) != clients.end());
 }
 
+Channel &Server::getChannelOrCreate(Client &client, channelInfo &chInfo)
+{
+	map<string, Channel>::iterator channelIt = getChannel(chInfo.name);
+
+	if (channelIt == channels.end()) // Channel doesn't exist
+	{
+		if (Server::channelsCount >= Server::MAXCHANNELS)
+			throw TooManyChannels();
+		channelIt = createChannel(chInfo.name, chInfo.password);
+		Server::channelsCount++;
+		channelIt -> second.addOperator(client);
+	}
+	else // Channel Exists
+	{
+		if (!channelIt->second.canBeJoinedBy(client, chInfo.password, *this))
+			throw CannotJoin();
+	}
+
+	return channelIt->second;
+}
+
 void Server::handleJOIN(Client &client, vector<string> &tokens)
 {
-	// TODO: Refactor this method so it looks like RemoveClientFromChannel
+	if (tokens.size() <= 1)
+		return Errors::ERR_NEEDMOREPARAMS(tokens[0], client, *this);
+
 	string channelsTokens;
 	string passwordsTokens;
 
-	vector<channelInfo> ch;
-
-	if (tokens.size() == 1)
-	{
-		// INFO: the next lines only for debugging purposes
-		map<string, Channel>::iterator it = channels.begin();
-			cerr << "channel name : ";
-		for(; it != channels.end(); it++)
-			cerr << "channelName = " << (it -> second).getChannelName() << ", count = " <<  channels.count((it -> second).getChannelName());
-
-		Errors::ERR_NEEDMOREPARAMS(tokens[0], client, *this);
-		return;
-	}
-
 	channelsTokens = tokens[1];
-	if (tokens.size() == 3)
+	if (tokens.size() >= 3)
 		passwordsTokens = tokens[2];
 
+	vector<channelInfo> ch;
 	parseChannelsToken(ch, channelsTokens, passwordsTokens);
 
 	vector<channelInfo>::iterator it = ch.begin();
 	vector<channelInfo>::iterator ite = ch.end();
+
+	channelInfo chToJoin;
 	for(; it != ite; it++)
 	{
-		if (it->name == "0")
+		chToJoin = *it;
+		if (chToJoin.name == "0")
 		{
 			client.leaveAllChannels(*this, "Left all channels...");
 			continue ;
 		}
-
-		if (!Channel::isValidName(it->name))
+		if (!Channel::isValidName(chToJoin.name))
 		{
-			Errors::ERR_NOSUCHCHANNEL(it->name, client, *this);
+			Errors::ERR_NOSUCHCHANNEL(chToJoin.name, client, *this);
 			continue;
 		}
 
-		it->name = Utility::toLower(it->name);
+		chToJoin.name = Utility::toLower(chToJoin.name);
+		try {
+			Channel &channelObj = getChannelOrCreate(client, chToJoin);
 
-		// check if channel exists if not create it
-		map<string, Channel>::iterator channelIt = getChannel(it -> name);
-		if (channelIt == channels.end())
-		{
-			if (Server::channelsCount >= Server::MAXCHANNELS){
-				Errors::CUSTOM_TOO_MANY_CHANNELS(client);
-				continue;
-			}
-//			cerr << "channel " << it -> name << " does not exist, creating it .." << endl;
-			channelIt = createChannel(it -> name, it -> password);
-			Server::channelsCount++;
-			channelIt -> second.addOperator(client);
-		}
-		else
-		{
-//			cerr << "channel " << it -> name << " exists!" << endl;
-
-			if (!channelIt->second.canBeJoinedBy(client, it->password, *this))
-				return;
-
-			// do nothing, currChannel already points to the right channel
-			// now just add the user to the channel and broadcast
-		}
-		Channel &channelObj = channelIt->second;
-		// adduser to channel
-		channelObj.addMemberAndBroadcast(client);
-		if (!channelObj.getTopic().empty()) {
-			Replies::RPL_TOPIC(channelObj.getChannelName(), channelObj.getTopic(), client, *this);
-			Replies::RPL_TOPICWHOTIME(channelObj.getChannelName(), channelObj.getTopicSetter(), channelObj.getTopicSetTime(), client, *this);
-		}
-		channelObj.sendClientsList(client, *this);
-		// channelIt -> second.broadcastAction(client, JOIN);
+			channelObj.addMemberAndBroadcast(client);
+			channelObj.sendTopic(client, *this);
+			channelObj.sendClientsList(client, *this);
+		} catch (TooManyChannels &e) {
+			Errors::CUSTOM_TOO_MANY_CHANNELS(client);
+		} catch (exception &e) {}
 	}
 }
 
@@ -293,7 +281,7 @@ void Server::handlePART(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
 	string command = tokens[0];
-	if (tokens_len == 1)
+	if (tokens_len <= 1)
 		return Errors::ERR_NEEDMOREPARAMS(command, client, *this);
 
 	string reason = "Client gone to edge";
@@ -350,7 +338,7 @@ void Server::handleKICK(Client &client, vector<string> &tokens)
 
 	string reason = "Kicked by " + client.getNick();
 
-	if (tokens_len == 4)
+	if (tokens_len >= 4)
 		reason = tokens.back();
 
 	for (size_t i = 0; i < kickedNicks.size(); i++)
@@ -784,7 +772,6 @@ void	Server::applyModeToChannel(Channel &channelObj, Client &client, vector<stri
 	modeString = tokens[2];
 
 	std::vector<std::string> Args(tokens.begin() + 3, tokens.end());
-	// TODO : lach mdayr client as pointer a l9lawi, use a reference instead!!
 	while(!modeString.empty())
 		HandleFlags(modeString, tokens, channelObj, client, *this, Args);
 }
@@ -820,4 +807,15 @@ void Server::handleMODE(Client &client, vector<string> &tokens)
 time_t Server::getCreationTime()
 {
 	return this -> creationTime;
+}
+
+// Exceptions
+const char *Server::TooManyChannels::what() const throw()
+{
+    return ("Server Exception: Too many channels");
+}
+
+const char *Server::CannotJoin::what() const throw()
+{
+    return ("Server Exception: Cannot Join channel");
 }

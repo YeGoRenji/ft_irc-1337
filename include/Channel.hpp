@@ -59,6 +59,7 @@ public:
 	void broadcastAction(Client &client, string reason, BroadCastAction action);
 	bool isOperator(string &nick);
 	void sendClientsList(Client &client, Server &server);
+	void sendTopic(Client &client, Server &server);
 	void addMessage(string sender, string message);
 	static bool isValidName(string &name);
 
