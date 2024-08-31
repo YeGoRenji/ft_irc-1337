@@ -93,6 +93,28 @@ void Replies::RPL_YOURHOST(Client &client, Server &server)
 	client << reply;
 }
 
+void Replies::RPL_MOTD(Client &client, Server &server, string line)
+{
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 372 ";
+	reply += Utility::getClientName(client, server);
+	reply += " :";
+	reply += line;
+
+	client << reply;
+}
+
+void Replies::sendBanner(Client &client, Server &server) {
+	RPL_MOTD(client, server, "");
+	RPL_MOTD(client, server, "   _   ___   ___      _   _               ___                 _");
+	RPL_MOTD(client, server, "  | | |_ _| | _ \\__ _| |_| |_  ___ _ _   / __|___ _ __  ___  | |");
+	RPL_MOTD(client, server, "  | |  | |  |   / _` |  _| ' \\/ -_) '_| | (__/ _ \\ '  \\/ -_) | |");
+	RPL_MOTD(client, server, "  | | |___| |_|_\\__,_|\\__|_||_\\___|_|    \\___\\___/_|_|_\\___| | |");
+	RPL_MOTD(client, server, "  |_|                                                        |_|");
+	RPL_MOTD(client, server, "");
+}
+
 void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)
 {
 	string reply = ":";

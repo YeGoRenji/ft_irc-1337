@@ -115,6 +115,7 @@ void Client::beWelcomed(Server &server)
 	Replies::RPL_CREATED(*this, server);
 	Replies::RPL_MYINFO(*this, server);
 	Replies::RPL_ISUPPORT(*this, server);
+	Replies::sendBanner(*this, server);
 }
 
 // format : USER <username> 0 * [:]<realname>
