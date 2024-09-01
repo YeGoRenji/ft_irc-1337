@@ -162,7 +162,7 @@ bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server)
 		return false;
 
 	// channel is invite only and Client not invited
-	if (modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY) && !isNickInvited(client.getNick()))
+	if (modeIsSet(CHANNEL_MODES::SET_INVITE_ONLY) && !isInvited(&client))
 	{
 		Errors::ERR_INVITEONLYCHAN(name, client, server);
 		return false;
@@ -172,7 +172,7 @@ bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server)
 	// What priv it gives is :
 	//  - it bypasses Limit
 	//  - it bypasses Password
-	if (isNickInvited(client.getNick()))
+	if (isInvited(&client))
 		return outvite(&client);
 
 	// user supplied a wrong password
@@ -317,18 +317,18 @@ unsigned long	Channel::getLimit(void)
 }
 
 void Channel::invite(Client* client) {
-    this->invited[client->getNick()] = client;
+    this->invited[client] = client;
 	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
 }
 
 bool Channel::outvite(Client* client) {
-	this->invited.erase(client->getNick());
+	this->invited.erase(client);
 	cout << "[ " << client->getNick() << " got outvited from " << this->name << " ]" << endl;
 	return true;
 }
 
-bool Channel::isNickInvited(string nick) {
-	return (invited.find(nick) != invited.end());
+bool Channel::isInvited(Client *client) {
+	return (invited.find(client) != invited.end());
 }
 
 const string	&Channel::getPassword() const {

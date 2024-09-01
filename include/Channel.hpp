@@ -74,7 +74,7 @@ public:
 	void invite(Client* client);
 	bool outvite(Client* client);
 
-	bool isNickInvited(string nick);
+	bool isInvited(Client *client);
 
 	~Channel();
 
@@ -106,7 +106,7 @@ private:
 
 	void removeMember(Client &client, string reason, bool isBroadcasted);
 	void addMember(Client &client, bool isBroadcasted);
-	map<string, Client*>	invited;
+	map<Client*, Client*>	invited;
 	string					topicSetter;
 	string					topic;
 	CHANNEL_MODES::Modes	mode;
