@@ -78,7 +78,7 @@ void Errors::CUSTOM_TOO_MANY_CHANNELS(Client &client)
 
 void Errors::CUSTOM_INVALID_LIMIT(Client &client)
 {
-	string error = "ERROR :Limit should be digits only";
+	string error = "ERROR :Invalid limit value";
 	client << error; \
 }
 

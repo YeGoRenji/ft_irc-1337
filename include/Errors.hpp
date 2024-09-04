@@ -18,7 +18,7 @@
 	X(401, NOSUCHNICK, "No such nick/channel", recevier) \
 	X(403, NOSUCHCHANNEL, "No such channel", channel) \
 	X(404, CANNOTSENDTOCHAN, "Cannot send to channel", channel) \
-	X(421, UNKNOWNCOMMAND, "ach had l command dzb ???", command) \
+	X(421, UNKNOWNCOMMAND, "is sus command ඞ ?", command) \
 	X(432, ERRONEUSNICKNAME, "Erroneus nickname", nick) \
 	X(433, NICKNAMEINUSE, "Nickname is already in use", nick) \
 	X(442, NOTONCHANNEL, "You're not on that channel", channel) \

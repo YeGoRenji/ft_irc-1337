@@ -105,14 +105,45 @@ void Replies::RPL_MOTD(Client &client, Server &server, string line)
 	client << reply;
 }
 
+void Replies::RPL_MOTDSTART(Client &client, Server &server) {
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 375 ";
+	reply += Utility::getClientName(client, server);
+	reply += " :- ";
+	reply += server.getServerName();
+	reply += " Message of the day - ";
+
+	client << reply;
+}
+
+void Replies::RPL_ENDOFMOTD(Client &client, Server &server) {
+	string reply = ":";
+	reply += server.getServerName();
+	reply += " 376 ";
+	reply += Utility::getClientName(client, server);
+	reply += " :End of /MOTD command.";
+
+	client << reply;
+}
+
 void Replies::sendBanner(Client &client, Server &server) {
-	RPL_MOTD(client, server, "");
-	RPL_MOTD(client, server, "   _   ___   ___      _   _               ___                 _");
-	RPL_MOTD(client, server, "  | | |_ _| | _ \\__ _| |_| |_  ___ _ _   / __|___ _ __  ___  | |");
-	RPL_MOTD(client, server, "  | |  | |  |   / _` |  _| ' \\/ -_) '_| | (__/ _ \\ '  \\/ -_) | |");
-	RPL_MOTD(client, server, "  | | |___| |_|_\\__,_|\\__|_||_\\___|_|    \\___\\___/_|_|_\\___| | |");
-	RPL_MOTD(client, server, "  |_|                                                        |_|");
-	RPL_MOTD(client, server, "");
+	RPL_MOTDSTART(client, server);
+
+	RPL_MOTD(client, server, "._. ._____.           ._. ._.                                      ._.");
+	RPL_MOTD(client, server, "| | |_   _|           | | | |                                      | |");
+	RPL_MOTD(client, server, "| |   | |    _ __ __ _| |_| |__   ___ _ __    ___ _   _ _ __ ___   | |");
+	RPL_MOTD(client, server, "| |   | |   | '__/ _` | __| '_ \\ / _ \\ '__|  / __| | | | '_ ` _ \\  | |");
+	RPL_MOTD(client, server, "| |  _| |_  | | | (_| | |_| | | |  __/ |    | (__| |_| | | | | | | | |");
+	RPL_MOTD(client, server, "| | |_____| |_|  \\__,_|\\__|_| |_|\\___|_|     \\___|\\__,_|_| |_| |_| | |");
+	RPL_MOTD(client, server, "| |                                                                | |");
+	RPL_MOTD(client, server, "| |       This server was made while gooning by :                  | |");
+	RPL_MOTD(client, server, "| |          o YeGo  (https://github.com/YeGoRenji)                | |");
+	RPL_MOTD(client, server, "| |          o Jeffy (https://github.com/0x00Jeff)                 | |");
+	RPL_MOTD(client, server, "| |          o Skrkl (https://github.com/SkaRkaL)                  | |");
+	RPL_MOTD(client, server, "|_|                                                                |_|");
+
+	RPL_ENDOFMOTD(client, server);
 }
 
 void Replies::RPL_NAMREPLY(Channel &channel, Client &client, Server &server)

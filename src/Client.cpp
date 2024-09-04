@@ -21,8 +21,6 @@ fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fa
 		inet_ntop(AF_INET, &client_info.sin_addr, ip_cstr, sizeof(ip_cstr));
 		ip = ip_cstr;
 	}
-
-	// TODO: should I do something if getpeername fails ?
 }
 
 Client::~Client()

@@ -1,6 +1,6 @@
 #include <Server.hpp>
 
-string Server::serverName = "IRatherComeServer.mybasement";
+string Server::serverName = "IRatherCumServer.myBasement";
 
 int Server::NICKLEN = 30;
 int Server::TOPICLEN = 369;
@@ -446,9 +446,6 @@ void Server::RemoveMemberFromChannel(Channel &channel, Client &client, string re
 	{
 		channels.erase(channel.getChannelName());
 		Server::channelsCount--;
-		// TODO : remove this shice before correctin day
-		if (Server::channelsCount < 0)
-			cerr << "there is some bug with the channelNumber" << std::endl;
 	}
 }
 
@@ -626,13 +623,12 @@ void	handleLimit(bool state, char c, vector<string> &token, Channel &channel, Cl
 			Args.erase(Args.begin());
 		}
 
-		if (str.find_first_not_of("0123456789") != string::npos || (str[0] == '0' && str.size() > 1))
-			return Errors::CUSTOM_INVALID_LIMIT(client);
-
-		// TODO: handle overflow ?
 		std::stringstream ss(str);
 		unsigned long     limit;
 		ss >> limit;
+
+		if (ss.fail() || !ss.eof())
+			return Errors::CUSTOM_INVALID_LIMIT(client);
 
 		channel.setLimit(limit);
 		channel.setMode(CHANNEL_MODES::SET_LIMIT);

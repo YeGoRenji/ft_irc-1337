@@ -20,7 +20,9 @@ public:
 	static void RPL_YOURHOST(Client &client, Server &server);
 	static void RPL_MYINFO(Client &client, Server &server);
 	static void RPL_ISUPPORT(Client &client, Server &server);
+	static void RPL_MOTDSTART(Client &client, Server &server);
 	static void RPL_MOTD(Client &client, Server &server, string line);
+	static void RPL_ENDOFMOTD(Client &client, Server &server);
 	static void sendBanner(Client &client, Server &server);
 
 
