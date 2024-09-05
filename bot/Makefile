@@ -1,20 +1,18 @@
 CXX := c++
 
-NAME := ircserv
+NAME := ircbot
 
-CXXFLAGS := -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address  -ggdb3
+CXXFLAGS := -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address #-ggdb3
 
 OBJSFOLDER := objs/
 
 INCLUDE := -Iinclude
 
-SRCS := Client.cpp \
-		FD.cpp \
-    	Server.cpp \
-    	Utility.cpp \
-    	Channel.cpp  \
-		Replies.cpp	  \
-		Errors.cpp
+SRCS := Game.cpp   \
+    	FD.cpp      \
+    	Utility.cpp  \
+		Bot.cpp 	  \
+		XOBot.cpp
 
 OBJS := $(SRCS:.cpp=.o)
 
@@ -23,9 +21,6 @@ GLOBAL_HEADERS := include/Hacks.hpp
 OBJS := $(addprefix $(OBJSFOLDER), $(OBJS))
 
 all: objs $(NAME)
-
-bonus:
-	make -C ./bot
 
 objs:
 	@mkdir objs
@@ -44,13 +39,11 @@ $(OBJSFOLDER)main.o: main.cpp
 
 clean:
 	rm -rf $(OBJS) objs/main.o
-	make -C bot clean
 
 fclean: clean
 	rm -rf $(NAME)
 	find . -name "*~" -delete
 	find . -name "*.swp" -delete
-	make -C bot fclean
 
 re: clean all
 

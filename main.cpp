@@ -23,11 +23,9 @@ int main (int argc, char **argv) {
 		string	port = argv[1];
 		string	password = argv[2];
 
-		check_port(port);
+		uint16_t portVal = check_port(port);
 
-		// cerr << "port: " << atoi(port.c_str()) << endl;
-		Server	srv(atoi(port.c_str()), password);
-
+		Server	srv(portVal, password);
 		srv.start();
 
 	} catch (std::exception &e) {
