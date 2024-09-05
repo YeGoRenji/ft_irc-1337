@@ -1,39 +1,37 @@
 #include <Channel.hpp>
 
-Channel::Channel(): name("default") // op("default")
+Channel::Channel() : name("default") // op("default")
 {
-	//std::cout << "Channel: Default constructor called" << endl;
 }
 
-Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode):
-name(Utility::toLower(_name)), creationTime(time(0)), password(_password), mode(_mode), limit(69)
+Channel::Channel(string _name, string _password, CHANNEL_MODES::Modes _mode) : name(Utility::toLower(_name)), creationTime(time(0)), password(_password), mode(_mode), limit(69)
 {
-	//std::cout << "Channel: Parameter constructor called" << endl;
 }
 
-void Channel::addMemberAndBroadcast(Client &client) {
+void Channel::addMemberAndBroadcast(Client &client)
+{
 	addMember(client, true);
 }
 
-void Channel::addMemberSilently(Client &client) {
+void Channel::addMemberSilently(Client &client)
+{
 	addMember(client, false);
 }
 
 void Channel::addMember(Client &client, bool isBroadcasted)
 {
-	// cerr << "Addr = " << &client << endl;
 	members[client.getNick()] = &client;
-	// cerr << client.getNick().size() << endl;
-	cout << client.getNick() << " (" << &client << ") was added to channel " << getChannelName() << endl;
 	if (isBroadcasted)
 		broadcastAction(client, "", JOIN);
 }
 
-void Channel::removeMemberAndBroadcast(Client &client, string reason) {
+void Channel::removeMemberAndBroadcast(Client &client, string reason)
+{
 	removeMember(client, reason, true);
 }
 
-void Channel::removeMemberSilently(Client &client) {
+void Channel::removeMemberSilently(Client &client)
+{
 	removeMember(client, "69", false);
 }
 
@@ -47,15 +45,18 @@ CHANNEL_MODES::Modes operator&(CHANNEL_MODES::Modes i, CHANNEL_MODES::Modes j)
 	return static_cast<CHANNEL_MODES::Modes>(static_cast<int>(i) & static_cast<int>(j));
 }
 
-bool	Channel::modeIsSet(CHANNEL_MODES::Modes _mode) {
-		return (this->mode & _mode);
+bool Channel::modeIsSet(CHANNEL_MODES::Modes _mode)
+{
+	return (this->mode & _mode);
 }
 
-void	Channel::setMode(CHANNEL_MODES::Modes _mode) {
+void Channel::setMode(CHANNEL_MODES::Modes _mode)
+{
 	this->mode = this->mode | _mode;
 }
 
-void	Channel::unsetMode(CHANNEL_MODES::Modes _mode) {
+void Channel::unsetMode(CHANNEL_MODES::Modes _mode)
+{
 	this->mode = static_cast<CHANNEL_MODES::Modes>(~_mode & mode);
 }
 
@@ -63,7 +64,7 @@ void Channel::removeMember(Client &client, string reason, bool isBroadcasted)
 {
 	string &nick = client.getNick();
 	if (!hasMember(nick))
-		return ;
+		return;
 
 	if (isBroadcasted)
 		broadcastAction(client, reason, PART);
@@ -78,12 +79,11 @@ bool Channel::hasPassword() const
 
 bool Channel::checkPassword(string userPassLine)
 {
-	return (userPassLine == this -> password);
+	return (userPassLine == this->password);
 }
 
 Channel::~Channel()
 {
-	//std::cout << "Channel: Destructor called" << endl;
 }
 
 void Channel::addOperator(Client &client)
@@ -97,12 +97,12 @@ void Channel::addOperator(Client &client)
 
 void Channel::removeOperator(Client &client)
 {
-    // Check if the client is already in the map
-    if (chanOps.find(client.getNick()) != chanOps.end())
-    {
-        // Remove the client from the map
-        chanOps.erase(client.getNick());
-    }
+	// Check if the client is already in the map
+	if (chanOps.find(client.getNick()) != chanOps.end())
+	{
+		// Remove the client from the map
+		chanOps.erase(client.getNick());
+	}
 }
 
 void Channel::broadcastAction(Client &client, string reason, BroadCastAction action)
@@ -110,8 +110,7 @@ void Channel::broadcastAction(Client &client, string reason, BroadCastAction act
 	string reply = ":";
 	const char *toStr[2] = {
 		"JOIN",
-		"PART"
-	};
+		"PART"};
 
 	reply += client.getNick();
 	reply += "!";
@@ -121,41 +120,43 @@ void Channel::broadcastAction(Client &client, string reason, BroadCastAction act
 	reply += " ";
 	reply += toStr[action];
 	reply += " ";
-	reply += this -> name;
-	if (!reason.empty()) {
+	reply += this->name;
+	if (!reason.empty())
+	{
 		reply += " ";
 		if (reason.find(' ') != string::npos)
 			reply += ":";
 		reply += reason;
 	}
-	cerr << "BROADCASTING <" << reply << ">" << endl;
-
 	broadcastMessageToGroup(reply, getMembers(), "");
 }
 
-void Channel::broadcastMessageToGroup(string message, map<string, Client*> &group, string senderNick)
+void Channel::broadcastMessageToGroup(string message, map<string, Client *> &group, string senderNick)
 {
-	map<string, Client*>::iterator member_it = group.begin();
-	map<string, Client*>::iterator member_ite = group.end();
+	map<string, Client *>::iterator member_it = group.begin();
+	map<string, Client *>::iterator member_ite = group.end();
 
 	for (; member_it != member_ite; member_it++)
 	{
 		Client *member = member_it->second;
-		if (member -> getNick() == senderNick)
+		if (member->getNick() == senderNick)
 			continue;
 		*member << message;
 	}
 }
 
-bool Channel::hasMember(string &nick) {
+bool Channel::hasMember(string &nick)
+{
 	return (members.find(nick) != members.end());
 }
 
-bool Channel::isOperator(string &nick) {
+bool Channel::isOperator(string &nick)
+{
 	return (chanOps.find(nick) != chanOps.end());
 }
 
-bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server) {
+bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server)
+{
 
 	// Already in channel
 	if (hasMember(client.getNick()))
@@ -192,7 +193,8 @@ bool Channel::canBeJoinedBy(Client &client, string suppliedPass, Server &server)
 	return true;
 }
 
-bool Channel::isValidName(string &name) {
+bool Channel::isValidName(string &name)
+{
 
 	if (name.empty())
 		return false;
@@ -214,14 +216,11 @@ void Channel::addMessage(string sender, string message)
 	messages.push_back((Message){sender, message});
 }
 
-void	Channel::setTopic(string &newTopic, string &setter)
+void Channel::setTopic(string &newTopic, string &setter)
 {
-	cerr << "Setting topic to " << newTopic << " by " << setter << endl;
 	this->topic = newTopic;
 	this->topicSetter = setter;
 	this->topicSetTime = time(0);
-
-	cout <<  "this->topicSetTime	" << this->topicSetTime << endl;
 }
 
 void Channel::sendClientsList(Client &client, Server &server)
@@ -232,7 +231,8 @@ void Channel::sendClientsList(Client &client, Server &server)
 
 void Channel::sendTopic(Client &client, Server &server)
 {
-	if (!topic.empty()) {
+	if (!topic.empty())
+	{
 		Replies::RPL_TOPIC(name, topic, client, server);
 		Replies::RPL_TOPICWHOTIME(name, topicSetter, topicSetTime, client, server);
 	}
@@ -240,37 +240,39 @@ void Channel::sendTopic(Client &client, Server &server)
 
 // getters
 
-string	&Channel::getTopic()
+string &Channel::getTopic()
 {
-        return topic;
+	return topic;
 }
 
-string	&Channel::getTopicSetter()
+string &Channel::getTopicSetter()
 {
 	return topicSetter;
 }
 
-time_t			Channel::getTopicSetTime()
+time_t Channel::getTopicSetTime()
 {
 	return topicSetTime;
 }
 
-string& Channel::getChannelName()
+string &Channel::getChannelName()
 {
-	return (this -> name);
+	return (this->name);
 }
 
-const string& Channel::getTopic() const
+const string &Channel::getTopic() const
 {
-	return (this -> topic);
+	return (this->topic);
 }
 
-map<string, Client*> &Channel::getMembers() {
-	return (this -> members);
+map<string, Client *> &Channel::getMembers()
+{
+	return (this->members);
 }
 
-map<string, Client*> &Channel::getChanOps() {
-	return (this -> chanOps);
+map<string, Client *> &Channel::getChanOps()
+{
+	return (this->chanOps);
 }
 
 size_t Channel::getMemberCount() const
@@ -286,12 +288,13 @@ size_t Channel::getChanOpCount() const
 string Channel::getNonOpsStrList()
 {
 	string str;
-	map<string, Client*>::iterator it = members.begin();
-	map<string, Client*>::iterator ite = members.end();
+	map<string, Client *>::iterator it = members.begin();
+	map<string, Client *>::iterator ite = members.end();
 
 	for (; it != ite; ++it)
 	{
-		if (!isOperator(it->second->getNick())) {
+		if (!isOperator(it->second->getNick()))
+		{
 			str += it->second->getNick();
 			str += " ";
 		}
@@ -311,37 +314,38 @@ void Channel::setLimit(unsigned long _limit)
 {
 	this->limit = _limit;
 }
-unsigned long	Channel::getLimit(void)
+unsigned long Channel::getLimit(void)
 {
 	return (this->limit);
 }
 
-void Channel::invite(Client* client) {
-    this->invited[client] = client;
-	cout << "[ Invited " << client->getNick() << " to " << this->name << " ]" << endl;
+void Channel::invite(Client *client)
+{
+	this->invited[client] = client;
 }
 
-bool Channel::outvite(Client* client) {
+bool Channel::outvite(Client *client)
+{
 	this->invited.erase(client);
-	cout << "[ " << client->getNick() << " got outvited from " << this->name << " ]" << endl;
 	return true;
 }
 
-bool Channel::isInvited(Client *client) {
+bool Channel::isInvited(Client *client)
+{
 	return (invited.find(client) != invited.end());
 }
 
-const string	&Channel::getPassword() const {
-    return this->password;
+const string &Channel::getPassword() const
+{
+	return this->password;
 }
 
-void	Channel::setPassword(const string &_password) {
-	cout << "\n\n\nSetting keyy to " << _password << endl;
-	cout << "Current keyy is " << this->password << "\n\n\n\n";
-    this->password = _password;
+void Channel::setPassword(const string &_password)
+{
+	this->password = _password;
 }
 
-time_t	Channel::getCreationTime() const
+time_t Channel::getCreationTime() const
 {
 	return creationTime;
 }

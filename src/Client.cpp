@@ -1,21 +1,17 @@
 #include <Client.hpp>
 
-Client::Client():
-fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false)
+Client::Client() : fdObject(-1), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false)
 {
-	cout << "Client: Default constructor called" << endl;
 }
 
-Client::Client(int _fd):
-fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("YOURMOM")
+Client::Client(int _fd) : fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(false), ip("YOURMOM")
 {
-	cout << "Client: Parameter constructor called" << endl;
-
 	sockaddr_in client_info;
 	bzero(&client_info, sizeof(client_info));
 	socklen_t info_size = sizeof(client_info);
 
-	if (!getpeername(_fd, (sockaddr *)&client_info, &info_size)) {
+	if (!getpeername(_fd, (sockaddr *)&client_info, &info_size))
+	{
 
 		char ip_cstr[INET_ADDRSTRLEN] = "unknown";
 		inet_ntop(AF_INET, &client_info.sin_addr, ip_cstr, sizeof(ip_cstr));
@@ -23,23 +19,23 @@ fdObject(_fd), isAuthed(false), passGiven(false), nickGiven(false), userGiven(fa
 	}
 }
 
-Client::~Client()
-{
-	cout << "Client: Destructor called" << endl;
-}
+Client::~Client() {}
 
-int Client::getFd() {
+int Client::getFd()
+{
 	return fdObject.getValue();
 }
 
-FD &Client::getFdObject() {
+FD &Client::getFdObject()
+{
 	return fdObject;
 }
 
 // format : PASS pass
-void Client::passHandler(Server &server, vector<string> tokens) {
+void Client::passHandler(Server &server, vector<string> tokens)
+{
 
-	if (this -> passGiven)
+	if (this->passGiven)
 	{
 		Errors::ERR_ALREADYREGISTERED(*this, server);
 		return;
@@ -51,7 +47,8 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 		return;
 	}
 
-	if (!server.checkPassword(tokens[1])) {
+	if (!server.checkPassword(tokens[1]))
+	{
 		Errors::ERR_PASSWDMISMATCH(*this, server);
 		return;
 	}
@@ -62,12 +59,12 @@ void Client::passHandler(Server &server, vector<string> tokens) {
 
 string &Client::getNick()
 {
-	return (this -> nickname);
+	return (this->nickname);
 }
 
 bool Client::isPassGiven()
 {
-	return (this -> passGiven);
+	return (this->passGiven);
 }
 
 bool Client::nickNameAlreadyExists(Server &server, string nickname)
@@ -76,7 +73,8 @@ bool Client::nickNameAlreadyExists(Server &server, string nickname)
 }
 
 // format : NICK nick
-void Client::handleNICK(Server &server, vector<string> tokens) {
+void Client::handleNICK(Server &server, vector<string> tokens)
+{
 
 	if (tokens.size() == 1)
 	{
@@ -95,14 +93,14 @@ void Client::handleNICK(Server &server, vector<string> tokens) {
 	if (nickNameAlreadyExists(server, nick))
 	{
 		Errors::ERR_NICKNAMEINUSE(nick, *this, server);
-		return ;
+		return;
 	}
 
 	setNick(server, nick);
 
 	nickGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
-		this -> beWelcomed(server);
+		this->beWelcomed(server);
 	isAuthed = passGiven & nickGiven & userGiven;
 }
 
@@ -136,22 +134,24 @@ void Client::setUsernameAndRealName(Server &server, vector<string> tokens)
 
 	userGiven = true;
 	if (!isAuthed && (passGiven & nickGiven & userGiven))
-		this -> beWelcomed(server);
+		this->beWelcomed(server);
 	isAuthed = passGiven & nickGiven & userGiven;
 }
 
-Client &Client::operator<<(std::string str) {
+Client &Client::operator<<(std::string str)
+{
 	fdObject << str;
 	return (*this);
 }
 
-void Client::operator>>(std::string& str) {
+void Client::operator>>(std::string &str)
+{
 	string buffer;
 	fdObject >> buffer;
 	command += buffer;
 
-	// cerr << "\nBuffered <" << buffer << "> from Client " << fdObject.getValue() << " (" << this -> nickname << ") " << this << endl;
-	if (command.size() > 512) {
+	if (command.size() > 512)
+	{
 		str = command.substr(0, 512);
 		command.clear();
 		return;
@@ -162,11 +162,11 @@ void Client::operator>>(std::string& str) {
 		return;
 
 	str = string(command.begin(), command.end() - 2);
-	cerr << "\nGot command : <" << str << ">" << endl;
 	command.clear();
 }
 
-void Client::disconnect() {
+void Client::disconnect()
+{
 	close(fdObject.getValue());
 	fdObject.setValue(-1);
 }
@@ -174,7 +174,6 @@ void Client::disconnect() {
 void Client::leaveAllChannels(Server &server, string reason)
 {
 	map<string, Channel> &channels = server.getChannels();
-
 
 	vector<Channel *> joinedChannels;
 	for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
@@ -246,9 +245,8 @@ void Client::setNick(Server &server, string &nick)
 		(*channelsWhereWasOp[i]).addOperator(*this);
 }
 
-
-
-bool Client::isValidNick(string nick) {
+bool Client::isValidNick(string nick)
+{
 
 	if (nick.empty())
 		return false;
@@ -263,7 +261,6 @@ bool Client::isValidNick(string nick) {
 	// 	They MUST NOT start with any of the following characters: dollar ('$', 0x24), colon (':', 0x3A).
 	if (firstChar == '$' || firstChar == ':')
 		return false;
-
 
 	// 	They MUST NOT start with a character listed as a channel type, or prefix listed in the IRCv3 multi-prefix Extension.
 	if (firstChar == '#' || firstChar == '&')

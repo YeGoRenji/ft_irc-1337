@@ -24,11 +24,8 @@ Server::Server(uint16_t port, string pass): password(pass), creationTime(time(NU
 {
 	signal(SIGPIPE, SIG_IGN);
 
-	std::cout << "Server: Parameter constructor called" << endl;
-
 	serverSocket.setValue(chk(socket(AF_INET, SOCK_STREAM, 0), "Couldn't open socket"));
 
-	cout << "Server socket : " << serverSocket.getValue() << endl;
 
 	int yes = 1;
 
@@ -42,14 +39,12 @@ Server::Server(uint16_t port, string pass): password(pass), creationTime(time(NU
 	address.sin_addr.s_addr = INADDR_ANY;
 
 	chk(bind(serverSocket.getValue(), (sockaddr *)&address, sizeof(address)), "Couldn't bind socket to address");
-
 	chk(listen(serverSocket.getValue(), SOMAXCONN), "Couldn't Listen to socket");
+
+	cout << "Listening for connections..." << endl;
 }
 
-Server::~Server()
-{
-	std::cout << "Server: Destructor called" << endl;
-}
+Server::~Server() {}
 
 string &Server::getServerName()
 {
@@ -75,7 +70,6 @@ void Server::start() {
 			if (newClientFd < 0)
 				continue;
 
-			cerr << "Clients count = " << clientsCount << endl;
 			if (clientsCount >= Server::MAXCLIENTS) {
 				Errors::CUSTOM_SERVER_FULL(newClient);
 				newClient.disconnect();
@@ -119,7 +113,6 @@ void Server::commandsLoop(Client &currentCLient, vector<string> &tokens, vector<
 	if (!currentCLient.isAuthenticated() && command != "PASS" && command != "NICK" && command != "USER" && command != "QUIT")
 		return Errors::ERR_CUSTOM_NOT_AUTHED(currentCLient, *this);
 
-//	cerr << "token size : " << command.size() << endl;
 	if (command == "PASS")
 		currentCLient.passHandler(*this, tokens);
 	else if (command == "NICK")
@@ -303,7 +296,6 @@ void Server::handlePART(Client &client, vector<string> &tokens)
 		string clientNick = client.getNick();
 		if (!ch -> second.hasMember(clientNick))
 	 		return Errors::ERR_NOTONCHANNEL(channelName, client, *this);
-		cerr << "Removing " << client.getNick() << " from channel " << channelName << ", Reason: " << reason << endl;
 		RemoveMemberFromChannel(ch->second, client, reason);
 	}
 }
@@ -490,7 +482,6 @@ void Server::handlePRIVMSG(Client &sender, vector<string> &tokens)
 		{
 			chanOpsOnly = true;
 			targetName.erase(0, 1);
-			cout << "targetName <" << targetName << ">" << endl;
 		}
 
 		if (this -> hasChannel(targetName))
@@ -737,9 +728,7 @@ void	HandleFlags(std::string& modeString, std::vector<std::string>& token, Chann
 		int index = (modeString[i] == 'i') * 1 + (modeString[i] == 't') * 2 + (modeString[i] == 'l') * 3 + (modeString[i] == 'k') * 4 + (modeString[i] == 'o') * 5;
 		f[index](state, modeString[i], token, channel, client, server, Args);
 	}
-	cout << "ModeString : " << modeString << endl;
 	modeString.erase(0, modeString.find_first_of("-+"));
-	cout << "ModeString : " << modeString << endl;
 }
 
 
@@ -776,8 +765,6 @@ void	Server::applyModeToChannel(Channel &channelObj, Client &client, vector<stri
 void Server::handleMODE(Client &client, vector<string> &tokens)
 {
 	size_t tokens_len = tokens.size();
-	for (size_t i = 0; i < tokens.size(); i++)
-		cerr << "token[" << i << "] = " << tokens[i] << endl;
 
 	string &command = tokens[0];
 	if (tokens_len < 2)

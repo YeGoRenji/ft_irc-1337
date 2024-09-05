@@ -140,7 +140,7 @@ void Replies::sendBanner(Client &client, Server &server) {
 	RPL_MOTD(client, server, "| |       This server was made while gooning by :                  | |");
 	RPL_MOTD(client, server, "| |          o YeGo  (https://github.com/YeGoRenji)                | |");
 	RPL_MOTD(client, server, "| |          o Jeffy (https://github.com/0x00Jeff)                 | |");
-	RPL_MOTD(client, server, "| |          o Skrkl (https://github.com/SkaRkaL)                  | |");
+	RPL_MOTD(client, server, "| |          o SkrkL (https://github.com/SkaRkaL)                  | |");
 	RPL_MOTD(client, server, "|_|                                                                |_|");
 
 	RPL_ENDOFMOTD(client, server);
@@ -295,7 +295,6 @@ void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &mod
 {
 	string reply = ":";
 
-	// cout << "MODE STRING : " << modeString << endl;
 	reply += server.getServerName();
 	reply += " ";
 	reply += "324";
@@ -309,22 +308,17 @@ void	Replies::RPL_CHANNELMODEIS(Channel &channelObj, Client &client, string &mod
 	// (void)channelObj;
 	if (modeString.find("l") != string::npos)
 	{
-		// cout << "LIMIT : " << channelObj.getLimit() << endl;
 		reply += " ";
 		reply += Utility::toStr(channelObj.getLimit());
 	}
 	if (modeString.find("k") != string::npos)
 	{
 		reply += " ";
-		// cout << "PASSWORD : " << channelObj.getPassword() << endl;
 		if (channelObj.isOperator(client.getNick()))
 			reply += channelObj.getPassword();
 		else
 			reply += "*";
 	}
-
-	cout << "REPLY : " << reply << endl;
-
 	client << reply;
 }
 
