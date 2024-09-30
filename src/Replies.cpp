@@ -140,7 +140,7 @@ void Replies::sendBanner(Client &client, Server &server) {
 	RPL_MOTD(client, server, "| |       This server was made while gooning by :                  | |");
 	RPL_MOTD(client, server, "| |          o YeGo  (https://github.com/YeGoRenji)                | |");
 	RPL_MOTD(client, server, "| |          o Jeffy (https://github.com/0x00Jeff)                 | |");
-	RPL_MOTD(client, server, "| |          o SkrkL (https://github.com/SkaRkaL)                  | |");
+	RPL_MOTD(client, server, "| |          o SkrkL (https://github.com/copilot)                  | |");
 	RPL_MOTD(client, server, "|_|                                                                |_|");
 
 	RPL_ENDOFMOTD(client, server);
